@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#070510" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Vegas MIB" />
+  <meta name="description" content="Vegas: Make It Big - mobile casino resort builder" />
+  <title>Vegas: Make It Big - Mobile</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/hud.css" />
+  <link rel="stylesheet" href="css/panels.css" />
+  <link rel="stylesheet" href="css/screens.css" />
+</head>
+<body>
+
+  <div id="canvas-container"></div>
+  <div id="floating-container"></div>
+  <div id="toast-container"></div>
+
+  <div class="top-hud">
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-label">Ταμείο</span>
+        <span class="stat-val" id="ui-cash">$5,000</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Κέρδος / κύκλο</span>
+        <span class="stat-val" id="ui-income" style="color:#06d6a0;">+$0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Ενέργεια</span>
+        <span class="stat-val" id="ui-power" style="color:#00f5d4;">4/10</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Επισκέπτες</span>
+        <span class="stat-val" id="ui-guests" style="color:#ff9ebb;">12</span>
+      </div>
+    </div>
+
+    <div class="sub-bar">
+      <button class="mode-switch-btn" id="btn-switch-view">Καζίνο</button>
+      <button class="icon-btn" id="btn-quests" title="Αποστολές">📜</button>
+      <button class="icon-btn" id="btn-ach" title="Επιτεύγματα">🏆</button>
+      <button class="icon-btn" id="btn-prestige" title="Prestige">💎</button>
+      <button class="icon-btn" id="btn-cam-rotate" title="Περιστροφή Κάμερας">🎥</button>
+      <button class="icon-btn" id="btn-sound" title="Ήχος">🔊</button>
+      <button class="icon-btn" id="btn-settings" title="Ρυθμίσεις">⚙️</button>
+      <button class="odds-btn" id="btn-odds">🎲 <span id="ui-odds-val">12%</span></button>
+    </div>
+
+    <div class="info-strip">
+      <span class="info-chip" id="ui-rep">⭐ Φήμη 10</span>
+      <span class="info-chip" id="ui-clock">🌙 Μέρα 1 • 08:00</span>
+      <span class="info-chip" id="ui-season">☀️ Καλοκαίρι</span>
+    </div>
+
+    <div class="hint-banner" id="ui-hint">
+      Διάλεξε κατασκευή από κάτω ή πάτησε σε υπάρχον κτίριο για επιλογές!
+    </div>
+  </div>
+
+  <div class="placement-bar" id="placement-bar">
+    <div class="placement-info">
+      <span class="placement-title" id="place-title">Ξενοδοχείο</span>
+      <span class="placement-sub" id="place-sub">Πάτησε άλλο κενό πλακίδιο για μετακίνηση</span>
+    </div>
+    <div class="placement-buttons">
+      <button class="p-btn p-btn-rotate" id="btn-place-rotate">Rotate 90°</button>
+      <button class="p-btn p-btn-confirm" id="btn-place-confirm">Επιβεβαίωση</button>
+      <button class="p-btn p-btn-cancel" id="btn-place-cancel">✖</button>
+    </div>
+  </div>
+
+  <div class="inspector-card" id="inspector">
+    <div class="inspector-header">
+      <span class="inspector-title" id="insp-title">Κτίριο</span>
+      <button class="inspector-close" id="insp-close">✕</button>
+    </div>
+    <div class="inspector-body" id="insp-body">Λεπτομέρειες...</div>
+    <div class="inspector-actions">
+      <button class="btn-action btn-upgrade" id="insp-upgrade">Αναβάθμιση</button>
+      <button class="btn-action btn-move" id="insp-move">Μετακίνηση / Rotate</button>
+      <button class="btn-action btn-sell" id="insp-sell">Πώληση Κτιρίου</button>
+    </div>
+  </div>
+
+  <div class="odds-modal" id="odds-modal">
+    <div class="inspector-header">
+      <span class="inspector-title" style="color:var(--neon-cyan)">Ρύθμιση Πιθανοτήτων Καζίνο</span>
+      <button class="inspector-close" id="odds-close">✕</button>
+    </div>
+    <div style="font-size:12px; color:#ccc; margin-bottom:6px;">
+      Ρύθμισε το <b>House Edge</b>. Χαμηλό ποσοστό φέρνει περισσότερους πελάτες, υψηλό βγάζει γρήγορο κέρδος αλλά διώχνει τους VIPs.
+    </div>
+    <input type="range" min="4" max="28" value="12" class="odds-slider" id="odds-slider" />
+    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gold); font-weight:700;">
+      <span>4% (Loose)</span>
+      <span id="odds-modal-label">12% (Ισορροπημένο)</span>
+      <span>28% (Tight)</span>
+    </div>
+  </div>
+
+  <div class="bottom-dock">
+    <div class="dock-header">
+      <span id="dock-title">Κατασκευές Resort</span>
+      <span id="dock-status" style="color:var(--neon-cyan); font-weight:700;">Λειτουργία Επιλογής</span>
+    </div>
+    <div class="build-scroll" id="build-grid"></div>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="event-banner"></div>
+  <div id="tutorial-banner"></div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p id="loading-text">Φόρτωση Resort...</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

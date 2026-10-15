@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Vegas: Make It Big - 3D Mobile Edition</title>
+  <style>
+    :root {
+      --gold: #ffd166;
+      --neon-pink: #ff2a85;
+      --neon-cyan: #00f5d4;
+      --neon-green: #06d6a0;
+      --dark-bg: rgba(12, 10, 24, 0.9);
+      --panel-border: rgba(255, 209, 102, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #070510;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #fff;
+      touch-action: none;
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* TOP HUD - PORTRAIT OPTIMIZED */
+    .top-hud {
+      position: fixed;
+      top: env(safe-area-inset-top, 8px);
+      left: 8px;
+      right: 8px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      background: var(--dark-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 8px 6px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      pointer-events: auto;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #aaa;
+      margin-bottom: 2px;
+    }
+
+    .stat-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .sub-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      pointer-events: auto;
+    }
+
+    .mode-switch-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #ff2a85, #7b2cbf);
+      border: 1px solid #ff85b3;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 42, 133, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .icon-btn {
+      background: var(--dark-bg);
+      border: 1px solid var(--panel-border);
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 11px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .odds-btn {
+      background: var(--dark-bg);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .hint-banner {
+      background: rgba(18, 16, 36, 0.88);
+      border-left: 3px solid var(--neon-cyan);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      color: #e0e0ff;
+      pointer-events: none;
+      text-shadow: 0 1px 2px #000;
+    }
+
+    /* TEMPORARY PLACEMENT / ROTATION BAR */
+    .placement-bar {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 8px) + 152px);
+      left: 10px;
+      right: 10px;
+      z-index: 20;
+      background: rgba(14, 12, 30, 0.96);
+      border: 2px solid var(--neon-cyan);
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 8px 28px rgba(0, 245, 212, 0.3);
+      backdrop-filter: blur(12px);
+    }
+
+    .placement-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .placement-title {
+      font-weight: 800;
+      color: var(--gold);
+      font-size: 13.5px;
+    }
+
+    .placement-sub {
+      color: #bbb;
+      font-size: 11px;
+    }
+
+    .placement-buttons {
+      display: grid;
+      grid-template-columns: 1.1fr 1.4fr 0.8fr;
+      gap: 8px;
+    }
+
+    .p-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 8px;
+      font-weight: 800;
+      font-size: 12.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .p-btn:active {
+      transform: scale(0.96);
+    }
+
+    .p-btn-rotate {
+      background: rgba(0, 245, 212, 0.18);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    .p-btn-confirm {
+      background: linear-gradient(135deg, #06d6a0, #04966f);
+      color: #041f18;
+      box-shadow: 0 0 12px rgba(6, 214, 160, 0.4);
+    }
+
+    .p-btn-cancel {
+      background: rgba(255, 77, 77, 0.2);
+      border: 1px solid #ff4d4d;
+      color: #ff9999;
+    }
+
+    /* INSPECTOR POPUP (FOR EXISTING BUILDINGS) */
+    .inspector-card {
+      position: fixed;
+      top: 142px;
+      left: 12px;
+      right: 12px;
+      z-index: 18;
+      background: rgba(16, 14, 32, 0.96);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      padding: 12px;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+    }
+
+    .inspector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .inspector-title {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--gold);
+    }
+
+    .inspector-close {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      padding: 4px 9px;
+      cursor: pointer;
+    }
+
+    .inspector-body {
+      font-size: 12px;
+      color: #ddd;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .inspector-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .btn-action {
+      padding: 9px 8px;
+      border-radius: 9px;
+      border: none;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-upgrade {
+      background: var(--gold);
+      color: #111;
+    }
+
+    .btn-move {
+      background: rgba(0, 245, 212, 0.16);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    .btn-sell {
+      grid-column: span 2;
+      background: rgba(255, 59, 59, 0.2);
+      border: 1px solid #ff4d4d;
+      color: #ff9999;
+      padding: 7px;
+    }
+
+    /* ODDS MODAL */
+    .odds-modal {
+      position: fixed;
+      top: 142px;
+      left: 12px;
+      right: 12px;
+      z-index: 19;
+      background: rgba(16, 14, 32, 0.96);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 14px;
+      padding: 14px;
+      display: none;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+    }
+
+    .odds-slider {
+      width: 100%;
+      margin: 10px 0;
+      accent-color: var(--neon-cyan);
+    }
+
+    /* BOTTOM BUILD DOCK */
+    .bottom-dock {
+      position: fixed;
+      bottom: env(safe-area-inset-bottom, 8px);
+      left: 8px;
+      right: 8px;
+      z-index: 10;
+      background: var(--dark-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.65);
+    }
+
+    .dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px 6px 4px;
+      font-size: 11px;
+      color: #bbb;
+    }
+
+    .build-scroll {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .build-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 11px;
+      padding: 7px 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .build-card.active {
+      background: rgba(255, 209, 102, 0.2);
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(255, 209, 102, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .build-icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .build-name {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .build-cost {
+      font-size: 10px;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    #floating-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .float-text {
+      position: absolute;
+      font-weight: 800;
+      font-size: 13px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      animation: floatUp 1.3s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.9); }
+      100% { opacity: 0; transform: translate(-50%, -38px) scale(1.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container"></div>
+  <div id="floating-container"></div>
+
+  <!-- TOP PORTRAIT HUD -->
+  <div class="top-hud">
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-label">Ταμείο</span>
+        <span class="stat-val" id="ui-cash">$5,000</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Ροή / 2s</span>
+        <span class="stat-val" id="ui-income" style="color:#06d6a0;">+$0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Ενέργεια</span>
+        <span class="stat-val" id="ui-power" style="color:#00f5d4;">⚡ 4/10</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Επισκέπτες</span>
+        <span class="stat-val" id="ui-guests" style="color:#ff9ebb;">👥 12</span>
+      </div>
+    </div>
+
+    <div class="sub-bar">
+      <button class="mode-switch-btn" id="btn-switch-view">
+        🎰 Είσοδος στο Καζίνο
+      </button>
+      <button class="icon-btn" id="btn-cam-rotate" title="Περιστροφή Κάμερας">
+        🎥
+      </button>
+      <button class="icon-btn" id="btn-sound" title="Ήχος">
+        🔊
+      </button>
+      <button class="odds-btn" id="btn-odds">
+        🎲 <span id="ui-odds-val">12%</span>
+      </button>
+    </div>
+
+    <div class="hint-banner" id="ui-hint">
+      👆 Διάλεξε κατασκευή από κάτω ή πάτησε σε υπάρχον κτίριο στον χάρτη για επιλογές!
+    </div>
+  </div>
+
+  <!-- TEMPORARY PLACEMENT & ROTATE BAR -->
+  <div class="placement-bar" id="placement-bar">
+    <div class="placement-info">
+      <span class="placement-title" id="place-title">🏨 Ξενοδοχείο</span>
+      <span class="placement-sub" id="place-sub">Πάτησε άλλο κενό πλακίδιο για μετακίνηση</span>
+    </div>
+    <div class="placement-buttons">
+      <button class="p-btn p-btn-rotate" id="btn-place-rotate">🔄 Rotate 90°</button>
+      <button class="p-btn p-btn-confirm" id="btn-place-confirm">✅ Επιβεβαίωση</button>
+      <button class="p-btn p-btn-cancel" id="btn-place-cancel">✖</button>
+    </div>
+  </div>
+
+  <!-- BUILDING INSPECTOR (ONLY ON TAPPING EXISTING BUILDINGS) -->
+  <div class="inspector-card" id="inspector">
+    <div class="inspector-header">
+      <span class="inspector-title" id="insp-title">Κτίριο</span>
+      <button class="inspector-close" id="insp-close">✕</button>
+    </div>
+    <div class="inspector-body" id="insp-body">Λεπτομέρειες...</div>
+    <div class="inspector-actions">
+      <button class="btn-action btn-upgrade" id="insp-upgrade">⬆️ Αναβάθμιση ($500)</button>
+      <button class="btn-action btn-move" id="insp-move">🔄 Μετακίνηση / Rotate ($100)</button>
+      <button class="btn-action btn-sell" id="insp-sell">🗑️ Πώληση Κτιρίου</button>
+    </div>
+  </div>
+
+  <!-- ODDS MANAGER MODAL -->
+  <div class="odds-modal" id="odds-modal">
+    <div class="inspector-header">
+      <span class="inspector-title" style="color:var(--neon-cyan)">🎲 Ρύθμιση Πιθανοτήτων Καζίνο</span>
+      <button class="inspector-close" id="odds-close">✕</button>
+    </div>
+    <div style="font-size:12px; color:#ccc; margin-bottom:6px;">
+      Ρύθμισε το <b>House Edge</b> (γκανιότα). Χαμηλό ποσοστό φέρνει περισσότερους πελάτες, υψηλό ποσοστό βγάζει γρήγορο κέρδος αλλά διώχνει τους VIPs!
+    </div>
+    <input type="range" min="4" max="28" value="12" class="odds-slider" id="odds-slider" />
+    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gold); font-weight:700;">
+      <span>4% (Loose)</span>
+      <span id="odds-modal-label">12% (Ισορροπημένο)</span>
+      <span>28% (Tight)</span>
+    </div>
+  </div>
+
+  <!-- BOTTOM BUILD DOCK -->
+  <div class="bottom-dock">
+    <div class="dock-header">
+      <span id="dock-title">🏗️ Κατασκευές Resort (Επίλεξε για χτίσιμο)</span>
+      <span id="dock-status" style="color:var(--neon-cyan); font-weight:700;">Λειτουργία Επιλογής</span>
+    </div>
+    <div class="build-scroll" id="build-grid"></div>
+  </div>
+
+  <!-- THREE.JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // ==========================================
+    // 1. WEB AUDIO SYNTHESIZER (ΗΧΗΤΙΚΑ ΕΦΕ)
+    // ==========================================
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'preview') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(420, now);
+          osc.frequency.exponentialRampToValueAtTime(580, now + 0.08);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.09);
+          osc.start(now);
+          osc.stop(now + 0.09);
+        } else if (type === 'rotate') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(680, now + 0.07);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'confirm') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(660, now + 0.07);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        } else if (type === 'cancel') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.linearRampToValueAtTime(180, now + 0.12);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.13);
+          osc.start(now);
+          osc.stop(now + 0.13);
+        }
+      } catch (e) {}
+    }
+
+    // ==========================================
+    // 2. ΚΑΤΑΛΟΓΟΣ ΚΤΙΡΙΩΝ (EXTERIOR & INTERIOR)
+    // ==========================================
+    const MOVE_ROTATE_COST = 100;
+
+    const CATALOG = {
+      exterior: [
+        {
+          id: 'casino',
+          name: 'Καζίνο',
+          icon: '🎰',
+          cost: 1200,
+          income: 160,
+          power: -3,
+          guests: 25,
+          desc: 'Η καρδιά του Resort. Έχει φωτεινή είσοδο με κόκκινο χαλί μπροστά.'
+        },
+        {
+          id: 'hotel',
+          name: 'Ξενοδοχείο',
+          icon: '🏨',
+          cost: 900,
+          income: 110,
+          power: -2,
+          guests: 40,
+          desc: 'Πολυτελής πύργος με πισίνα στην μπροστινή πλευρά.'
+        },
+        {
+          id: 'chapel',
+          name: 'Chapel',
+          icon: '💒',
+          cost: 650,
+          income: 95,
+          power: -1,
+          guests: 15,
+          desc: 'Εκκλησάκι γάμων με είσοδο και καμπαναριό στην πρόσοψη.'
+        },
+        {
+          id: 'fountain',
+          name: 'Σιντριβάνι',
+          icon: '⛲',
+          cost: 500,
+          income: 45,
+          power: -1,
+          guests: 30,
+          desc: 'Θεαματικό σιντριβάνι με χρυσή αψίδα που κοιτάζει προς τους επισκέπτες.'
+        },
+        {
+          id: 'generator',
+          name: 'Γεννήτρια',
+          icon: '⚡',
+          cost: 450,
+          income: -15,
+          power: 8,
+          guests: -5,
+          desc: 'Παράγει +8 Ενέργεια για το Resort σου.'
+        }
+      ],
+      interior: [
+        {
+          id: 'slots',
+          name: 'Slots',
+          icon: '🍒',
+          cost: 350,
+          income: 75,
+          power: -1,
+          guests: 10,
+          noisy: true,
+          desc: 'Σειρά κουλοχέρηδων με σκαμπό μπροστά. Κάνουν φασαρία για τα VIP τραπέζια!'
+        },
+        {
+          id: 'roulette',
+          name: 'Ρουλέτα',
+          icon: '🎡',
+          cost: 600,
+          income: 120,
+          power: -1,
+          guests: 14,
+          desc: 'Τραπέζι Ρουλέτας. Περίστρεψέ το για να ταιριάξει στον διάδρομο!'
+        },
+        {
+          id: 'vip_bj',
+          name: 'VIP Blackjack',
+          icon: '🃏',
+          cost: 1100,
+          income: 260,
+          power: -1,
+          guests: 8,
+          isVip: true,
+          desc: 'Τραπέζι High-Rollers! Χάνει 50% κέρδη αν συνορεύει με Slots χωρίς VIP Τοίχο.'
+        },
+        {
+          id: 'wall',
+          name: 'VIP Τοίχος',
+          icon: '🧱',
+          cost: 150,
+          income: 0,
+          power: 0,
+          guests: 2,
+          isWall: true,
+          desc: 'Χρυσός ηχομονωτικός τοίχος. Κάνε του Rotate 90° για οριζόντια ή κάθετη τοποθέτηση!'
+        },
+        {
+          id: 'security',
+          name: 'Security',
+          icon: '🛡️',
+          cost: 500,
+          income: -10,
+          power: -1,
+          guests: 5,
+          isSecurity: true,
+          desc: 'Σταθμός ασφαλείας με κάμερες. Δίνει +35% κέρδη σε όλα τα διπλανά τραπέζια.'
+        }
+      ]
+    };
+
+    // ==========================================
+    // 3. ΚΑΤΑΣΤΑΣΗ ΠΑΙΧΝΙΔΙΟΥ (STATE)
+    // ==========================================
+    const state = {
+      cash: 5000,
+      houseEdge: 12,
+      mode: 'exterior', // 'exterior' | 'interior'
+      selectedTool: null, // null = Λειτουργία Επιλογής / Επιθεώρησης
+      gridSize: 7,
+      tileSize: 2.2,
+      exteriorGrid: {},
+      interiorGrid: {},
+      inspectedKey: null,
+      pendingPlacement: null // Κρατάει το προσωρινό κτίριο πριν την επιβεβαίωση
+    };
+
+    // ==========================================
+    // 4. THREE.JS ΣΚΗΝΗ & ΚΑΜΕΡΑ
+    // ==========================================
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x090614);
+    scene.fog = new THREE.FogExp2(0x090614, 0.022);
+
+    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 150);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffe6aa, 0.85);
+    dirLight.position.set(12, 22, 14);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    const neonPointLight = new THREE.PointLight(0xff2a85, 1.1, 30);
+    neonPointLight.position.set(0, 8, 0);
+    scene.add(neonPointLight);
+
+    const exteriorGroup = new THREE.Group();
+    const interiorGroup = new THREE.Group();
+    interiorGroup.visible = false;
+    scene.add(exteriorGroup);
+    scene.add(interiorGroup);
+
+    const pickableTilesExt = [];
+    const pickableTilesInt = [];
+    const animatedObjects = [];
+    const vehicles = [];
+    const walkers = [];
+
+    // Selection highlight ring for inspected building
+    const inspectRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.85, 1.05, 24),
+      new THREE.MeshBasicMaterial({ color: 0xffd166, side: THREE.DoubleSide })
+    );
+    inspectRing.rotation.x = -Math.PI / 2;
+    inspectRing.position.y = 0.12;
+    inspectRing.visible = false;
+    scene.add(inspectRing);
+
+    // ==========================================
+    // 5. ΔΗΜΙΟΥΡΓΙΑ ΚΟΣΜΩΝ (EXTERIOR & INTERIOR)
+    // ==========================================
+    function createWorlds() {
+      const half = Math.floor(state.gridSize / 2);
+
+      // Exterior Ground & Strip Road
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(60, 60),
+        new THREE.MeshStandardMaterial({ color: 0x120e24, roughness: 0.9 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.1;
+      exteriorGroup.add(ground);
+
+      const road = new THREE.Mesh(
+        new THREE.BoxGeometry(36, 0.12, 4.2),
+        new THREE.MeshStandardMaterial({ color: 0x1c1c28, roughness: 0.7 })
+      );
+      road.position.set(0, -0.02, half * state.tileSize + 3.4);
+      exteriorGroup.add(road);
+
+      for (let i = -14; i <= 14; i += 2.5) {
+        const stripe = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 0.14, 0.15),
+          new THREE.MeshBasicMaterial({ color: 0xffd166 })
+        );
+        stripe.position.set(i, -0.01, road.position.z);
+        exteriorGroup.add(stripe);
+      }
+
+      // Exterior Grid Tiles
+      for (let gx = -half; gx <= half; gx++) {
+        for (let gz = -half; gz <= half; gz++) {
+          const isChecker = (gx + gz) % 2 === 0;
+          const tile = new THREE.Mesh(
+            new THREE.BoxGeometry(state.tileSize * 0.92, 0.16, state.tileSize * 0.92),
+            new THREE.MeshStandardMaterial({ color: isChecker ? 0x231d3c : 0x1d1833, roughness: 0.8 })
+          );
+          tile.position.set(gx * state.tileSize, 0, gz * state.tileSize);
+          tile.userData = { gx, gz, key: `${gx},${gz}`, world: 'exterior' };
+          exteriorGroup.add(tile);
+          pickableTilesExt.push(tile);
+        }
+      }
+
+      // Interior Floor & Walls
+      const floorBase = new THREE.Mesh(
+        new THREE.PlaneGeometry(50, 50),
+        new THREE.MeshStandardMaterial({ color: 0x1a081f, roughness: 0.85 })
+      );
+      floorBase.rotation.x = -Math.PI / 2;
+      floorBase.position.y = -0.1;
+      interiorGroup.add(floorBase);
+
+      const wallBorderMat = new THREE.MeshStandardMaterial({ color: 0x3c096c, roughness: 0.5 });
+      const backWall = new THREE.Mesh(new THREE.BoxGeometry(17, 2.5, 0.4), wallBorderMat);
+      backWall.position.set(0, 1.25, -half * state.tileSize - 1.5);
+      const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.5, 17), wallBorderMat);
+      leftWall.position.set(-half * state.tileSize - 1.5, 1.25, 0);
+      interiorGroup.add(backWall, leftWall);
+
+      for (let gx = -half; gx <= half; gx++) {
+        for (let gz = -half; gz <= half; gz++) {
+          const isChecker = (gx + gz) % 2 === 0;
+          const tile = new THREE.Mesh(
+            new THREE.BoxGeometry(state.tileSize * 0.92, 0.16, state.tileSize * 0.92),
+            new THREE.MeshStandardMaterial({ color: isChecker ? 0x4a154b : 0x3b0d3c, roughness: 0.6 })
+          );
+          tile.position.set(gx * state.tileSize, 0, gz * state.tileSize);
+          tile.userData = { gx, gz, key: `${gx},${gz}`, world: 'interior' };
+          interiorGroup.add(tile);
+          pickableTilesInt.push(tile);
+        }
+      }
+
+      // Cars on the Strip
+      for (let i = 0; i < 5; i++) {
+        const isLimo = i % 2 === 0;
+        const carGroup = new THREE.Group();
+        const body = new THREE.Mesh(
+          new THREE.BoxGeometry(isLimo ? 2.1 : 1.2, 0.45, 0.7),
+          new THREE.MeshStandardMaterial({ color: isLimo ? 0xffffff : 0x00f5d4, roughness: 0.3 })
+        );
+        body.position.y = 0.3;
+        const cabin = new THREE.Mesh(
+          new THREE.BoxGeometry(isLimo ? 1.3 : 0.65, 0.35, 0.6),
+          new THREE.MeshStandardMaterial({ color: 0x111122 })
+        );
+        cabin.position.y = 0.65;
+        carGroup.add(body, cabin);
+
+        const dir = i % 2 === 0 ? 1 : -1;
+        carGroup.position.set((Math.random() - 0.5) * 26, 0.05, road.position.z + (dir * 0.85));
+        exteriorGroup.add(carGroup);
+        vehicles.push({ mesh: carGroup, speed: (0.06 + Math.random() * 0.05) * dir });
+      }
+
+      // Walkers
+      for (let i = 0; i < 12; i++) {
+        const isVip = i < 4;
+        const walker = new THREE.Group();
+        const torso = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.13, 0.17, 0.5, 8),
+          new THREE.MeshStandardMaterial({ color: isVip ? 0xffd166 : 0x00bbf9 })
+        );
+        torso.position.y = 0.32;
+        const head = new THREE.Mesh(
+          new THREE.SphereGeometry(0.13, 8, 8),
+          new THREE.MeshStandardMaterial({ color: 0xffcba4 })
+        );
+        head.position.y = 0.7;
+        walker.add(torso, head);
+
+        const targetGroup = i < 6 ? exteriorGroup : interiorGroup;
+        walker.position.set((Math.random() - 0.5) * 10, 0.08, (Math.random() - 0.5) * 10);
+        targetGroup.add(walker);
+        walkers.push({
+          mesh: walker,
+          tx: (Math.random() - 0.5) * 11,
+          tz: (Math.random() - 0.5) * 11
+        });
+      }
+    }
+
+    // ==========================================
+    // 6. 3D ΚΤΙΡΙΑ ΜΕ ΚΑΘΑΡΗ ΠΡΟΣΟΨΗ (ΓΙΑ ROTATE)
+    // ==========================================
+    function createBuildingMesh(item, level = 1, isGhost = false) {
+      const group = new THREE.Group();
+      const scaleY = 1 + (level - 1) * 0.25;
+
+      if (item.id === 'casino') {
+        const base = new THREE.Mesh(
+          new THREE.BoxGeometry(1.6, 1.45 * scaleY, 1.4),
+          new THREE.MeshStandardMaterial({ color: 0x2b0938, roughness: 0.4 })
+        );
+        base.position.set(0, 0.72 * scaleY, -0.1);
+        const neonRoof = new THREE.Mesh(
+          new THREE.BoxGeometry(1.75, 0.2, 1.55),
+          new THREE.MeshBasicMaterial({ color: 0xff2a85 })
+        );
+        neonRoof.position.set(0, 1.5 * scaleY, -0.1);
+
+        // Μπροστινή είσοδος με τέντα & κόκκινο χαλί (+Z)
+        const canopy = new THREE.Mesh(
+          new THREE.BoxGeometry(0.9, 0.18, 0.55),
+          new THREE.MeshBasicMaterial({ color: 0xffd166 })
+        );
+        canopy.position.set(0, 0.65, 0.72);
+        const carpet = new THREE.Mesh(
+          new THREE.BoxGeometry(0.65, 0.06, 0.5),
+          new THREE.MeshBasicMaterial({ color: 0xef233c })
+        );
+        carpet.position.set(0, 0.04, 0.75);
+
+        const sign = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.42, 0),
+          new THREE.MeshBasicMaterial({ color: 0xffd166 })
+        );
+        sign.position.set(0, 2.05 * scaleY, -0.1);
+        animatedObjects.push({ mesh: sign, type: 'spin' });
+        group.add(base, neonRoof, canopy, carpet, sign);
+
+      } else if (item.id === 'hotel') {
+        // Πύργος πίσω + Πισίνα/Είσοδος μπροστά (+Z)
+        const tower = new THREE.Mesh(
+          new THREE.BoxGeometry(1.45, 2.7 * scaleY, 0.95),
+          new THREE.MeshStandardMaterial({ color: 0x00bbf9, metalness: 0.5, roughness: 0.2 })
+        );
+        tower.position.set(0, 1.35 * scaleY, -0.35);
+        const crown = new THREE.Mesh(
+          new THREE.BoxGeometry(1.55, 0.2, 1.05),
+          new THREE.MeshBasicMaterial({ color: 0xffd166 })
+        );
+        crown.position.set(0, 2.75 * scaleY, -0.35);
+
+        // Μπροστινή πισίνα resort
+        const poolDeck = new THREE.Mesh(
+          new THREE.BoxGeometry(1.35, 0.12, 0.75),
+          new THREE.MeshStandardMaterial({ color: 0xf8f9fa })
+        );
+        poolDeck.position.set(0, 0.06, 0.48);
+        const poolWater = new THREE.Mesh(
+          new THREE.BoxGeometry(1.05, 0.15, 0.5),
+          new THREE.MeshBasicMaterial({ color: 0x00f5d4 })
+        );
+        poolWater.position.set(0, 0.07, 0.48);
+
+        group.add(tower, crown, poolDeck, poolWater);
+
+      } else if (item.id === 'chapel') {
+        const body = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 0.95 * scaleY, 1.4),
+          new THREE.MeshStandardMaterial({ color: 0xffffff })
+        );
+        body.position.set(0, 0.48 * scaleY, -0.1);
+        const roof = new THREE.Mesh(
+          new THREE.ConeGeometry(1.05, 0.75, 4),
+          new THREE.MeshStandardMaterial({ color: 0xff9ebb })
+        );
+        roof.rotation.y = Math.PI / 4;
+        roof.position.set(0, 1.3 * scaleY, -0.1);
+
+        // Μπροστινό καμπαναριό & κόκκινο χαλί (+Z)
+        const steeple = new THREE.Mesh(
+          new THREE.BoxGeometry(0.45, 1.55 * scaleY, 0.45),
+          new THREE.MeshStandardMaterial({ color: 0xffe5ec })
+        );
+        steeple.position.set(0, 0.78 * scaleY, 0.55);
+        const doorCarpet = new THREE.Mesh(
+          new THREE.BoxGeometry(0.45, 0.06, 0.45),
+          new THREE.MeshBasicMaterial({ color: 0xff2a85 })
+        );
+        doorCarpet.position.set(0, 0.04, 0.78);
+
+        group.add(body, roof, steeple, doorCarpet);
+
+      } else if (item.id === 'fountain') {
+        const pool = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.82, 0.88, 0.32, 16),
+          new THREE.MeshStandardMaterial({ color: 0x00f5d4 })
+        );
+        pool.position.y = 0.16;
+        const jet = new THREE.Mesh(
+          new THREE.ConeGeometry(0.32, 1.4 * scaleY, 12),
+          new THREE.MeshBasicMaterial({ color: 0x90e0ef, wireframe: true })
+        );
+        jet.position.y = 0.85 * scaleY;
+        // Πίσω χρυσή αψίδα για να φαίνεται η κατεύθυνση
+        const arch = new THREE.Mesh(
+          new THREE.BoxGeometry(1.3, 1.1, 0.18),
+          new THREE.MeshStandardMaterial({ color: 0xffd166, metalness: 0.6 })
+        );
+        arch.position.set(0, 0.55, -0.65);
+        animatedObjects.push({ mesh: jet, type: 'spin' });
+        group.add(pool, jet, arch);
+
+      } else if (item.id === 'generator') {
+        const box = new THREE.Mesh(
+          new THREE.BoxGeometry(1.3, 0.85, 1.1),
+          new THREE.MeshStandardMaterial({ color: 0x555b6e })
+        );
+        box.position.set(0, 0.42, -0.1);
+        const panel = new THREE.Mesh(
+          new THREE.BoxGeometry(0.7, 0.5, 0.15),
+          new THREE.MeshBasicMaterial({ color: 0x00f5d4 })
+        );
+        panel.position.set(0, 0.45, 0.46);
+        const rotor = new THREE.Mesh(
+          new THREE.TorusGeometry(0.35, 0.09, 8, 16),
+          new THREE.MeshBasicMaterial({ color: 0xffd166 })
+        );
+        rotor.position.set(0, 1.05, -0.1);
+        animatedObjects.push({ mesh: rotor, type: 'spin' });
+        group.add(box, panel, rotor);
+
+      } else if (item.id === 'slots') {
+        for (let i = -0.48; i <= 0.48; i += 0.48) {
+          const cab = new THREE.Mesh(
+            new THREE.BoxGeometry(0.36, 1.05 * scaleY, 0.45),
+            new THREE.MeshStandardMaterial({ color: 0xffbe0b })
+          );
+          cab.position.set(i, 0.52 * scaleY, -0.15);
+          // Οθόνη & σκαμπό στην μπροστινή πλευρά (+Z)
+          const screen = new THREE.Mesh(
+            new THREE.BoxGeometry(0.28, 0.3, 0.1),
+            new THREE.MeshBasicMaterial({ color: 0x00f5d4 })
+          );
+          screen.position.set(i, 0.68 * scaleY, 0.08);
+          const stool = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.13, 0.1, 0.35, 8),
+            new THREE.MeshStandardMaterial({ color: 0xef233c })
+          );
+          stool.position.set(i, 0.18, 0.38);
+          group.add(cab, screen, stool);
+        }
+
+      } else if (item.id === 'roulette') {
+        const table = new THREE.Mesh(
+          new THREE.BoxGeometry(1.5, 0.62, 0.95),
+          new THREE.MeshStandardMaterial({ color: 0x06d6a0 })
+        );
+        table.position.y = 0.31;
+        const wheel = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.34, 0.34, 0.15, 14),
+          new THREE.MeshStandardMaterial({ color: 0xffd166 })
+        );
+        wheel.position.set(-0.32, 0.68, 0);
+        animatedObjects.push({ mesh: wheel, type: 'spin' });
+
+        // Σκαμπό παικτών στην μπροστινή πλευρά (+Z)
+        for (let sx = -0.45; sx <= 0.45; sx += 0.45) {
+          const seat = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.13, 0.1, 0.35, 8),
+            new THREE.MeshStandardMaterial({ color: 0xffd166 })
+          );
+          seat.position.set(sx, 0.18, 0.68);
+          group.add(seat);
+        }
+        group.add(table, wheel);
+
+      } else if (item.id === 'vip_bj') {
+        const base = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.72, 0.62, 0.65, 12),
+          new THREE.MeshStandardMaterial({ color: 0xef233c })
+        );
+        base.position.y = 0.32;
+        const goldRing = new THREE.Mesh(
+          new THREE.TorusGeometry(0.55, 0.07, 8, 20),
+          new THREE.MeshBasicMaterial({ color: 0xffd166 })
+        );
+        goldRing.rotation.x = Math.PI / 2;
+        goldRing.position.y = 0.66;
+
+        // Καρέκλες VIP παικτών μπροστά (+Z)
+        for (let angle = -0.7; angle <= 0.7; angle += 0.7) {
+          const chair = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.15, 0.12, 0.42, 8),
+            new THREE.MeshStandardMaterial({ color: 0xffd166 })
+          );
+          chair.position.set(Math.sin(angle) * 0.85, 0.21, Math.cos(angle) * 0.85);
+          group.add(chair);
+        }
+        group.add(base, goldRing);
+
+      } else if (item.id === 'wall') {
+        const wall = new THREE.Mesh(
+          new THREE.BoxGeometry(1.95, 1.55 * scaleY, 0.38),
+          new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.6, roughness: 0.3 })
+        );
+        wall.position.y = 0.77 * scaleY;
+        group.add(wall);
+
+      } else if (item.id === 'security') {
+        const desk = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 0.85, 0.9),
+          new THREE.MeshStandardMaterial({ color: 0x1d3557 })
+        );
+        desk.position.y = 0.42;
+        const monitor = new THREE.Mesh(
+          new THREE.BoxGeometry(0.8, 0.35, 0.12),
+          new THREE.MeshBasicMaterial({ color: 0x00f5d4 })
+        );
+        monitor.position.set(0, 0.68, 0.42);
+        const dome = new THREE.Mesh(
+          new THREE.SphereGeometry(0.32, 12, 12),
+          new THREE.MeshBasicMaterial({ color: 0x3a86ff, wireframe: true })
+        );
+        dome.position.y = 1.15;
+        animatedObjects.push({ mesh: dome, type: 'spin' });
+        group.add(desk, monitor, dome);
+      }
+
+      // Αν είναι σε κατάσταση προσωρινής τοποθέτησης (Ghost Preview), προσθέτουμε φωτεινό δακτύλιο & βέλος κατεύθυνσης
+      if (isGhost) {
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry(0.85, 1.05, 24),
+          new THREE.MeshBasicMaterial({ color: 0x00f5d4, side: THREE.DoubleSide })
+        );
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.y = 0.06;
+
+        // Βέλος που δείχνει την μπροστινή όψη (+Z)
+        const arrow = new THREE.Mesh(
+          new THREE.ConeGeometry(0.24, 0.45, 4),
+          new THREE.MeshBasicMaterial({ color: 0x00f5d4 })
+        );
+        arrow.rotation.x = Math.PI / 2;
+        arrow.position.set(0, 0.18, 1.12);
+
+        group.add(ring, arrow);
+      }
+
+      return group;
+    }
+
+    // ==========================================
+    // 7. ΟΙΚΟΝΟΜΙΑ & ΚΑΝΟΝΕΣ VEGAS: MAKE IT BIG
+    // ==========================================
+    function getNeighbors(grid, gx, gz) {
+      const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+      const res = [];
+      for (const [dx, dz] of dirs) {
+        const n = grid[`${gx + dx},${gz + dz}`];
+        if (n) res.push(n);
+      }
+      return res;
+    }
+
+    function evaluateTileStats(worldName, cell) {
+      const item = cell.item;
+      let inc = item.income * cell.level;
+      const notes = [];
+
+      if (worldName === 'interior') {
+        const neighbors = getNeighbors(state.interiorGrid, cell.gx, cell.gz);
+        const hasNoisyNeighbor = neighbors.some(n => n.item.noisy);
+        const hasWallNeighbor = neighbors.some(n => n.item.isWall);
+        const hasSecurityNeighbor = neighbors.some(n => n.item.isSecurity);
+
+        if (item.isVip) {
+          if (hasNoisyNeighbor && !hasWallNeighbor) {
+            inc *= 0.5;
+            notes.push('⚠️ Θόρυβος από Κουλοχέρηδες (-50% κέρδη! Βάλε VIP Τοίχο δίπλα)');
+          } else if (hasWallNeighbor) {
+            inc *= 1.25;
+            notes.push('🧱 Ηχομόνωση VIP Τοίχου (+25% VIP Bonus)');
+          }
+        }
+
+        if (hasSecurityNeighbor && inc > 0) {
+          inc *= 1.35;
+          notes.push('🛡️ Security Κάλυψη (+35% κέρδη χωρίς Cheaters)');
+        }
+      }
+
+      return { income: Math.round(inc), notes };
+    }
+
+    function calculateTotals() {
+      let powerUsed = 0;
+      let powerCap = 10;
+      let guests = 10;
+      let rawIncome = 0;
+
+      Object.values(state.exteriorGrid).forEach(cell => {
+        if (cell.item.power > 0) powerCap += cell.item.power * cell.level;
+        else powerUsed += Math.abs(cell.item.power);
+        guests += (cell.item.guests || 0) * cell.level;
+        rawIncome += evaluateTileStats('exterior', cell).income;
+      });
+
+      Object.values(state.interiorGrid).forEach(cell => {
+        if (cell.item.power < 0) powerUsed += Math.abs(cell.item.power);
+        guests += (cell.item.guests || 0) * cell.level;
+        rawIncome += evaluateTileStats('interior', cell).income;
+      });
+
+      guests = Math.max(0, guests);
+
+      const edgeFactor = state.houseEdge <= 15
+        ? 0.75 + (state.houseEdge / 15) * 0.45
+        : Math.max(0.35, 1.2 - ((state.houseEdge - 15) * 0.06));
+
+      const powerPenalty = powerUsed > powerCap ? 0.4 : 1.0;
+      const totalIncome = Math.round(rawIncome * edgeFactor * powerPenalty);
+
+      return { powerUsed, powerCap, guests, totalIncome, hasBlackout: powerUsed > powerCap };
+    }
+
+    function updateHUD() {
+      const totals = calculateTotals();
+      document.getElementById('ui-cash').textContent = `$${state.cash.toLocaleString()}`;
+      const incEl = document.getElementById('ui-income');
+      incEl.textContent = `${totals.totalIncome >= 0 ? '+' : ''}$${totals.totalIncome}`;
+      incEl.style.color = totals.totalIncome >= 0 ? '#06d6a0' : '#ff4d4d';
+
+      const powEl = document.getElementById('ui-power');
+      powEl.textContent = `⚡ ${totals.powerUsed}/${totals.powerCap}`;
+      powEl.style.color = totals.hasBlackout ? '#ff4d4d' : '#00f5d4';
+
+      document.getElementById('ui-guests').textContent = `👥 ${totals.guests}`;
+    }
+
+    // ==========================================
+    // 8. ΣΥΣΤΗΜΑ ΠΡΟΣΩΡΙΝΗΣ ΤΟΠΟΘΕΤΗΣΗΣ (GHOST PREVIEW) & ROTATE
+    // ==========================================
+    function startPendingPlacement(tileMesh, item, mode = 'new', existingData = null) {
+      closeInspector();
+
+      const { gx, gz, key, world } = tileMesh.userData;
+      const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+
+      // Αν υπάρχει ήδη ενεργό ghost, το μετακινούμε στο νέο κενό πλακίδιο!
+      if (state.pendingPlacement) {
+        state.pendingPlacement.gx = gx;
+        state.pendingPlacement.gz = gz;
+        state.pendingPlacement.key = key;
+        state.pendingPlacement.tileMesh = tileMesh;
+        state.pendingPlacement.mesh.position.copy(tileMesh.position);
+        state.pendingPlacement.mesh.position.y = 0.08;
+        playSound('preview');
+        return;
+      }
+
+      const rotIndex = existingData ? existingData.rotation : 0;
+      const level = existingData ? existingData.level : 1;
+      const cost = mode === 'new' ? item.cost : MOVE_ROTATE_COST;
+
+      const ghostMesh = createBuildingMesh(item, level, true);
+      ghostMesh.position.copy(tileMesh.position);
+      ghostMesh.position.y = 0.08;
+      ghostMesh.rotation.y = rotIndex * (Math.PI / 2);
+      group.add(ghostMesh);
+
+      state.pendingPlacement = {
+        mode, // 'new' | 'edit'
+        item,
+        gx,
+        gz,
+        key,
+        world,
+        tileMesh,
+        rotation: rotIndex,
+        level,
+        cost,
+        mesh: ghostMesh,
+        originalData: existingData
+      };
+
+      playSound('preview');
+      updatePlacementUI();
+    }
+
+    function updatePlacementUI() {
+      const bar = document.getElementById('placement-bar');
+      if (!state.pendingPlacement) {
+        bar.style.display = 'none';
+        return;
+      }
+
+      const p = state.pendingPlacement;
+      bar.style.display = 'flex';
+      if (p.mode === 'new') {
+        document.getElementById('place-title').textContent = `${p.item.icon} ${p.item.name} (Νέα Τοποθέτηση)`;
+        document.getElementById('place-sub').textContent = 'Πάτησε άλλο πλακίδιο για μετακίνηση ή Rotate';
+        document.getElementById('btn-place-confirm').textContent = `✅ Χτίσιμο ($${p.cost})`;
+      } else {
+        document.getElementById('place-title').textContent = `🔄 Μετακίνηση / Περιστροφή: ${p.item.name}`;
+        document.getElementById('place-sub').textContent = 'Πάτησε σε κενό πλακίδιο ή γύρισέ το με Rotate';
+        document.getElementById('btn-place-confirm').textContent = `✅ Επιβεβαίωση ($${p.cost})`;
+      }
+    }
+
+    function rotatePendingPlacement() {
+      if (!state.pendingPlacement) return;
+      state.pendingPlacement.rotation = (state.pendingPlacement.rotation + 1) % 4;
+      state.pendingPlacement.mesh.rotation.y = state.pendingPlacement.rotation * (Math.PI / 2);
+      playSound('rotate');
+    }
+
+    function confirmPendingPlacement() {
+      if (!state.pendingPlacement) return;
+      const p = state.pendingPlacement;
+      const grid = p.world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const group = p.world === 'exterior' ? exteriorGroup : interiorGroup;
+
+      if (state.cash < p.cost) {
+        spawnFloatingText(p.tileMesh.position, 'Δεν φτάνουν τα $!', '#ff4d4d');
+        playSound('cancel');
+        return;
+      }
+
+      state.cash -= p.cost;
+
+      // Αφαιρούμε το προσωρινό ghost mesh και βάζουμε το τελικό κτίριο
+      group.remove(p.mesh);
+      const finalMesh = createBuildingMesh(p.item, p.level, false);
+      finalMesh.position.copy(p.tileMesh.position);
+      finalMesh.position.y = 0.08;
+      finalMesh.rotation.y = p.rotation * (Math.PI / 2);
+      group.add(finalMesh);
+
+      grid[p.key] = {
+        gx: p.gx,
+        gz: p.gz,
+        key: p.key,
+        world: p.world,
+        item: p.item,
+        level: p.level,
+        rotation: p.rotation,
+        mesh: finalMesh,
+        tileMesh: p.tileMesh
+      };
+
+      spawnFloatingText(p.tileMesh.position, p.mode === 'new' ? `-$${p.cost}` : `Μετακινήθηκε (-$${p.cost})`, '#06d6a0');
+      playSound('confirm');
+
+      // Καθαρισμός προσωρινής κατάστασης & αποεπιλογή εργαλείου ώστε να ΜΗΝ ανοίγει παράθυρο αναβάθμισης!
+      state.pendingPlacement = null;
+      state.selectedTool = null;
+      updatePlacementUI();
+      renderDock();
+      updateHUD();
+      document.getElementById('ui-hint').innerHTML = '✅ <b>Τοποθετήθηκε!</b> Πάτησε πάνω σε οποιοδήποτε κτίριο αν θέλεις Αναβάθμιση ή Μετακίνηση.';
+    }
+
+    function cancelPendingPlacement() {
+      if (!state.pendingPlacement) return;
+      const p = state.pendingPlacement;
+      const grid = p.world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const group = p.world === 'exterior' ? exteriorGroup : interiorGroup;
+
+      group.remove(p.mesh);
+
+      // Αν κάναμε edit σε υπάρχον κτίριο και πατήσαμε Ακύρωση, το επαναφέρουμε δωρεάν στην αρχική του θέση!
+      if (p.mode === 'edit' && p.originalData) {
+        const orig = p.originalData;
+        const restoredMesh = createBuildingMesh(orig.item, orig.level, false);
+        restoredMesh.position.copy(orig.tileMesh.position);
+        restoredMesh.position.y = 0.08;
+        restoredMesh.rotation.y = orig.rotation * (Math.PI / 2);
+        group.add(restoredMesh);
+
+        grid[orig.key] = {
+          ...orig,
+          mesh: restoredMesh
+        };
+      }
+
+      playSound('cancel');
+      state.pendingPlacement = null;
+      updatePlacementUI();
+      renderDock();
+    }
+
+    document.getElementById('btn-place-rotate').addEventListener('click', rotatePendingPlacement);
+    document.getElementById('btn-place-confirm').addEventListener('click', confirmPendingPlacement);
+    document.getElementById('btn-place-cancel').addEventListener('click', cancelPendingPlacement);
+
+    // ==========================================
+    // 9. ΑΜΕΣΗ ΤΟΠΟΘΕΤΗΣΗ (ΜΟΝΟ ΓΙΑ STARTER RESORT)
+    // ==========================================
+    function placeStarterBuilding(tileMesh, itemId, rotation = 0) {
+      const { gx, gz, key, world } = tileMesh.userData;
+      const grid = world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+      const item = CATALOG[world].find(x => x.id === itemId);
+      if (!item) return;
+
+      const mesh = createBuildingMesh(item, 1, false);
+      mesh.position.copy(tileMesh.position);
+      mesh.position.y = 0.08;
+      mesh.rotation.y = rotation * (Math.PI / 2);
+      group.add(mesh);
+
+      grid[key] = { gx, gz, key, world, item, level: 1, rotation, mesh, tileMesh };
+    }
+
+    // ==========================================
+    // 10. INSPECTOR MENU (ΜΟΝΟ ΟΤΑΝ ΠΑΤΑΣ ΣΕ ΥΠΑΡΧΟΝ ΚΤΙΡΙΟ)
+    // ==========================================
+    function openInspector(world, key) {
+      if (state.pendingPlacement) return; // Ποτέ όταν τοποθετούμε κτίριο!
+
+      const grid = world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const cell = grid[key];
+      if (!cell) return;
+
+      state.inspectedKey = { world, key };
+      const evalStats = evaluateTileStats(world, cell);
+      const upgCost = Math.round(cell.item.cost * 0.8 * cell.level);
+      const refund = Math.round(cell.item.cost * 0.5 * cell.level);
+
+      inspectRing.position.set(cell.tileMesh.position.x, 0.12, cell.tileMesh.position.z);
+      inspectRing.visible = true;
+
+      document.getElementById('insp-title').textContent = `${cell.item.icon} ${cell.item.name} (Επ. ${cell.level})`;
+      let html = `<div>${cell.item.desc}</div>`;
+      html += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Απόδοση: $${evalStats.income} / κύκλο</div>`;
+      if (evalStats.notes.length > 0) {
+        html += `<div style="margin-top:4px; color:#ffd166;">${evalStats.notes.join('<br>')}</div>`;
+      }
+      document.getElementById('insp-body').innerHTML = html;
+      document.getElementById('insp-upgrade').textContent = `⬆️ Αναβάθμιση ($${upgCost})`;
+      document.getElementById('insp-move').textContent = `🔄 Μετακίνηση / Rotate ($${MOVE_ROTATE_COST})`;
+      document.getElementById('insp-sell').textContent = `🗑️ Πώληση (+$${refund})`;
+      document.getElementById('inspector').style.display = 'block';
+      playSound('preview');
+    }
+
+    function closeInspector() {
+      document.getElementById('inspector').style.display = 'none';
+      inspectRing.visible = false;
+      state.inspectedKey = null;
+    }
+
+    document.getElementById('insp-close').addEventListener('click', closeInspector);
+
+    // Κουμπί Αναβάθμισης
+    document.getElementById('insp-upgrade').addEventListener('click', () => {
+      if (!state.inspectedKey) return;
+      const { world, key } = state.inspectedKey;
+      const grid = world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+      const cell = grid[key];
+      if (!cell) return;
+
+      const upgCost = Math.round(cell.item.cost * 0.8 * cell.level);
+      if (state.cash < upgCost) {
+        spawnFloatingText(cell.mesh.position, 'Δεν φτάνουν τα $!', '#ff4d4d');
+        playSound('cancel');
+        return;
+      }
+
+      state.cash -= upgCost;
+      cell.level += 1;
+      group.remove(cell.mesh);
+      cell.mesh = createBuildingMesh(cell.item, cell.level, false);
+      cell.mesh.position.copy(cell.tileMesh.position);
+      cell.mesh.position.y = 0.08;
+      cell.mesh.rotation.y = (cell.rotation || 0) * (Math.PI / 2);
+      group.add(cell.mesh);
+
+      playSound('confirm');
+      spawnFloatingText(cell.mesh.position, `Level ${cell.level}!`, '#00f5d4');
+      openInspector(world, key);
+      updateHUD();
+    });
+
+    // Κουμπί Μετακίνησης & Περιστροφής Υπάρχοντος Κτιρίου ($100)
+    document.getElementById('insp-move').addEventListener('click', () => {
+      if (!state.inspectedKey) return;
+      const { world, key } = state.inspectedKey;
+      const grid = world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+      const cell = grid[key];
+      if (!cell) return;
+
+      if (state.cash < MOVE_ROTATE_COST) {
+        spawnFloatingText(cell.mesh.position, `Χρειάζεσαι $${MOVE_ROTATE_COST}!`, '#ff4d4d');
+        playSound('cancel');
+        return;
+      }
+
+      // Αποθηκεύουμε τα αρχικά στοιχεία σε περίπτωση ακύρωσης
+      const snapshot = { ...cell };
+      group.remove(cell.mesh);
+      delete grid[key];
+
+      closeInspector();
+      startPendingPlacement(snapshot.tileMesh, snapshot.item, 'edit', snapshot);
+    });
+
+    // Κουμπί Πώλησης
+    document.getElementById('insp-sell').addEventListener('click', () => {
+      if (!state.inspectedKey) return;
+      const { world, key } = state.inspectedKey;
+      const grid = world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+      const cell = grid[key];
+      if (!cell) return;
+
+      const refund = Math.round(cell.item.cost * 0.5 * cell.level);
+      state.cash += refund;
+      group.remove(cell.mesh);
+      delete grid[key];
+
+      playSound('confirm');
+      spawnFloatingText(cell.tileMesh.position, `+$${refund}`, '#ffd166');
+      closeInspector();
+      updateHUD();
+    });
+
+    // ==========================================
+    // 11. UI DOCK & VIEW SWITCHER
+    // ==========================================
+    function renderDock() {
+      const dockGrid = document.getElementById('build-grid');
+      dockGrid.innerHTML = '';
+      const list = CATALOG[state.mode];
+
+      const statusEl = document.getElementById('dock-status');
+      if (state.selectedTool) {
+        const sel = list.find(x => x.id === state.selectedTool);
+        statusEl.textContent = sel ? `Επιλεγμένο: ${sel.name}` : 'Λειτουργία Επιλογής';
+        statusEl.style.color = '#ffd166';
+      } else {
+        statusEl.textContent = 'Tap σε κτίριο για Επιλογές';
+        statusEl.style.color = '#00f5d4';
+      }
+
+      list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `build-card ${state.selectedTool === item.id ? 'active' : ''}`;
+        card.innerHTML = `
+          <div class="build-icon">${item.icon}</div>
+          <div class="build-name">${item.name}</div>
+          <div class="build-cost">$${item.cost}</div>
+        `;
+        card.addEventListener('click', () => {
+          // Αν είχαμε ανοιχτό ghost από προηγούμενη ενέργεια, το ακυρώνουμε
+          if (state.pendingPlacement) cancelPendingPlacement();
+          closeInspector();
+
+          // Εναλλαγή επιλογής (toggle)
+          if (state.selectedTool === item.id) {
+            state.selectedTool = null;
+            document.getElementById('ui-hint').innerHTML = '👆 Πάτησε πάνω σε υπάρχον κτίριο στον χάρτη για Αναβάθμιση ή Μετακίνηση.';
+          } else {
+            state.selectedTool = item.id;
+            document.getElementById('ui-hint').innerHTML = `${item.icon} <b>${item.name}:</b> Πάτησε σε ένα κενό πλακίδιο για προσωρινή τοποθέτηση & περιστροφή!`;
+          }
+          playSound('preview');
+          renderDock();
+        });
+        dockGrid.appendChild(card);
+      });
+    }
+
+    document.getElementById('btn-switch-view').addEventListener('click', () => {
+      if (state.pendingPlacement) cancelPendingPlacement();
+      closeInspector();
+      state.selectedTool = null;
+
+      if (state.mode === 'exterior') {
+        state.mode = 'interior';
+        exteriorGroup.visible = false;
+        interiorGroup.visible = true;
+        scene.background.setHex(0x140519);
+        document.getElementById('btn-switch-view').innerHTML = '🌴 Έξοδος στο Strip';
+        document.getElementById('dock-title').textContent = '🎰 Εξοπλισμός Καζίνο (Επίλεξε για χτίσιμο)';
+        document.getElementById('ui-hint').innerHTML = '🃏 <b>Καζίνο:</b> Επίλεξε τραπέζι από κάτω ή πάτησε σε υπάρχον για Rotate/Αναβάθμιση!';
+      } else {
+        state.mode = 'exterior';
+        interiorGroup.visible = false;
+        exteriorGroup.visible = true;
+        scene.background.setHex(0x090614);
+        document.getElementById('btn-switch-view').innerHTML = '🎰 Είσοδος στο Καζίνο';
+        document.getElementById('dock-title').textContent = '🏗️ Κατασκευές Resort (Επίλεξε για χτίσιμο)';
+        document.getElementById('ui-hint').innerHTML = '🌴 <b>Las Vegas Strip:</b> Πάτησε σε υπάρχον κτίριο για Αναβάθμιση/Μετακίνηση ή χτίσε νέο!';
+      }
+      renderDock();
+    });
+
+    // Camera Rotation & Sound Toggle
+    let camTargetAngle = Math.PI / 4;
+    let camAngle = Math.PI / 4;
+
+    document.getElementById('btn-cam-rotate').addEventListener('click', () => {
+      camTargetAngle += Math.PI / 2;
+      playSound('rotate');
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', (e) => {
+      soundEnabled = !soundEnabled;
+      e.currentTarget.textContent = soundEnabled ? '🔊' : '🔇';
+    });
+
+    // Odds Modal
+    const oddsModal = document.getElementById('odds-modal');
+    document.getElementById('btn-odds').addEventListener('click', () => {
+      oddsModal.style.display = oddsModal.style.display === 'block' ? 'none' : 'block';
+    });
+    document.getElementById('odds-close').addEventListener('click', () => {
+      oddsModal.style.display = 'none';
+    });
+    document.getElementById('odds-slider').addEventListener('input', (e) => {
+      state.houseEdge = parseInt(e.target.value, 10);
+      document.getElementById('ui-odds-val').textContent = `${state.houseEdge}%`;
+      document.getElementById('odds-modal-label').textContent = `${state.houseEdge}% House Edge`;
+      updateHUD();
+    });
+
+    // ==========================================
+    // 12. TOUCH & TAP CONTROLS (ΧΩΡΙΣ ΔΙΠΛΟ FIRE ΣΤΑ ΚΙΝΗΤΑ)
+    // ==========================================
+    const camTarget = new THREE.Vector3(0, 0, 1.5);
+    let camRadius = 21;
+    let camElevation = 0.85;
+
+    function updateCameraPosition() {
+      camera.position.x = camTarget.x + camRadius * Math.sin(camAngle) * Math.cos(camElevation);
+      camera.position.y = camTarget.y + camRadius * Math.sin(camElevation);
+      camera.position.z = camTarget.z + camRadius * Math.cos(camAngle) * Math.cos(camElevation);
+      camera.lookAt(camTarget);
+    }
+    updateCameraPosition();
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+
+    function handleMapTap(clientX, clientY) {
+      pointer.x = (clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+
+      const targets = state.mode === 'exterior' ? pickableTilesExt : pickableTilesInt;
+      const intersects = raycaster.intersectObjects(targets, false);
+
+      if (intersects.length === 0) return;
+
+      const tile = intersects[0].object;
+      const { key, world } = tile.userData;
+      const grid = world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      const existingCell = grid[key];
+
+      // ΠΕΡΙΠΤΩΣΗ 1: Έχουμε ήδη ενεργό προσωρινό κτίριο (Ghost Preview)
+      if (state.pendingPlacement) {
+        if (!existingCell) {
+          // Μετακινεί το προσωρινό κτίριο στο νέο κενό πλακίδιο
+          startPendingPlacement(tile, state.pendingPlacement.item, state.pendingPlacement.mode, state.pendingPlacement.originalData);
+        } else {
+          spawnFloatingText(tile.position, 'Το πλακίδιο είναι πιασμένο!', '#ff4d4d');
+          playSound('cancel');
+        }
+        return;
+      }
+
+      // ΠΕΡΙΠΤΩΣΗ 2: Πατήσαμε πάνω σε ΗΔΗ τοποθετημένο κτίριο -> Ανοίγει το μενού Αναβάθμισης / Μετακίνησης!
+      if (existingCell) {
+        openInspector(world, key);
+        return;
+      }
+
+      // ΠΕΡΙΠΤΩΣΗ 3: Πατήσαμε σε κενό πλακίδιο ενώ έχουμε επιλέξει κτίριο από το κάτω μενού -> Το βάζει ΠΡΟΣΩΡΙΝΑ!
+      if (state.selectedTool) {
+        const item = CATALOG[world].find(x => x.id === state.selectedTool);
+        if (item) {
+          startPendingPlacement(tile, item, 'new', null);
+        }
+      } else {
+        closeInspector();
+      }
+    }
+
+    const domEl = renderer.domElement;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let lastX = 0, lastY = 0;
+    let pinchDist = 0;
+    let lastTouchTimestamp = 0; // Αποτρέπει το διπλό synthetic mouse click στα κινητά!
+
+    domEl.addEventListener('touchstart', (e) => {
+      lastTouchTimestamp = Date.now();
+      if (e.touches.length === 1) {
+        isDragging = false;
+        startX = lastX = e.touches[0].clientX;
+        startY = lastY = e.touches[0].clientY;
+      } else if (e.touches.length === 2) {
+        isDragging = true;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchDist = Math.hypot(dx, dy);
+      }
+    }, { passive: false });
+
+    domEl.addEventListener('touchmove', (e) => {
+      lastTouchTimestamp = Date.now();
+      e.preventDefault();
+      if (e.touches.length === 1) {
+        const cx = e.touches[0].clientX;
+        const cy = e.touches[0].clientY;
+        if (Math.hypot(cx - startX, cy - startY) > 10) isDragging = true;
+
+        if (isDragging) {
+          const dx = (cx - lastX) * 0.032;
+          const dy = (cy - lastY) * 0.032;
+          camTarget.x = Math.max(-7, Math.min(7, camTarget.x - dx));
+          camTarget.z = Math.max(-7, Math.min(9, camTarget.z - dy));
+          updateCameraPosition();
+        }
+        lastX = cx;
+        lastY = cy;
+      } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const newDist = Math.hypot(dx, dy);
+        const delta = (pinchDist - newDist) * 0.045;
+        camRadius = Math.max(12, Math.min(30, camRadius + delta));
+        pinchDist = newDist;
+        updateCameraPosition();
+      }
+    }, { passive: false });
+
+    domEl.addEventListener('touchend', (e) => {
+      lastTouchTimestamp = Date.now();
+      if (!isDragging && e.changedTouches.length === 1) {
+        handleMapTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }
+    });
+
+    // Mouse Events (μόνο για υπολογιστή, αγνοούνται αν προηγήθηκε touch)
+    let mouseDown = false;
+    domEl.addEventListener('mousedown', (e) => {
+      if (Date.now() - lastTouchTimestamp < 600) return;
+      mouseDown = true;
+      isDragging = false;
+      startX = lastX = e.clientX;
+      startY = lastY = e.clientY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!mouseDown || Date.now() - lastTouchTimestamp < 600) return;
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) isDragging = true;
+      if (isDragging) {
+        camTarget.x = Math.max(-7, Math.min(7, camTarget.x - (e.clientX - lastX) * 0.03));
+        camTarget.z = Math.max(-7, Math.min(9, camTarget.z - (e.clientY - lastY) * 0.03));
+        updateCameraPosition();
+      }
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (Date.now() - lastTouchTimestamp < 600) return;
+      if (mouseDown && !isDragging && e.target === domEl) {
+        handleMapTap(e.clientX, e.clientY);
+      }
+      mouseDown = false;
+    });
+
+    domEl.addEventListener('wheel', (e) => {
+      camRadius = Math.max(12, Math.min(30, camRadius + e.deltaY * 0.015));
+      updateCameraPosition();
+    });
+
+    // ==========================================
+    // 13. FLOATING TEXT & GAME LOOP
+    // ==========================================
+    function spawnFloatingText(worldPos, text, color = '#06d6a0') {
+      const vec = worldPos.clone();
+      vec.y += 1.8;
+      vec.project(camera);
+
+      const x = (vec.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-(vec.y * 0.5) + 0.5) * window.innerHeight;
+
+      const el = document.createElement('div');
+      el.className = 'float-text';
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      el.style.color = color;
+      el.textContent = text;
+      document.getElementById('floating-container').appendChild(el);
+      setTimeout(() => el.remove(), 1300);
+    }
+
+    function seedStarterResort() {
+      const findTile = (list, gx, gz) => list.find(t => t.userData.gx === gx && t.userData.gz === gz);
+      placeStarterBuilding(findTile(pickableTilesExt, 0, 1), 'casino', 0);
+      placeStarterBuilding(findTile(pickableTilesExt, -2, 1), 'fountain', 0);
+      placeStarterBuilding(findTile(pickableTilesExt, 2, -2), 'generator', 0);
+
+      placeStarterBuilding(findTile(pickableTilesInt, -1, 0), 'slots', 0);
+      placeStarterBuilding(findTile(pickableTilesInt, 0, 0), 'wall', 1); // Κάθετος τοίχος!
+      placeStarterBuilding(findTile(pickableTilesInt, 1, 0), 'vip_bj', 0);
+    }
+
+    createWorlds();
+    seedStarterResort();
+    renderDock();
+    updateHUD();
+
+    // Κύκλος Εσόδων
+    setInterval(() => {
+      const totals = calculateTotals();
+      state.cash += totals.totalIncome;
+      updateHUD();
+
+      const activeGrid = state.mode === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+      Object.values(activeGrid).forEach(cell => {
+        const stat = evaluateTileStats(state.mode, cell);
+        if (stat.income > 0) {
+          spawnFloatingText(cell.mesh.position, `+$${stat.income}`, '#06d6a0');
+        }
+      });
+    }, 2200);
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      // Ομαλή περιστροφή κάμερας
+      if (Math.abs(camTargetAngle - camAngle) > 0.005) {
+        camAngle += (camTargetAngle - camAngle) * 0.12;
+        updateCameraPosition();
+      }
+
+      // Εφέ παλμού στο προσωρινό κτίριο (Ghost)
+      if (state.pendingPlacement && state.pendingPlacement.mesh) {
+        state.pendingPlacement.mesh.position.y = 0.12 + Math.sin(t * 6) * 0.06;
+      }
+
+      animatedObjects.forEach(obj => {
+        if (obj.type === 'spin') obj.mesh.rotation.y += 0.035;
+      });
+
+      vehicles.forEach(v => {
+        v.mesh.position.x += v.speed;
+        if (v.mesh.position.x > 16) v.mesh.position.x = -16;
+        if (v.mesh.position.x < -16) v.mesh.position.x = 16;
+      });
+
+      walkers.forEach(w => {
+        const dx = w.tx - w.mesh.position.x;
+        const dz = w.tz - w.mesh.position.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist < 0.3) {
+          w.tx = (Math.random() - 0.5) * 11;
+          w.tz = (Math.random() - 0.5) * 11;
+        } else {
+          w.mesh.position.x += (dx / dist) * 0.025;
+          w.mesh.position.z += (dz / dist) * 0.025;
+        }
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

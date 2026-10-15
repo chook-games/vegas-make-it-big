@@ -1,0 +1,20 @@
+{
+  "name": "Vegas: Make It Big",
+  "short_name": "Vegas MIB",
+  "description": "Χτίσε το απόλυτο Καζίνο-Resort στην καρδιά της Vegas.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070510",
+  "theme_color": "#070510",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

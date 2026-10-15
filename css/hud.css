@@ -1,0 +1,133 @@
+.top-hud {
+  position: fixed;
+  top: calc(var(--safe-top) + 6px);
+  left: 8px;
+  right: 8px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: var(--dark-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 8px 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #aaa;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.stat-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.sub-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  pointer-events: auto;
+}
+
+.mode-switch-btn {
+  flex: 1 1 130px;
+  min-width: 0;
+  background: linear-gradient(135deg, #ff2a85, #7b2cbf);
+  border: 1px solid #ff85b3;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 42, 133, 0.45);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mode-switch-btn:active { transform: scale(0.97); }
+
+.icon-btn {
+  background: var(--dark-bg);
+  border: 1px solid var(--panel-border);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 8px 9px;
+  border-radius: 12px;
+  cursor: pointer;
+  line-height: 1;
+}
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn.alert { border-color: var(--gold); box-shadow: 0 0 12px rgba(255,209,102,0.6); animation: pulseBtn 1.4s infinite; }
+
+@keyframes pulseBtn {
+  0%, 100% { box-shadow: 0 0 6px rgba(255,209,102,0.5); }
+  50% { box-shadow: 0 0 16px rgba(255,209,102,0.95); }
+}
+
+.odds-btn {
+  background: var(--dark-bg);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  font-weight: 700;
+  font-size: 12px;
+  padding: 9px 9px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.info-strip {
+  display: flex;
+  gap: 6px;
+  pointer-events: none;
+  flex-wrap: wrap;
+}
+
+.info-chip {
+  background: rgba(18, 16, 36, 0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #dfe3ff;
+  white-space: nowrap;
+}
+
+.hint-banner {
+  background: rgba(18, 16, 36, 0.88);
+  border-left: 3px solid var(--neon-cyan);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: #e0e0ff;
+  text-shadow: 0 1px 2px #000;
+}
