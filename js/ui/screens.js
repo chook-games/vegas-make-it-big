@@ -6,6 +6,9 @@ import { ACHIEVEMENTS } from '../data/achievements.js';
 import { questProgress } from '../game/quests.js';
 import { prestigeGoal, canPrestige, previewPoints, doPrestige } from '../game/prestige.js';
 import { playSound, refreshMusic } from '../audio/audio.js';
+import { rankFor } from '../data/levels.js';
+import { allItems } from '../data/buildings.js';
+import { STAFF } from '../data/staff.js';
 
 export function openQuestsScreen() {
   const rows = QUESTS.map((q, i) => {
@@ -126,6 +129,29 @@ export function openWelcomeScreen({ hasSave, onContinue, onNew }) {
       hasSave ? { label: 'Συνέχεια', cls: 'btn-green', onClick: () => { closeModal(); onContinue && onContinue(); } } : null,
       { label: hasSave ? 'Νέο Παιχνίδι' : 'Ξεκίνα', cls: 'btn-primary', onClick: () => { closeModal(); onNew && onNew(); } }
     ].filter(Boolean)
+  });
+}
+
+export function openLevelUpScreen({ level, reward }) {
+  const unlockedBuildings = allItems().filter(i => i.requires && i.requires.level === level);
+  const unlockedStaff = STAFF.filter(s => s.requires && s.requires.level === level);
+  let unlockHTML = '';
+  if (unlockedBuildings.length) {
+    unlockHTML += '<div class="spacer"></div><div class="muted">🔓 Νέα κτίρια:</div>' +
+      unlockedBuildings.map(i => `<div class="list-row"><div class="list-icon">${i.icon}</div><div class="list-main"><div class="list-name">${i.name}</div></div></div>`).join('');
+  }
+  if (unlockedStaff.length) {
+    unlockHTML += '<div class="spacer"></div><div class="muted">🔓 Νέο προσωπικό:</div>' +
+      unlockedStaff.map(s => `<div class="list-row"><div class="list-icon">${s.icon}</div><div class="list-main"><div class="list-name">${s.name}</div></div></div>`).join('');
+  }
+  openModal({
+    title: `🆙 Level ${level}!`,
+    bodyHTML: `
+      <div class="center big-stat">${rankFor(level)}</div>
+      <div class="center muted">Ανταμοιβή: +$${reward.cash.toLocaleString()}${reward.gold ? ` · +${reward.gold} 💎` : ''}</div>
+      ${unlockHTML}
+    `,
+    actions: [{ label: 'Τέλεια!', cls: 'btn-green', onClick: closeModal }]
   });
 }
 

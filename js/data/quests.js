@@ -82,5 +82,33 @@ export const QUESTS = [
     reward: { cash: 10000, rep: 10 },
     goal: s => s.reputation >= 70,
     progress: s => clampProgress(Math.floor(s.reputation), 70)
+  },
+  {
+    id: 'q_staff', title: 'Στελέχωση', icon: '👔',
+    desc: 'Πρόσλαβε 3 εργαζόμενους για να ανεβάσεις την απόδοση.',
+    reward: { cash: 2500 },
+    goal: s => Object.values(s.staff || {}).reduce((a, b) => a + b, 0) >= 3,
+    progress: s => clampProgress(Object.values(s.staff || {}).reduce((a, b) => a + b, 0), 3)
+  },
+  {
+    id: 'q_plot', title: 'Μεγάλωσε το Resort', icon: '🗺️',
+    desc: 'Αγόρασε ένα Plot επέκτασης χάρτη.',
+    reward: { cash: 6000 },
+    goal: s => s.plots >= 1,
+    progress: s => clampProgress(s.plots, 1)
+  },
+  {
+    id: 'q_level10', title: 'Άνοδος', icon: '🆙',
+    desc: 'Φτάσε στο Level 10.',
+    reward: { cash: 8000, gold: 1 },
+    goal: s => s.level >= 10,
+    progress: s => clampProgress(s.level, 10)
+  },
+  {
+    id: 'q_level20', title: 'Βετεράνος', icon: '🎖️',
+    desc: 'Φτάσε στο Level 20 και χτίσε αυτοκρατορία.',
+    reward: { cash: 30000, gold: 3 },
+    goal: s => s.level >= 20,
+    progress: s => clampProgress(s.level, 20)
   }
 ];

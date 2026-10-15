@@ -1,6 +1,9 @@
 import { state } from '../core/state.js';
 import { BASE_POWER_CAP, BASE_GUESTS } from '../core/constants.js';
 import { getTimeFactors, seasonInfo } from './daynight.js';
+import { addXP } from './leveling.js';
+import { XP } from '../data/levels.js';
+import { staffEffects, totalWages } from './staff.js';
 
 function getNeighbors(grid, gx, gz) {
   const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -98,17 +101,27 @@ export function calculateTotals() {
   const time = getTimeFactors();
   const season = seasonInfo();
   const event = state.event;
-  const eventIncome = event ? (event.effects.incomeMul || 1) : 1;
+  let eventIncome = event ? (event.effects.incomeMul || 1) : 1;
   const eventGuest = event ? (event.effects.guestMul || 1) : 1;
 
-  const totalIncome = Math.round(
+  const eff = staffEffects();
+  const staffIncomeMul = 1 + eff.incomePct;
+
+  if (event && event.id === 'ev_hackers') {
+    eventIncome = eventIncome + (1 - eventIncome) * eff.crime;
+  }
+
+  const grossIncome = Math.round(
     (rawExt * time.dayFactor + rawInt * time.nightFactor) *
     edgeIncomeFactor * repFactor * happyFactor *
-    season.incomeMul * eventIncome * powerPenalty * prestigeMul
+    season.incomeMul * eventIncome * powerPenalty * prestigeMul * staffIncomeMul
   );
 
-  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul;
-  let guests = Math.round(capacity * Math.min(demandFactor, 2.4));
+  const wages = totalWages();
+  const totalIncome = grossIncome - wages;
+
+  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct);
+  let guests = Math.round(capacity * Math.min(demandFactor, 3.0));
   if (hasBlackout) guests = Math.round(guests * 0.6);
   guests = Math.max(0, guests);
 
@@ -116,14 +129,14 @@ export function calculateTotals() {
 
   return {
     powerUsed, powerCap, capacity, guests, fill,
-    rawExt, rawInt, totalIncome, hasBlackout,
+    rawExt, rawInt, totalIncome, grossIncome, wages, hasBlackout,
     edgeIncomeFactor, edgeGuestFactor, repFactor, happyFactor,
-    prestigeMul, eventIncome, eventGuest
+    prestigeMul, eventIncome, eventGuest, staffEff: eff
   };
 }
 
 export function updateHappinessAndReputation(totals) {
-  let target = 55 + totals.edgeGuestFactor * 30;
+  let target = 55 + totals.edgeGuestFactor * 30 + (totals.staffEff ? totals.staffEff.happiness : 0);
   if (totals.hasBlackout) target = 28;
   const overcrowded = totals.fill > 1.15;
   if (overcrowded) target -= 25;
@@ -144,6 +157,7 @@ export function doIncomeTick() {
   state.cash += totals.totalIncome;
   state.stats.totalEarned += Math.max(0, totals.totalIncome);
   updateHappinessAndReputation(totals);
+  if (totals.totalIncome > 0) addXP(Math.max(0.5, totals.totalIncome * XP.income));
   return totals;
 }
 

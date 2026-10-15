@@ -2,6 +2,7 @@ import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { DAY_LENGTH_MS, SEASONS } from '../core/constants.js';
 import { ambientLight, dirLight, neonPointLight, scene } from '../three/scene.js';
+import { updateSky } from '../three/sky.js';
 
 function bandFor(hour) {
   if (hour >= 22 || hour < 6) return { id: 'night', name: 'Νύχτα', nightFactor: 1.35, dayFactor: 0.8 };
@@ -47,6 +48,8 @@ function applyLighting() {
   dirLight.intensity = 0.25 + dayLight * 0.75;
   ambientLight.intensity = 0.35 + dayLight * 0.4;
   neonPointLight.intensity = 0.6 + nightAmount * 1.4;
+
+  updateSky(state.clock.hour, nightAmount);
 
   if (state.mode === 'exterior') {
     const r = Math.round(9 + dayLight * 60);

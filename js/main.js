@@ -3,7 +3,9 @@ import { Bus, EV } from './core/events.js';
 import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
 import { hasSave, load, save, resetToNew } from './core/save.js';
 import { createWorlds } from './three/worlds.js';
-import { scene, camera, renderer, animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
+import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
+import { renderFrame, initPostFX, resizePostFX } from './three/postfx.js';
+import { updateParticles, spawnConfetti, spawnMoneyBurst } from './three/particles.js';
 import { initControls, updateCamera, rotateCameraStep } from './three/controls.js';
 import { initToast, spawnFloatingText } from './ui/toast.js';
 import { initHUD, updateHUD } from './ui/hud.js';
@@ -11,8 +13,10 @@ import { initDock, renderDock } from './ui/dock.js';
 import { initInspector, closeInspector } from './game/inspector.js';
 import { initPlacement, handleTileTap, seedStarterResort, rebuildBuildingsFromState, cancelPendingPlacement } from './game/placement.js';
 import { initTutorial, beginTutorial } from './game/tutorial.js';
-import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openWelcomeScreen } from './ui/screens.js';
+import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openWelcomeScreen, openLevelUpScreen } from './ui/screens.js';
+import { openStaffScreen } from './ui/staffScreen.js';
 import { openSettingsScreen } from './ui/settings.js';
+import { openPlotsScreen } from './ui/plotsScreen.js';
 import { updateDayNight } from './game/daynight.js';
 import { updateEvents } from './game/randomEvents.js';
 import { doIncomeTick, calculateTotals } from './game/economy.js';
@@ -37,6 +41,8 @@ function initUI() {
   document.getElementById('btn-cam-rotate').addEventListener('click', () => { rotateCameraStep(); playSound('rotate'); });
   document.getElementById('btn-sound').addEventListener('click', toggleSound);
   document.getElementById('btn-settings').addEventListener('click', () => { closeInspector(); openSettingsScreen(); });
+  document.getElementById('btn-staff').addEventListener('click', () => { closeInspector(); openStaffScreen(); });
+  document.getElementById('btn-plots').addEventListener('click', () => { closeInspector(); openPlotsScreen(); });
   document.getElementById('btn-quests').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
   document.getElementById('btn-ach').addEventListener('click', () => { closeInspector(); openAchievementsScreen(); });
   document.getElementById('btn-prestige').addEventListener('click', () => { closeInspector(); openPrestigeScreen(); });
@@ -56,11 +62,18 @@ function initUI() {
 
   document.getElementById('btn-sound').textContent = state.settings.sound ? '🔊' : '🔇';
 
-  window.addEventListener('resize', onResize);
+  window.addEventListener('resize', () => { onResize(); resizePostFX(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
   unlockAudio();
   document.body.addEventListener('pointerdown', unlockAudio, { once: true });
+
+  Bus.on('level:up', (data) => {
+    playSound('achievement');
+    vibrate(30);
+    spawnConfetti();
+    openLevelUpScreen(data);
+  });
 }
 
 function toggleSound() {
@@ -97,7 +110,7 @@ function switchView() {
 let lastGuestUpdate = 0;
 function loop() {
   requestAnimationFrame(loop);
-  const dt = clock.getDelta() * 1000;
+  const dt = Math.min(clock.getDelta() * 1000, 100);
   const t = clock.getElapsedTime();
 
   updateCamera();
@@ -119,11 +132,14 @@ function loop() {
   lastGuestUpdate += dt;
   if (lastGuestUpdate > 500) {
     lastGuestUpdate = 0;
-    updateGuests(dt, calculateTotals());
+    const totals = calculateTotals();
+    state._blackout = totals.hasBlackout;
+    updateGuests(dt, totals);
   }
-  animateGuests();
+  animateGuests(dt);
+  updateParticles(dt / 1000);
 
-  renderer.render(scene, camera);
+  renderFrame();
 }
 
 function incomeTick() {
@@ -189,6 +205,7 @@ function boot() {
   createWorlds();
   initControls(handleTileTap);
   applySettings();
+  initPostFX();
 
   const existing = hasSave();
   let raw = null;

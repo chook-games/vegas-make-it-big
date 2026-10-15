@@ -20,5 +20,12 @@ export const ACHIEVEMENTS = [
   { id: 'a_gen', title: 'Παραγωγή', icon: '⚡', desc: 'Χτίσε 4 γεννήτριες.', reward: { cash: 1500 }, check: s => countIn(s.exteriorGrid, 'generator') >= 4 },
   { id: 'a_firstday', title: 'Καλημέρα Vegas', icon: '🌅', desc: 'Ολοκλήρωσε την πρώτη σου μέρα.', reward: { cash: 500 }, check: s => s.clock.day >= 2 },
   { id: 'a_week', title: 'Πλήρης Εβδομάδα', icon: '📅', desc: 'Επιβίωσε 7 μέρες.', reward: { cash: 5000 }, check: s => s.clock.day >= 8 },
-  { id: 'a_prestige1', title: 'Ξανά από την Αρχή', icon: '💎', desc: 'Κάνε το πρώτο σου Prestige.', reward: { cash: 5000 }, check: s => s.prestigeLevel >= 1 }
+  { id: 'a_prestige1', title: 'Ξανά από την Αρχή', icon: '💎', desc: 'Κάνε το πρώτο σου Prestige.', reward: { cash: 5000 }, check: s => s.prestigeLevel >= 1 },
+  { id: 'a_level10', title: 'Ανερχόμενος', icon: '🆙', desc: 'Φτάσε Level 10.', reward: { cash: 2000 }, check: s => s.level >= 10 },
+  { id: 'a_level25', title: 'Κορυφαίος', icon: '🚀', desc: 'Φτάσε Level 25.', reward: { cash: 25000 }, check: s => s.level >= 25 },
+  { id: 'a_staff5', title: 'Αφεντικό', icon: '👔', desc: 'Πρόσλαβε 5 εργαζόμενους.', reward: { cash: 3000 }, check: s => Object.values(s.staff || {}).reduce((a, b) => a + b, 0) >= 5 },
+  { id: 'a_staff15', title: 'Αυτοκρατορία', icon: '🏢', desc: 'Πρόσλαβε 15 εργαζόμενους.', reward: { cash: 12000 }, check: s => Object.values(s.staff || {}).reduce((a, b) => a + b, 0) >= 15 },
+  { id: 'a_plot', title: 'Επεκτατικός', icon: '🗺️', desc: 'Αγόρασε ένα Plot επέκτασης.', reward: { cash: 4000 }, check: s => s.plots >= 1 },
+  { id: 'a_plot3', title: 'Μεγιστάνας Γης', icon: '🌐', desc: 'Επέκτεινε τον χάρτη 3 φορές.', reward: { cash: 20000 }, check: s => s.plots >= 3 },
+  { id: 'a_gold', title: 'Χρυσές Τσέπες', icon: '💎', desc: 'Συγκέντρωσε 10 gold.', reward: { cash: 8000 }, check: s => s.gold >= 10 }
 ];

@@ -4,11 +4,15 @@ import { QUESTS } from '../data/quests.js';
 import { ACHIEVEMENTS } from '../data/achievements.js';
 import { playSound } from '../audio/audio.js';
 import { save } from '../core/save.js';
+import { addXP } from './leveling.js';
+import { XP } from '../data/levels.js';
 
-function grantReward(reward) {
-  if (!reward) return;
-  if (reward.cash) state.cash += reward.cash;
-  if (reward.rep) state.reputation = Math.min(100, state.reputation + reward.rep);
+function grantReward(reward, xpAmount) {
+  if (reward) {
+    if (reward.cash) state.cash += reward.cash;
+    if (reward.rep) state.reputation = Math.min(100, state.reputation + reward.rep);
+  }
+  if (xpAmount) addXP(xpAmount);
 }
 
 export function activeQuest() {
@@ -20,7 +24,7 @@ export function checkQuests() {
   while (state.questIndex < QUESTS.length) {
     const q = QUESTS[state.questIndex];
     if (!q.goal(state)) break;
-    grantReward(q.reward);
+    grantReward(q.reward, XP.quest);
     state.questIndex++;
     advanced = true;
     playSound('quest');
@@ -41,7 +45,7 @@ export function checkAchievements() {
     if (state.achievements[a.id]) continue;
     if (a.check(state)) {
       state.achievements[a.id] = true;
-      grantReward(a.reward);
+      grantReward(a.reward, XP.achievement);
       unlocked++;
       playSound('achievement');
       const rewardTxt = a.reward && a.reward.cash ? ` +$${a.reward.cash}` : '';

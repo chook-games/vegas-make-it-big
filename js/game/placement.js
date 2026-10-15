@@ -8,6 +8,8 @@ import { findTile } from '../three/worlds.js';
 import { screenRay } from '../three/controls.js';
 import { spawnFloatingText } from '../ui/toast.js';
 import { playSound, vibrate } from '../audio/audio.js';
+import { addXP } from './leveling.js';
+import { XP, xpForCost } from '../data/levels.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -106,6 +108,8 @@ export function confirmPendingPlacement() {
   };
 
   if (p.mode === 'new') state.stats.buildingsBuilt++;
+
+  addXP(xpForCost(p.cost, p.mode === 'new' ? XP.build : XP.upgrade));
 
   spawnFloatingText(p.tileMesh.position, p.mode === 'new' ? `-$${p.cost}` : `Μετακινήθηκε (-$${p.cost})`, '#06d6a0');
   playSound('confirm');

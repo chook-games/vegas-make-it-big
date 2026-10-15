@@ -3,6 +3,7 @@ import { Bus, EV } from '../core/events.js';
 import { openModal, closeModal } from './modals.js';
 import { refreshMusic, playSound } from '../audio/audio.js';
 import { applySettings } from '../three/scene.js';
+import { setBloom, bloomAvailable } from '../three/postfx.js';
 import { resetToNew, save } from '../core/save.js';
 
 function toggleRow(label, sub, key, onChange) {
@@ -21,6 +22,7 @@ export function openSettingsScreen() {
     ${toggleRow('🎵 Μουσική', 'Απαλό ambient loop', 'music')}
     ${toggleRow('📳 Δόνηση', 'Haptic feedback (mobile)', 'vibration')}
     ${toggleRow('🌑 Σκιές', 'Πιο όμορφα αλλά πιο βαρύ', 'shadows')}
+    ${bloomAvailable() ? toggleRow('✨ Bloom (Neon Glow)', 'Λάμψη στα φώτα, πιο βαρύ', 'bloom') : ''}
     <div class="settings-row">
       <div>
         <div class="settings-label">🖥️ Πλήρης Οθόνη</div>
@@ -45,6 +47,7 @@ export function openSettingsScreen() {
         t.classList.toggle('on', state.settings[key]);
         if (key === 'music') refreshMusic();
         if (key === 'shadows') applySettings();
+        if (key === 'bloom') setBloom(state.settings.bloom);
         playSound('preview');
         save();
       });

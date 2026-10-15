@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v1';
+const CACHE = 'vegas-mib-v2';
 const CORE = [
   './',
   './index.html',
@@ -17,11 +17,19 @@ const CORE = [
   './js/data/quests.js',
   './js/data/achievements.js',
   './js/data/randomEvents.js',
+  './js/data/levels.js',
+  './js/data/staff.js',
   './js/audio/audio.js',
   './js/three/scene.js',
+  './js/three/meshkit.js',
   './js/three/meshes.js',
+  './js/three/meshes-exterior.js',
+  './js/three/meshes-interior.js',
   './js/three/worlds.js',
   './js/three/controls.js',
+  './js/three/sky.js',
+  './js/three/particles.js',
+  './js/three/postfx.js',
   './js/game/economy.js',
   './js/game/daynight.js',
   './js/game/randomEvents.js',
@@ -31,11 +39,16 @@ const CORE = [
   './js/game/prestige.js',
   './js/game/quests.js',
   './js/game/tutorial.js',
+  './js/game/leveling.js',
+  './js/game/staff.js',
+  './js/game/plots.js',
   './js/ui/toast.js',
   './js/ui/hud.js',
   './js/ui/dock.js',
   './js/ui/modals.js',
   './js/ui/screens.js',
+  './js/ui/staffScreen.js',
+  './js/ui/plotsScreen.js',
   './js/ui/settings.js'
 ];
 

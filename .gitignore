@@ -9,3 +9,7 @@ Thumbs.db
 
 # temp
 *.tmp
+
+# local test harness
+_test*.mjs
+_harness*.mjs

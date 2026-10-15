@@ -1,4 +1,9 @@
 import { camera, renderer } from './scene.js';
+import { state } from '../core/state.js';
+
+function lim() {
+  return Math.floor(state.gridSize / 2) * state.tileSize + 2;
+}
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
 let camRadius = 21;
@@ -25,8 +30,8 @@ export function updateCamera() {
 }
 
 export function focusOn(worldX, worldZ) {
-  camTarget.x = Math.max(-8, Math.min(8, worldX));
-  camTarget.z = Math.max(-8, Math.min(10, worldZ));
+  camTarget.x = Math.max(-lim(), Math.min(lim(), worldX));
+  camTarget.z = Math.max(-lim(), Math.min(lim() + 1, worldZ));
   updateCameraPosition();
 }
 
@@ -72,8 +77,8 @@ export function initControls(onTap) {
       const cy = e.touches[0].clientY;
       if (Math.hypot(cx - startX, cy - startY) > 10) isDragging = true;
       if (isDragging) {
-        camTarget.x = Math.max(-8, Math.min(8, camTarget.x - (cx - lastX) * 0.032));
-        camTarget.z = Math.max(-8, Math.min(10, camTarget.z - (cy - lastY) * 0.032));
+        camTarget.x = Math.max(-lim(), Math.min(lim(), camTarget.x - (cx - lastX) * 0.032));
+        camTarget.z = Math.max(-lim(), Math.min(lim() + 1, camTarget.z - (cy - lastY) * 0.032));
         updateCameraPosition();
       }
       lastX = cx; lastY = cy;
@@ -108,8 +113,8 @@ export function initControls(onTap) {
     if (!mouseDown || Date.now() - lastTouch < 600) return;
     if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) isDragging = true;
     if (isDragging) {
-      camTarget.x = Math.max(-8, Math.min(8, camTarget.x - (e.clientX - lastX) * 0.03));
-      camTarget.z = Math.max(-8, Math.min(10, camTarget.z - (e.clientY - lastY) * 0.03));
+      camTarget.x = Math.max(-lim(), Math.min(lim(), camTarget.x - (e.clientX - lastX) * 0.03));
+      camTarget.z = Math.max(-lim(), Math.min(lim() + 1, camTarget.z - (e.clientY - lastY) * 0.03));
       updateCameraPosition();
     }
     lastX = e.clientX; lastY = e.clientY;

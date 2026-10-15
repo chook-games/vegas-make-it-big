@@ -2,6 +2,8 @@ import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { calculateTotals } from '../game/economy.js';
 import { formatClock, seasonInfo } from '../game/daynight.js';
+import { levelProgress } from '../game/leveling.js';
+import { totalStaff } from '../game/staff.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -26,6 +28,14 @@ export function updateHUD() {
   document.getElementById('ui-season').textContent = `${s.icon} ${s.name}`;
 
   document.getElementById('ui-odds-val').textContent = `${state.houseEdge}%`;
+
+  const lp = levelProgress();
+  document.getElementById('ui-xp-fill').style.width = `${lp.pct}%`;
+  document.getElementById('ui-level').textContent = `Lv.${lp.level} · ${lp.rank} · ${lp.xp}/${lp.need} XP`;
+
+  document.getElementById('ui-gold').textContent = `💎 ${state.gold}`;
+  document.getElementById('ui-staff').textContent = `👔 ${totalStaff()} εργαζόμενοι`;
+
   return totals;
 }
 

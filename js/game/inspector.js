@@ -7,6 +7,8 @@ import { evaluateTileStats, upgradeCost, sellRefund } from './economy.js';
 import { startPendingPlacement } from './placement.js';
 import { spawnFloatingText } from '../ui/toast.js';
 import { playSound, vibrate } from '../audio/audio.js';
+import { addXP } from './leveling.js';
+import { XP, xpForCost } from '../data/levels.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -71,6 +73,7 @@ function onUpgrade() {
 
   playSound('levelup');
   vibrate(25);
+  addXP(xpForCost(cost, XP.upgrade));
   spawnFloatingText(cell.mesh.position, `Level ${cell.level}!`, '#00f5d4');
   openInspector(world, key);
   Bus.emit(EV.CASH_CHANGED);
