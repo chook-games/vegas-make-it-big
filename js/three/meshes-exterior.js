@@ -1,21 +1,24 @@
 import { std, bas, glow, box, cyl, cone, sphere, at, spin, scaleFor } from './meshkit.js';
 
 export const EXTERIOR = {
-  casino(item, level) {
+  casino(item, level, ctx) {
     const g = new THREE.Group();
     const s = scaleFor(level);
-    g.add(at(box(1.6, 1.45 * s, 1.4, std(0x2b0938, { roughness: 0.4 })), 0, 0.72 * s, -0.1));
-    g.add(at(box(1.75, 0.2, 1.55, bas(0xff2a85)), 0, 1.5 * s, -0.1));
+    const shell = ctx && ctx.theme ? ctx.theme.shell : 0x2b0938;
+    const roof = ctx && ctx.theme ? ctx.theme.roof : 0xff2a85;
+    g.add(at(box(1.6, 1.45 * s, 1.4, std(shell, { roughness: 0.4 })), 0, 0.72 * s, -0.1));
+    g.add(at(box(1.75, 0.2, 1.55, bas(roof)), 0, 1.5 * s, -0.1));
     g.add(at(box(0.9, 0.18, 0.55, bas(0xffd166)), 0, 0.65, 0.72));
     g.add(at(box(0.65, 0.06, 0.5, bas(0xef233c)), 0, 0.04, 0.75));
     const sign = at(new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), bas(0xffd166)), 0, 2.05 * s, -0.1);
     spin(sign); g.add(sign);
     return g;
   },
-  hotel(item, level) {
+  hotel(item, level, ctx) {
     const g = new THREE.Group();
     const s = scaleFor(level);
-    g.add(at(box(1.45, 2.7 * s, 0.95, std(0x00bbf9, { metalness: 0.5, roughness: 0.2 })), 0, 1.35 * s, -0.35));
+    const shell = ctx && ctx.theme ? ctx.theme.shell : 0x00bbf9;
+    g.add(at(box(1.45, 2.7 * s, 0.95, std(shell, { metalness: 0.5, roughness: 0.2 })), 0, 1.35 * s, -0.35));
     g.add(at(box(1.55, 0.2, 1.05, bas(0xffd166)), 0, 2.75 * s, -0.35));
     g.add(at(box(1.35, 0.12, 0.75, std(0xf8f9fa)), 0, 0.06, 0.48));
     g.add(at(box(1.05, 0.15, 0.5, bas(0x00f5d4)), 0, 0.07, 0.48));
@@ -229,6 +232,114 @@ export const EXTERIOR = {
     g.add(at(sphere(0.6, 14, std(0x33415c)), 0, 2.6 * s, 0));
     const beam = at(cone(0.2, 1.0, 8, glow(0x00f5d4, 0.5)), 0.3, 3.1 * s, 0.3);
     spin(beam); g.add(beam);
+    return g;
+  },
+  statue(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    const c = ctx && ctx.theme ? ctx.theme.accent : 0x2ecc71;
+    g.add(at(box(0.9, 0.4, 0.9, std(0xd9d9d9)), 0, 0.2, 0));
+    g.add(at(cyl(0.18, 0.28, 2.4 * s, 10, std(c)), 0, 1.6 * s, 0));
+    g.add(at(sphere(0.22, 10, std(c)), 0, 2.9 * s, 0));
+    const torch = at(cone(0.12, 0.5, 8, glow(0xffd166, 0.9)), 0.25, 3.2 * s, 0);
+    spin(torch); g.add(torch);
+    return g;
+  },
+  titanic(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    const c = ctx && ctx.theme ? ctx.theme.shell : 0x023e8a;
+    g.add(at(box(2.0, 0.7 * s, 0.8, std(c)), 0, 0.5, 0));
+    g.add(at(box(1.6, 0.35, 0.55, std(0xffffff)), 0, 1.05 * s, 0));
+    for (const x of [-0.5, 0, 0.5]) g.add(at(cyl(0.1, 0.14, 0.6 * s, 8, std(0xd62828)), x, 1.5 * s, 0));
+    return g;
+  },
+  rocket(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(cyl(0.35, 0.5, 2.4 * s, 12, std(0xe0e0e0)), 0, 1.2 * s, 0));
+    g.add(at(cone(0.35, 0.8, 12, std(0xff2a85)), 0, 2.75 * s, 0));
+    g.add(at(cone(0.2, 0.7, 8, glow(0xff8c00, 0.9)), 0, -0.05, 0));
+    for (let i = 0; i < 3; i++) {
+      const a = (i / 3) * Math.PI * 2;
+      g.add(at(box(0.1, 0.6, 0.5, std(0x00f5d4)), Math.cos(a) * 0.5, 0.3, Math.sin(a) * 0.5));
+    }
+    return g;
+  },
+  trex(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(0.5, 1.1 * s, 0.9, std(0x3f7d2e)), 0, 0.75 * s, -0.2));
+    g.add(at(box(0.5, 0.5, 0.6, std(0x2e6b2e)), 0.1, 1.5 * s, 0.2));
+    g.add(at(box(0.7, 0.2, 0.2, std(0x2e6b2e)), 0.5, 1.55 * s, 0.3));
+    g.add(at(cyl(0.06, 0.16, 1.4 * s, 6, std(0x3f7d2e)), -0.1, 0.5, 0.7));
+    return g;
+  },
+  pagoda(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    const c = ctx && ctx.theme ? ctx.theme.shell : 0x9d0208;
+    for (let i = 0; i < 3; i++) {
+      const w = 1.4 - i * 0.35;
+      g.add(at(box(w, 0.4, w, std(c)), 0, 0.4 + i * 0.75 * s, 0));
+      const roof = cone(w * 0.8, 0.4, 4, std(0xffd166));
+      roof.rotation.y = Math.PI / 4;
+      g.add(at(roof, 0, 0.75 + i * 0.75 * s, 0));
+    }
+    return g;
+  },
+  pyramid(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    const c = ctx && ctx.theme ? ctx.theme.shell : 0xc9a227;
+    const p = new THREE.Mesh(new THREE.ConeGeometry(1.1, 2.0 * s, 4), std(c));
+    p.rotation.y = Math.PI / 4;
+    g.add(at(p, 0, 1.0 * s, 0));
+    g.add(at(box(0.3, 0.4, 0.1, bas(0x111111)), 0, 0.4, 0.75));
+    const glowTop = at(cone(0.15, 0.3, 4, glow(0xffd166, 0.9)), 0, 2.05 * s, 0);
+    spin(glowTop); g.add(glowTop);
+    return g;
+  },
+  saloon(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.6, 1.1 * s, 1.2, std(0x8f5a30)), 0, 0.55 * s, 0));
+    g.add(at(box(1.8, 0.2, 1.4, std(0x5a3320)), 0, 1.15 * s, 0));
+    g.add(at(cyl(0.05, 0.05, 1.2, 6, std(0x4a2c17)), 0, 0.9, -0.6));
+    g.add(at(box(0.8, 0.35, 0.05, bas(0xd9822b)), 0, 0.9, 0.61));
+    return g;
+  },
+  volcano(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(cone(1.2, 1.8 * s, 8, std(0x4a3520)), 0, 0.9 * s, 0));
+    const lava = at(cone(0.35, 0.5, 8, glow(0xff4d00, 0.95)), 0, 1.9 * s, 0);
+    spin(lava); g.add(lava);
+    return g;
+  },
+  castle(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.8, 1.4 * s, 1.4, std(0x777f8c)), 0, 0.7 * s, 0));
+    for (const [x, z] of [[-0.8, -0.6], [0.8, -0.6], [-0.8, 0.6], [0.8, 0.6]]) {
+      g.add(at(cyl(0.22, 0.22, 1.8 * s, 8, std(0x5c6672)), x, 0.9 * s, z));
+    }
+    g.add(at(box(0.5, 0.6, 0.1, bas(0x3d4450)), 0, 0.4, 0.72));
+    return g;
+  },
+  robot(item, level, ctx) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    const c = ctx && ctx.theme ? ctx.theme.accent : 0xff2a85;
+    g.add(at(box(0.2, 0.8, 0.2, std(0x8a8f98)), -0.3, 0.4, 0));
+    g.add(at(box(0.2, 0.8, 0.2, std(0x8a8f98)), 0.3, 0.4, 0));
+    g.add(at(box(1.0, 1.0 * s, 0.8, std(0x2b2d42)), 0, 1.3 * s, 0));
+    g.add(at(box(0.7, 0.5, 0.7, std(0x33365a)), 0, 2.15 * s, 0));
+    const eye = at(sphere(0.1, 8, glow(c, 1.0)), 0, 2.2 * s, 0.36);
+    g.add(eye);
+    const ring = at(new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.05, 6, 20), glow(0x00f5d4, 0.8)), 0, 1.3 * s, 0);
+    ring.rotation.x = Math.PI / 2;
+    spin(ring); g.add(ring);
     return g;
   }
 };

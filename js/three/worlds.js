@@ -7,36 +7,29 @@ const MAX_HALF = 6;
 
 let stripGroup = null;
 let interiorWalls = null;
+const allExt = [];
+const allInt = [];
+let groundMesh = null;
+let floorMesh = null;
+
+const extMatA = new THREE.MeshStandardMaterial({ color: 0x231d3c, roughness: 0.8 });
+const extMatB = new THREE.MeshStandardMaterial({ color: 0x1d1833, roughness: 0.8 });
+const intMatA = new THREE.MeshStandardMaterial({ color: 0x4a154b, roughness: 0.6 });
+const intMatB = new THREE.MeshStandardMaterial({ color: 0x3b0d3c, roughness: 0.6 });
+const extGeo = new THREE.BoxGeometry(state.tileSize * 0.92, 0.16, state.tileSize * 0.92);
 
 export function findTile(list, gx, gz) {
   return list.find(t => t.userData.gx === gx && t.userData.gz === gz);
 }
 
-function makeTile(gx, gz, world, colorA, colorB) {
+function makeTile(gx, gz, world) {
   const ts = state.tileSize;
   const checker = (gx + gz) % 2 === 0;
-  const tile = new THREE.Mesh(
-    new THREE.BoxGeometry(ts * 0.92, 0.16, ts * 0.92),
-    new THREE.MeshStandardMaterial({ color: checker ? colorA : colorB, roughness: world === 'exterior' ? 0.8 : 0.6 })
-  );
+  const mat = world === 'exterior' ? (checker ? extMatA : extMatB) : (checker ? intMatA : intMatB);
+  const tile = new THREE.Mesh(extGeo, mat);
   tile.position.set(gx * ts, 0, gz * ts);
   tile.userData = { gx, gz, key: `${gx},${gz}`, world };
   return tile;
-}
-
-function addRing(radius, world) {
-  const group = world === 'exterior' ? exteriorGroup : interiorGroup;
-  const list = world === 'exterior' ? pickableTilesExt : pickableTilesInt;
-  const cA = world === 'exterior' ? 0x231d3c : 0x4a154b;
-  const cB = world === 'exterior' ? 0x1d1833 : 0x3b0d3c;
-  for (let gx = -radius; gx <= radius; gx++) {
-    for (let gz = -radius; gz <= radius; gz++) {
-      if (Math.max(Math.abs(gx), Math.abs(gz)) !== radius) continue;
-      const tile = makeTile(gx, gz, world, cA, cB);
-      group.add(tile);
-      list.push(tile);
-    }
-  }
 }
 
 function updateStrip() {
@@ -53,66 +46,82 @@ function updateInteriorWalls() {
   interiorWalls.left.position.x = -d;
 }
 
-export function createWorlds() {
-  const half = Math.floor(state.gridSize / 2);
-  const ts = state.tileSize;
+export function applyRadius(radius) {
+  pickableTilesExt.length = 0;
+  pickableTilesInt.length = 0;
+  for (const t of allExt) {
+    const vis = Math.max(Math.abs(t.userData.gx), Math.abs(t.userData.gz)) <= radius;
+    t.visible = vis;
+    if (vis) pickableTilesExt.push(t);
+  }
+  for (const t of allInt) {
+    const vis = Math.max(Math.abs(t.userData.gx), Math.abs(t.userData.gz)) <= radius;
+    t.visible = vis;
+    if (vis) pickableTilesInt.push(t);
+  }
+  updateStrip();
+  updateInteriorWalls();
+}
 
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(64, 64),
+export function applyThemeToTiles(theme) {
+  extMatA.color.setHex(theme.groundA);
+  extMatB.color.setHex(theme.groundB);
+  intMatA.color.setHex(theme.groundA).offsetHSL(0, 0, 0.05);
+  intMatB.color.setHex(theme.groundB).offsetHSL(0, 0, 0.05);
+  if (groundMesh) groundMesh.material.color.setHex(theme.groundB).offsetHSL(0, 0, -0.03);
+  if (floorMesh) floorMesh.material.color.setHex(theme.groundA).offsetHSL(0, 0, 0.02);
+}
+
+export function createWorlds() {
+  for (let gx = -MAX_HALF; gx <= MAX_HALF; gx++) {
+    for (let gz = -MAX_HALF; gz <= MAX_HALF; gz++) {
+      const tExt = makeTile(gx, gz, 'exterior');
+      exteriorGroup.add(tExt);
+      allExt.push(tExt);
+      const tInt = makeTile(gx, gz, 'interior');
+      interiorGroup.add(tInt);
+      allInt.push(tInt);
+    }
+  }
+
+  groundMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(70, 70),
     new THREE.MeshStandardMaterial({ color: 0x120e24, roughness: 0.9 })
   );
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.1;
-  exteriorGroup.add(ground);
+  groundMesh.rotation.x = -Math.PI / 2;
+  groundMesh.position.y = -0.1;
+  exteriorGroup.add(groundMesh);
 
   stripGroup = new THREE.Group();
   const road = new THREE.Mesh(
-    new THREE.BoxGeometry(40, 0.12, 4.2),
+    new THREE.BoxGeometry(44, 0.12, 4.2),
     new THREE.MeshStandardMaterial({ color: 0x1c1c28, roughness: 0.7 })
   );
   road.position.y = -0.02;
   stripGroup.add(road);
-  for (let i = -18; i <= 18; i += 2.5) {
+  for (let i = -20; i <= 20; i += 2.5) {
     const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.14, 0.15), new THREE.MeshBasicMaterial({ color: 0xffd166 }));
     stripe.position.set(i, -0.01, 0);
     stripGroup.add(stripe);
   }
   exteriorGroup.add(stripGroup);
-  updateStrip();
 
-  for (let gx = -half; gx <= half; gx++) {
-    for (let gz = -half; gz <= half; gz++) {
-      const tile = makeTile(gx, gz, 'exterior', 0x231d3c, 0x1d1833);
-      exteriorGroup.add(tile);
-      pickableTilesExt.push(tile);
-    }
-  }
-
-  const floorBase = new THREE.Mesh(
-    new THREE.PlaneGeometry(52, 52),
+  floorMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(58, 58),
     new THREE.MeshStandardMaterial({ color: 0x1a081f, roughness: 0.85 })
   );
-  floorBase.rotation.x = -Math.PI / 2;
-  floorBase.position.y = -0.1;
-  interiorGroup.add(floorBase);
+  floorMesh.rotation.x = -Math.PI / 2;
+  floorMesh.position.y = -0.1;
+  interiorGroup.add(floorMesh);
 
   const wallMat = new THREE.MeshStandardMaterial({ color: 0x3c096c, roughness: 0.5 });
   interiorWalls = {
-    back: new THREE.Mesh(new THREE.BoxGeometry(0.4 + MAX_HALF * ts * 2, 2.5, 0.4), wallMat),
-    left: new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.5, 0.4 + MAX_HALF * ts * 2), wallMat)
+    back: new THREE.Mesh(new THREE.BoxGeometry(0.4 + MAX_HALF * state.tileSize * 2, 2.5, 0.4), wallMat),
+    left: new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.5, 0.4 + MAX_HALF * state.tileSize * 2), wallMat)
   };
   interiorWalls.back.position.y = 1.25;
   interiorWalls.left.position.y = 1.25;
   interiorGroup.add(interiorWalls.back, interiorWalls.left);
-  updateInteriorWalls();
-
-  for (let gx = -half; gx <= half; gx++) {
-    for (let gz = -half; gz <= half; gz++) {
-      const tile = makeTile(gx, gz, 'interior', 0x4a154b, 0x3b0d3c);
-      interiorGroup.add(tile);
-      pickableTilesInt.push(tile);
-    }
-  }
 
   for (let i = 0; i < 5; i++) {
     const isLimo = i % 2 === 0;
@@ -131,14 +140,12 @@ export function createWorlds() {
     exteriorGroup.add(car);
     vehicles.push({ mesh: car, speed: (0.06 + Math.random() * 0.05) * dir });
   }
+
+  applyRadius(Math.floor(state.gridSize / 2));
 }
 
 export function expandWorld() {
-  const newHalf = Math.floor(state.gridSize / 2);
-  addRing(newHalf, 'exterior');
-  addRing(newHalf, 'interior');
-  updateStrip();
-  updateInteriorWalls();
+  applyRadius(Math.floor(state.gridSize / 2));
 }
 
 export function worldRadius() {

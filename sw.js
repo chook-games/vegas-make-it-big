@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v2';
+const CACHE = 'vegas-mib-v3';
 const CORE = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const CORE = [
   './js/data/randomEvents.js',
   './js/data/levels.js',
   './js/data/staff.js',
+  './js/data/themes.js',
   './js/audio/audio.js',
   './js/three/scene.js',
   './js/three/meshkit.js',
@@ -42,6 +43,9 @@ const CORE = [
   './js/game/leveling.js',
   './js/game/staff.js',
   './js/game/plots.js',
+  './js/game/lots.js',
+  './js/game/noise.js',
+  './js/game/archetypes.js',
   './js/ui/toast.js',
   './js/ui/hud.js',
   './js/ui/dock.js',
@@ -49,6 +53,8 @@ const CORE = [
   './js/ui/screens.js',
   './js/ui/staffScreen.js',
   './js/ui/plotsScreen.js',
+  './js/ui/lotScreen.js',
+  './js/ui/heatmap.js',
   './js/ui/settings.js'
 ];
 

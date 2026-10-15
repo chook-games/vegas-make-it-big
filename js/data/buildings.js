@@ -43,7 +43,27 @@ export const CATALOG = {
     { id: 'helipad', name: 'Ελικοδρόμιο', icon: '🚁', cost: 4200, income: 360, power: -4, guests: 70, tier: 4, requires: { level: 18, rep: 70, prestige: 1 },
       desc: 'Helipad για High Rollers. Άφιξη με στιλ.' },
     { id: 'observatory', name: 'Παρατηρητήριο', icon: '🔭', cost: 5200, income: 460, power: -6, guests: 100, tier: 5, requires: { level: 22, rep: 80, prestige: 2 },
-      desc: 'Ουρανοξύστης με θέα 360°. Το σύμβολο του Resort σου.' }
+      desc: 'Ουρανοξύστης με θέα 360°. Το σύμβολο του Resort σου.' },
+    { id: 'statue', name: 'Αγάλμα Ελευθερίας', icon: '🗽', cost: 4200, income: 380, power: -4, guests: 80, tier: 3, isLandmark: true, themeOnly: 'american', requires: { level: 6 },
+      desc: 'Αμερικανικό ορόσημο. Εμβληματικό αξιοθέατο του lot.' },
+    { id: 'titanic', name: 'Casino Titanic', icon: '🚢', cost: 4600, income: 420, power: -4, guests: 90, tier: 3, isLandmark: true, themeOnly: 'ocean', requires: { level: 6 },
+      desc: 'Πλωτό καζίνο-θρύλος. Χρειάζεται ωκεανό γύρω του.' },
+    { id: 'rocket', name: 'Διαστημικός Πύραυλος', icon: '🚀', cost: 4400, income: 400, power: -5, guests: 85, tier: 3, isLandmark: true, themeOnly: 'space', requires: { level: 6 },
+      desc: 'Πύραυλος σε εκτόξευση. Space αξιοθέατο.' },
+    { id: 'trex', name: 'Τ-Rex', icon: '🦖', cost: 4300, income: 390, power: -3, guests: 88, tier: 3, isLandmark: true, themeOnly: 'prehistoric', requires: { level: 6 },
+      desc: 'Ζωντανός δεινόσαυρος. Τρόμος και θέαμα.' },
+    { id: 'pagoda', name: 'Παγόδα', icon: '🏯', cost: 4500, income: 410, power: -4, guests: 84, tier: 3, isLandmark: true, themeOnly: 'oriental', requires: { level: 6 },
+      desc: 'Πολύχρωμη παγόδα με φανάρια.' },
+    { id: 'pyramid', name: 'Πυραμίδα', icon: '🛕', cost: 4700, income: 430, power: -5, guests: 92, tier: 3, isLandmark: true, themeOnly: 'egyptian', requires: { level: 6 },
+      desc: 'Χρυσή πυραμίδα με φωτεινή κορυφή.' },
+    { id: 'saloon', name: 'Σαλούν', icon: '🤠', cost: 3900, income: 360, power: -3, guests: 76, tier: 3, isLandmark: true, themeOnly: 'western', requires: { level: 6 },
+      desc: 'Σαλούν της Άγριας Δύσης με live σόου.' },
+    { id: 'volcano', name: 'Ηφαίστειο', icon: '🌋', cost: 4800, income: 440, power: -4, guests: 95, tier: 3, isLandmark: true, themeOnly: 'tropical', requires: { level: 6 },
+      desc: 'Ενεργό ηφαίστειο-αξιοθέατο.' },
+    { id: 'castle', name: 'Κάστρο', icon: '🏰', cost: 4600, income: 415, power: -4, guests: 86, tier: 3, isLandmark: true, themeOnly: 'medieval', requires: { level: 6 },
+      desc: 'Μεσαιωνικό κάστρο με τουρνουά.' },
+    { id: 'robot', name: 'Γιγάντιο Ρομπότ', icon: '🤖', cost: 4900, income: 455, power: -5, guests: 98, tier: 3, isLandmark: true, themeOnly: 'futuristic', requires: { level: 6 },
+      desc: 'Holographic ρομπότ-φύλακας.' }
   ],
   interior: [
     { id: 'slots', name: 'Slots', icon: '🍒', cost: 350, income: 75, power: -1, guests: 10, noisy: true, tier: 1,
@@ -91,7 +111,11 @@ export const CATALOG = {
     { id: 'boxing', name: 'Ring', icon: '🥊', cost: 3000, income: 380, power: -3, guests: 70, noisy: true, tier: 4, requires: { level: 24, rep: 75, prestige: 2 },
       desc: 'Ρίνγκ αγώνων μέσα στο καζίνο. Σόου και τζόγος.' },
     { id: 'vault', name: 'Χρυσό Θησαυροφυλάκιο', icon: '🏦', cost: 4000, income: 520, power: -3, guests: 20, tier: 5, requires: { level: 28, rep: 85, prestige: 3 },
-      desc: 'Θρυλικό θησαυροφυλάκιο. Το απόλυτο κύρος.' }
+      desc: 'Θρυλικό θησαυροφυλάκιο. Το απόλυτο κύρος.' },
+    { id: 'restroom', name: 'Τουαλέτες', icon: '🚻', cost: 300, income: 15, power: -1, guests: 6, tier: 1, isRestroom: true,
+      desc: 'Απαραίτητες τουαλέτες. Βγάζουν δυσοσμία — κρατήσου μακριά από VIP τραπέζια.' },
+    { id: 'plants', name: 'Φυτά Διακόσμησης', icon: '🌿', cost: 120, income: 0, power: 0, guests: 3, tier: 1, isDecor: true,
+      desc: 'Καθαρίζουν τον αέρα και μειώνουν τη δυσοσμία γύρω τους.' }
   ]
 };
 

@@ -10,6 +10,7 @@ import { spawnFloatingText } from '../ui/toast.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
+import { markLotDirty, currentTheme } from './lots.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -95,7 +96,7 @@ export function confirmPendingPlacement() {
   state.cash -= p.cost;
 
   groupFor(p.world).remove(p.mesh);
-  const finalMesh = createBuildingMesh(p.item, p.level, false);
+  const finalMesh = createBuildingMesh(p.item, p.level, false, { theme: currentTheme() });
   finalMesh.position.copy(p.tileMesh.position);
   finalMesh.position.y = 0.08;
   finalMesh.rotation.y = p.rotation * (Math.PI / 2);
@@ -108,6 +109,7 @@ export function confirmPendingPlacement() {
   };
 
   if (p.mode === 'new') state.stats.buildingsBuilt++;
+  markLotDirty();
 
   addXP(xpForCost(p.cost, p.mode === 'new' ? XP.build : XP.upgrade));
 
@@ -133,7 +135,7 @@ export function cancelPendingPlacement() {
 
   if (p.mode === 'edit' && p.originalData) {
     const orig = p.originalData;
-    const restored = createBuildingMesh(orig.item, orig.level, false);
+    const restored = createBuildingMesh(orig.item, orig.level, false, { theme: currentTheme() });
     restored.position.copy(orig.tileMesh.position);
     restored.position.y = 0.08;
     restored.rotation.y = orig.rotation * (Math.PI / 2);
@@ -144,6 +146,7 @@ export function cancelPendingPlacement() {
   playSound('cancel');
   state.pendingPlacement = null;
   updatePlacementUI();
+  markLotDirty();
   Bus.emit(EV.UI_REFRESH);
 }
 
@@ -153,7 +156,7 @@ export function placeStarterBuilding(tileMesh, itemId, rotation = 0) {
   const item = findItem(world, itemId);
   if (!item) return;
 
-  const mesh = createBuildingMesh(item, 1, false);
+  const mesh = createBuildingMesh(item, 1, false, { theme: currentTheme() });
   mesh.position.copy(tileMesh.position);
   mesh.position.y = 0.08;
   mesh.rotation.y = rotation * (Math.PI / 2);
@@ -171,11 +174,12 @@ export function seedStarterResort() {
 }
 
 export function rebuildBuildingsFromState() {
+  const theme = currentTheme();
   const rebuild = (grid, tiles, world) => {
     Object.values(grid).forEach(cell => {
       const tile = findTile(tiles, cell.gx, cell.gz);
       if (!tile) return;
-      const mesh = createBuildingMesh(cell.item, cell.level, false);
+      const mesh = createBuildingMesh(cell.item, cell.level, false, { theme });
       mesh.position.copy(tile.position);
       mesh.position.y = 0.08;
       mesh.rotation.y = (cell.rotation || 0) * (Math.PI / 2);
@@ -186,6 +190,7 @@ export function rebuildBuildingsFromState() {
   };
   rebuild(state.exteriorGrid, pickableTilesExt, 'exterior');
   rebuild(state.interiorGrid, pickableTilesInt, 'interior');
+  markLotDirty();
 }
 
 export function handleTileTap(clientX, clientY) {

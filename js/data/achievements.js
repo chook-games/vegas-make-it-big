@@ -27,5 +27,7 @@ export const ACHIEVEMENTS = [
   { id: 'a_staff15', title: 'Αυτοκρατορία', icon: '🏢', desc: 'Πρόσλαβε 15 εργαζόμενους.', reward: { cash: 12000 }, check: s => Object.values(s.staff || {}).reduce((a, b) => a + b, 0) >= 15 },
   { id: 'a_plot', title: 'Επεκτατικός', icon: '🗺️', desc: 'Αγόρασε ένα Plot επέκτασης.', reward: { cash: 4000 }, check: s => s.plots >= 1 },
   { id: 'a_plot3', title: 'Μεγιστάνας Γης', icon: '🌐', desc: 'Επέκτεινε τον χάρτη 3 φορές.', reward: { cash: 20000 }, check: s => s.plots >= 3 },
-  { id: 'a_gold', title: 'Χρυσές Τσέπες', icon: '💎', desc: 'Συγκέντρωσε 10 gold.', reward: { cash: 8000 }, check: s => s.gold >= 10 }
+  { id: 'a_gold', title: 'Χρυσές Τσέπες', icon: '💎', desc: 'Συγκέντρωσε 10 gold.', reward: { cash: 8000 }, check: s => s.gold >= 10 },
+  { id: 'a_lot2', title: 'Επιχειρηματίας Strip', icon: '🏙️', desc: 'Αγόρασε δεύτερο οικόπεδο.', reward: { cash: 8000 }, check: s => (s.lots ? s.lots.length : 1) >= 2 },
+  { id: 'a_lot4', title: 'Αυτοκράτορας του Strip', icon: '🌆', desc: 'Αγόρασε 4 οικόπεδα.', reward: { cash: 40000 }, check: s => (s.lots ? s.lots.length : 1) >= 4 }
 ];

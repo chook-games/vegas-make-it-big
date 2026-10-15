@@ -198,3 +198,39 @@
 .plot-cell.on { background: var(--neon-cyan); }
 .plot-cell.edge { background: rgba(255,209,102,0.4); }
 
+.theme-grid { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.theme-chip {
+  width: 46px; height: 46px; border-radius: 11px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  font-size: 21px; cursor: pointer; line-height: 1;
+}
+.theme-chip.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(255,209,102,0.5);
+  background: rgba(255,209,102,0.15);
+}
+.theme-chip:active { transform: scale(0.94); }
+
+#heat-legend {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 210px);
+  left: 10px;
+  z-index: 15;
+  background: rgba(12,10,24,0.92);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 11px;
+  display: none;
+  pointer-events: none;
+}
+#heat-legend.show { display: block; }
+.hl-title { font-weight: 800; color: var(--gold); margin-bottom: 4px; }
+.hl-row { display: flex; align-items: center; gap: 6px; }
+.hl-dot { width: 14px; height: 12px; border-radius: 3px; display: inline-block; }
+.hl-dot.noise { background: linear-gradient(90deg, #8a7a00, #ff2a00); }
+.hl-dot.smell { background: linear-gradient(90deg, #006644, #00ff88); }
+.hl-hint { color: #889; margin-top: 4px; font-size: 10px; max-width: 160px; }
+
+

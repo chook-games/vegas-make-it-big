@@ -1,0 +1,50 @@
+export const ARCHETYPES = [
+  {
+    id: 'tourist', name: 'Τουρίστας', icon: '🧳', color: 0x00bbf9,
+    visits: 5, tipMul: 1, activities: ['gamble', 'food', 'drink', 'fun', 'restroom']
+  },
+  {
+    id: 'family', name: 'Οικογένεια', icon: '👪', color: 0xff9ebb,
+    visits: 4, tipMul: 0.8, activities: ['fun', 'food', 'restroom', 'fun']
+  },
+  {
+    id: 'highroller', name: 'High Roller', icon: '🎩', color: 0xffd166,
+    visits: 6, tipMul: 5, noiseSensitive: true, activities: ['gamble', 'drink', 'gamble', 'food', 'fun']
+  },
+  {
+    id: 'cheater', name: 'Cheater', icon: '🕵️', color: 0x8d99ae,
+    visits: 3, tipMul: 0.5, cheater: true, activities: ['gamble', 'gamble', 'drink']
+  }
+];
+
+export const CATEGORY = {
+  gamble: new Set(['slots', 'roulette', 'craps', 'sicbo', 'keno', 'baccarat', 'poker', 'sportsbook', 'vip_bj', 'highlimit', 'casino']),
+  food: new Set(['restaurant', 'buffet', 'foodcourt']),
+  drink: new Set(['bar', 'lounge', 'nightclub']),
+  restroom: new Set(['restroom']),
+  rest: new Set(['hotel']),
+  fun: new Set(['pool', 'cinema', 'aquarium', 'ferris', 'rollercoaster', 'gardens', 'stadium', 'mall', 'spa', 'volcano', 'pagoda', 'robot', 'pyramid', 'castle', 'saloon', 'trex', 'rocket', 'titanic', 'statue'])
+};
+
+export function archetypeWeights(state) {
+  const rep = state.reputation / 100;
+  const edge = state.houseEdge;
+  const cashPressure = Math.min(1, state.cash / 200000);
+  return [
+    { def: ARCHETYPES[0], w: 1.0 },
+    { def: ARCHETYPES[1], w: 0.6 + rep * 0.3 },
+    { def: ARCHETYPES[2], w: 0.15 + rep * 0.9 + cashPressure * 0.4 },
+    { def: ARCHETYPES[3], w: 0.2 + (edge > 15 ? 0.4 : 0.15) }
+  ];
+}
+
+export function pickArchetype(state) {
+  const weights = archetypeWeights(state);
+  let total = weights.reduce((a, b) => a + b.w, 0);
+  let r = Math.random() * total;
+  for (const entry of weights) {
+    if (r < entry.w) return entry.def;
+    r -= entry.w;
+  }
+  return ARCHETYPES[0];
+}

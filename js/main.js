@@ -1,4 +1,4 @@
-import { state } from './core/state.js';
+import { state, activeLot } from './core/state.js';
 import { Bus, EV } from './core/events.js';
 import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
 import { hasSave, load, save, resetToNew } from './core/save.js';
@@ -15,8 +15,12 @@ import { initPlacement, handleTileTap, seedStarterResort, rebuildBuildingsFromSt
 import { initTutorial, beginTutorial } from './game/tutorial.js';
 import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openWelcomeScreen, openLevelUpScreen } from './ui/screens.js';
 import { openStaffScreen } from './ui/staffScreen.js';
+import { openLotScreen } from './ui/lotScreen.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
+import { toggleHeatmap, initHeatmap, applyHeatmap } from './ui/heatmap.js';
+import { currentTheme } from './game/lots.js';
+import { applyThemeToTiles, applyRadius } from './three/worlds.js';
 import { updateDayNight } from './game/daynight.js';
 import { updateEvents } from './game/randomEvents.js';
 import { doIncomeTick, calculateTotals } from './game/economy.js';
@@ -43,6 +47,8 @@ function initUI() {
   document.getElementById('btn-settings').addEventListener('click', () => { closeInspector(); openSettingsScreen(); });
   document.getElementById('btn-staff').addEventListener('click', () => { closeInspector(); openStaffScreen(); });
   document.getElementById('btn-plots').addEventListener('click', () => { closeInspector(); openPlotsScreen(); });
+  document.getElementById('btn-lots').addEventListener('click', () => { closeInspector(); openLotScreen(); });
+  document.getElementById('btn-heat').addEventListener('click', () => toggleHeatmap());
   document.getElementById('btn-quests').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
   document.getElementById('btn-ach').addEventListener('click', () => { closeInspector(); openAchievementsScreen(); });
   document.getElementById('btn-prestige').addEventListener('click', () => { closeInspector(); openPrestigeScreen(); });
@@ -158,6 +164,7 @@ function incomeTick() {
 
   checkProgress();
   refreshPrestigeAlert();
+  if (state.heatmap) applyHeatmap();
 }
 
 function refreshPrestigeAlert() {
@@ -180,7 +187,8 @@ function computeOffline(raw) {
 
 function startNewGame() {
   resetToNew();
-  applyLightingRefresh();
+  applyRadius(activeLot().radius || 3);
+  applyThemeToTiles(currentTheme());
   seedStarterResort();
   beginTutorial();
   Bus.emit(EV.UI_REFRESH);
@@ -189,6 +197,8 @@ function startNewGame() {
 }
 
 function startContinue(raw) {
+  applyRadius(activeLot().radius || 3);
+  applyThemeToTiles(currentTheme());
   rebuildBuildingsFromState();
   computeOffline(raw);
   if (!state.tutorialDone) beginTutorial();
@@ -218,6 +228,7 @@ function boot() {
     updateHUD();
     renderDock();
     refreshPrestigeAlert();
+    initHeatmap();
   };
 
   document.getElementById('loading').classList.add('hide');

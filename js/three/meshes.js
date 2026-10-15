@@ -27,9 +27,9 @@ function decorate(group, level) {
   }
 }
 
-export function createBuildingMesh(item, level = 1, isGhost = false) {
+export function createBuildingMesh(item, level = 1, isGhost = false, ctx = {}) {
   const builder = EXTERIOR[item.id] || INTERIOR[item.id];
-  const group = builder ? builder(item, level) : new THREE.Group();
+  const group = builder ? builder(item, level, ctx) : new THREE.Group();
 
   if (isGhost) {
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.05, 24), new THREE.MeshBasicMaterial({ color: 0x00f5d4, side: THREE.DoubleSide }));

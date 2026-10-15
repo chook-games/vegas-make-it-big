@@ -110,5 +110,12 @@ export const QUESTS = [
     reward: { cash: 30000, gold: 3 },
     goal: s => s.level >= 20,
     progress: s => clampProgress(s.level, 20)
+  },
+  {
+    id: 'q_lot2', title: 'Επέκταση στο Strip', icon: '🏙️',
+    desc: 'Αγόρασε ένα δεύτερο οικόπεδο με νέο θέμα.',
+    reward: { cash: 15000, gold: 1 },
+    goal: s => (s.lots ? s.lots.length : 1) >= 2,
+    progress: s => clampProgress(s.lots ? s.lots.length : 1, 2)
   }
 ];

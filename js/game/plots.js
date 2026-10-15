@@ -1,26 +1,28 @@
-import { state } from '../core/state.js';
+import { state, activeLot, syncActiveGrids } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
-import { expandWorld } from '../three/worlds.js';
+import { applyRadius } from '../three/worlds.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { save } from '../core/save.js';
+import { markLotDirty } from './lots.js';
 
-export const MAX_PLOTS = 3;
+export const MAX_RADIUS = 6;
+export const MAX_PLOTS = MAX_RADIUS - 3;
 
-export function nextGridSize() {
-  return state.gridSize + 2;
+export function currentRadius() {
+  return activeLot().radius || 3;
 }
 
 export function plotCost() {
-  return Math.round(6000 * Math.pow(2.4, state.plots));
+  return Math.round(6000 * Math.pow(2.4, currentRadius() - 3));
 }
 
 export function canExpand() {
-  return state.plots < MAX_PLOTS;
+  return currentRadius() < MAX_RADIUS;
 }
 
 export function buyPlot() {
   if (!canExpand()) {
-    Bus.emit(EV.TOAST, { text: 'Έφτασες τη μέγιστη έκταση του Resort.', kind: 'info' });
+    Bus.emit(EV.TOAST, { text: 'Έφτασες τη μέγιστη έκταση αυτού του οικοπέδου.', kind: 'info' });
     playSound('error');
     return false;
   }
@@ -31,12 +33,15 @@ export function buyPlot() {
     return false;
   }
   state.cash -= cost;
+  const lot = activeLot();
+  lot.radius = currentRadius() + 1;
   state.plots += 1;
-  state.gridSize += 2;
-  expandWorld();
+  syncActiveGrids();
+  applyRadius(lot.radius);
+  markLotDirty(lot);
   playSound('levelup');
   vibrate(30);
-  Bus.emit(EV.TOAST, { text: `🗺️ Το Resort επεκτάθηκε! Νέα έκταση ${state.gridSize}×${state.gridSize}.`, kind: 'good' });
+  Bus.emit(EV.TOAST, { text: `🗺️ Το οικόπεδο επεκτάθηκε! Νέα έκταση ${lot.radius * 2 + 1}×${lot.radius * 2 + 1}.`, kind: 'good' });
   Bus.emit(EV.UI_REFRESH);
   Bus.emit(EV.CASH_CHANGED);
   save();

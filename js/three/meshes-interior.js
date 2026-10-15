@@ -205,5 +205,21 @@ export const INTERIOR = {
     const dial = at(new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.04, 6, 16), bas(0xff2a85)), 0, 0.7 * s, 0.62);
     spin(dial); g.add(dial);
     return g;
+  },
+  restroom(item, level) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.1, 1.0 * s, 0.9, std(0x8ecae6)), 0, 0.5 * s, 0));
+    g.add(at(box(1.2, 0.14, 1.0, bas(0xffffff)), 0, 1.0 * s, 0));
+    g.add(at(box(0.4, 0.55, 0.06, bas(0x023047)), 0, 0.3, 0.47));
+    return g;
+  },
+  plants(item, level) {
+    const g = new THREE.Group();
+    for (const [x, z] of [[-0.3, 0.2], [0.3, -0.2], [0, 0.35]]) {
+      g.add(at(cyl(0.12, 0.16, 0.3, 8, std(0x8d6e4a)), x, 0.15, z));
+      g.add(at(sphere(0.28, 8, std(0x2ecc71)), x, 0.55, z));
+    }
+    return g;
   }
 };

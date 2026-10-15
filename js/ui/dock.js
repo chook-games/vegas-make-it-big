@@ -3,11 +3,13 @@ import { Bus, EV } from '../core/events.js';
 import { CATALOG, isUnlocked, lockLabel } from '../data/buildings.js';
 import { playSound } from '../audio/audio.js';
 import { cancelPendingPlacement } from '../game/placement.js';
+import { activeLot } from '../game/lots.js';
 
 export function renderDock() {
   const grid = document.getElementById('build-grid');
   grid.innerHTML = '';
-  const list = CATALOG[state.mode];
+  const theme = activeLot() ? activeLot().theme : 'american';
+  const list = CATALOG[state.mode].filter(item => !item.themeOnly || item.themeOnly === theme);
 
   const statusEl = document.getElementById('dock-status');
   if (state.selectedTool) {

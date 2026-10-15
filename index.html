@@ -49,8 +49,10 @@
 
     <div class="sub-bar">
       <button class="mode-switch-btn" id="btn-switch-view">Καζίνο</button>
+      <button class="icon-btn" id="btn-lots" title="Vegas Strip / Οικόπεδα">🏙️</button>
+      <button class="icon-btn" id="btn-plots" title="Επέκταση Οικοπέδου">🗺️</button>
+      <button class="icon-btn" id="btn-heat" title="Heatmap Θορύβου/Μυρωδιάς">🌡️</button>
       <button class="icon-btn" id="btn-staff" title="Προσωπικό">👔</button>
-      <button class="icon-btn" id="btn-plots" title="Επέκταση Χάρτη">🗺️</button>
       <button class="icon-btn" id="btn-quests" title="Αποστολές">📜</button>
       <button class="icon-btn" id="btn-ach" title="Επιτεύγματα">🏆</button>
       <button class="icon-btn" id="btn-prestige" title="Prestige">💎</button>
@@ -61,6 +63,7 @@
     </div>
 
     <div class="info-strip">
+      <span class="info-chip" id="ui-lot">🇺🇸 Lot 1</span>
       <span class="info-chip" id="ui-rep">⭐ Φήμη 10</span>
       <span class="info-chip" id="ui-gold">💎 0</span>
       <span class="info-chip" id="ui-staff">👔 0 εργαζόμενοι</span>
@@ -125,6 +128,12 @@
   <div id="modal-root"></div>
   <div id="event-banner"></div>
   <div id="tutorial-banner"></div>
+  <div id="heat-legend">
+    <div class="hl-title">Heatmap</div>
+    <div class="hl-row"><span class="hl-dot noise"></span> Θόρυβος</div>
+    <div class="hl-row"><span class="hl-dot smell"></span> Μυρωδιά</div>
+    <div class="hl-hint">Χτίσε τοίχους & φύτεψε φυτά για να καθαρίσεις</div>
+  </div>
 
   <div id="loading">
     <div class="spinner"></div>

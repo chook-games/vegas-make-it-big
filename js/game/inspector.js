@@ -9,6 +9,7 @@ import { spawnFloatingText } from '../ui/toast.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
+import { markLotDirty, currentTheme } from './lots.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -65,11 +66,12 @@ function onUpgrade() {
   state.cash -= cost;
   cell.level += 1;
   groupFor(world).remove(cell.mesh);
-  cell.mesh = createBuildingMesh(cell.item, cell.level, false);
+  cell.mesh = createBuildingMesh(cell.item, cell.level, false, { theme: currentTheme() });
   cell.mesh.position.copy(cell.tileMesh.position);
   cell.mesh.position.y = 0.08;
   cell.mesh.rotation.y = (cell.rotation || 0) * (Math.PI / 2);
   groupFor(world).add(cell.mesh);
+  markLotDirty();
 
   playSound('levelup');
   vibrate(25);
@@ -111,6 +113,7 @@ function onSell() {
   state.cash += refund;
   groupFor(world).remove(cell.mesh);
   delete grid[key];
+  markLotDirty();
 
   playSound('confirm');
   spawnFloatingText(cell.tileMesh.position, `+$${refund}`, '#ffd166');

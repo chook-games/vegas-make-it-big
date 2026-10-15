@@ -16,7 +16,7 @@ function serializeGrid(grid) {
 
 export function serialize() {
   return {
-    v: 2,
+    v: 3,
     cash: state.cash,
     houseEdge: state.houseEdge,
     reputation: state.reputation,
@@ -26,6 +26,9 @@ export function serialize() {
     gold: state.gold,
     staff: state.staff,
     plots: state.plots,
+    activeLot: state.activeLot,
+    gameMode: state.gameMode,
+    campaignIndex: state.campaignIndex,
     prestigeLevel: state.prestigeLevel,
     prestigePoints: state.prestigePoints,
     questIndex: state.questIndex,
@@ -36,8 +39,14 @@ export function serialize() {
     tutorial: state.tutorial,
     tutorialDone: state.tutorialDone,
     seenWelcome: state.seenWelcome,
-    exteriorGrid: serializeGrid(state.exteriorGrid),
-    interiorGrid: serializeGrid(state.interiorGrid),
+    lots: state.lots.map(lot => ({
+      id: lot.id,
+      name: lot.name,
+      theme: lot.theme,
+      radius: lot.radius || 3,
+      exteriorGrid: serializeGrid(lot.exteriorGrid),
+      interiorGrid: serializeGrid(lot.interiorGrid)
+    })),
     lastSavedAt: Date.now()
   };
 }
@@ -88,8 +97,26 @@ export function load() {
   const raw = loadRaw();
   if (!raw) return null;
   const data = Object.assign({}, raw);
-  data.exteriorGrid = hydrateGrid(raw.exteriorGrid, 'exterior');
-  data.interiorGrid = hydrateGrid(raw.interiorGrid, 'interior');
+
+  if (raw.lots && raw.lots.length) {
+    data.lots = raw.lots.map(lot => ({
+      id: lot.id,
+      name: lot.name,
+      theme: lot.theme || 'american',
+      radius: lot.radius || 3,
+      exteriorGrid: hydrateGrid(lot.exteriorGrid, 'exterior'),
+      interiorGrid: hydrateGrid(lot.interiorGrid, 'interior')
+    }));
+    data.activeLot = Math.min(raw.activeLot || 0, data.lots.length - 1);
+  } else {
+    data.lots = [{
+      id: 0, name: 'Lot 1', theme: 'american', radius: 3,
+      exteriorGrid: hydrateGrid(raw.exteriorGrid, 'exterior'),
+      interiorGrid: hydrateGrid(raw.interiorGrid, 'interior')
+    }];
+    data.activeLot = 0;
+  }
+
   applyLoadedState(data);
   return raw;
 }

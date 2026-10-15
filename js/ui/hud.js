@@ -4,6 +4,8 @@ import { calculateTotals } from '../game/economy.js';
 import { formatClock, seasonInfo } from '../game/daynight.js';
 import { levelProgress } from '../game/leveling.js';
 import { totalStaff } from '../game/staff.js';
+import { activeLot } from '../game/lots.js';
+import { themeById } from '../data/themes.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -35,6 +37,10 @@ export function updateHUD() {
 
   document.getElementById('ui-gold').textContent = `💎 ${state.gold}`;
   document.getElementById('ui-staff').textContent = `👔 ${totalStaff()} εργαζόμενοι`;
+
+  const lot = activeLot();
+  const lotEl = document.getElementById('ui-lot');
+  if (lotEl && lot) lotEl.textContent = `${themeById(lot.theme).icon} ${lot.name}`;
 
   return totals;
 }

@@ -2,6 +2,17 @@ import {
   GRID_SIZE, TILE_SIZE, START_CASH, START_HOUSE_EDGE, START_REPUTATION
 } from './constants.js';
 
+export function makeLot(id, theme, name) {
+  return {
+    id,
+    name: name || `Lot ${id + 1}`,
+    theme,
+    radius: 3,
+    exteriorGrid: {},
+    interiorGrid: {}
+  };
+}
+
 export function freshState() {
   return {
     cash: START_CASH,
@@ -12,6 +23,11 @@ export function freshState() {
     tileSize: TILE_SIZE,
     exteriorGrid: {},
     interiorGrid: {},
+    lots: [makeLot(0, 'american', 'Lot 1')],
+    activeLot: 0,
+    campaignIndex: 0,
+    gameMode: 'freeplay',
+    heatmap: false,
     inspectedKey: null,
     pendingPlacement: null,
     reputation: START_REPUTATION,
@@ -47,6 +63,20 @@ export function freshState() {
 
 export const state = freshState();
 
+export function activeLot() {
+  return state.lots[state.activeLot] || state.lots[0];
+}
+
+export function syncActiveGrids() {
+  const lot = activeLot();
+  if (!lot) return;
+  state.exteriorGrid = lot.exteriorGrid;
+  state.interiorGrid = lot.interiorGrid;
+  state.gridSize = (lot.radius || 3) * 2 + 1;
+}
+
+syncActiveGrids();
+
 export function applyLoadedState(data) {
   const fresh = freshState();
   for (const key in fresh) {
@@ -62,6 +92,12 @@ export function applyLoadedState(data) {
   }
   state.pendingPlacement = null;
   state.inspectedKey = null;
+  if (!Array.isArray(state.lots) || !state.lots.length) {
+    state.lots = [makeLot(0, 'american', 'Lot 1')];
+    state.activeLot = 0;
+  }
+  if (state.activeLot == null || state.activeLot >= state.lots.length) state.activeLot = 0;
+  syncActiveGrids();
 }
 
 export function gridFor(world) {
