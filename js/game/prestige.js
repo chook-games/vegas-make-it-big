@@ -53,7 +53,7 @@ export function doPrestige() {
 
   clearAllBuildings();
   const lot = state.lots[0];
-  applyRadius(lot.radius || 5);
+  applyRadius(lot.radius || 7);
   applyThemeToTiles(themeById(lot.theme));
   markLotDirty(lot);
   seedStarterResort();

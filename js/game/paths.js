@@ -7,23 +7,59 @@ export function frontOffset(rotation) {
 }
 
 export function entranceKey(cell) {
-  const f = frontOffset(cell.rotation || 0);
-  return `${cell.gx + f.x},${cell.gz + f.z}`;
+  const w = cell.w || 1;
+  const h = cell.h || 1;
+  const rot = ((cell.rotation || 0) % 4 + 4) % 4;
+  if (rot === 0) return `${cell.gx + Math.floor((w - 1) / 2)},${cell.gz + h}`;
+  if (rot === 1) return `${cell.gx + w},${cell.gz + Math.floor((h - 1) / 2)}`;
+  if (rot === 2) return `${cell.gx + Math.floor((w - 1) / 2)},${cell.gz - 1}`;
+  return `${cell.gx - 1},${cell.gz + Math.floor((h - 1) / 2)}`;
 }
 
 function gridFor(lot, world) {
   return world === 'exterior' ? lot.exteriorGrid : lot.interiorGrid;
 }
 
+function computeOccupancy(lot, world) {
+  const grid = gridFor(lot, world);
+  const map = new Map();
+  for (const k in grid) {
+    const c = grid[k];
+    const w = c.w || 1;
+    const h = c.h || 1;
+    for (let dx = 0; dx < w; dx++) {
+      for (let dz = 0; dz < h; dz++) {
+        const kk = `${c.gx + dx},${c.gz + dz}`;
+        if (!map.has(kk)) map.set(kk, k);
+      }
+    }
+  }
+  return map;
+}
+
+export function getOccupancy(lot, world) {
+  if (!lot) return new Map();
+  if (!lot.__occ) lot.__occ = {};
+  if (!lot.__occ[world]) lot.__occ[world] = computeOccupancy(lot, world);
+  return lot.__occ[world];
+}
+
+export function occupantAt(lot, world, key) {
+  return getOccupancy(lot, world).get(key) || null;
+}
+
 function compute(lot, world) {
   const grid = gridFor(lot, world);
+  const ts = state.tileSize;
   const walkable = new Map();
   let maxGz = -99;
   for (const k in grid) {
     const c = grid[k];
     maxGz = Math.max(maxGz, c.gz);
-    if (c.item.isPath && c.tileMesh) {
-      walkable.set(k, { x: c.tileMesh.position.x, z: c.tileMesh.position.z });
+    if (c.item.isPath) {
+      const cx = c.cx != null ? c.cx : c.gx;
+      const cz = c.cz != null ? c.cz : c.gz;
+      walkable.set(k, { x: cx * ts, z: cz * ts });
     }
   }
 
@@ -65,7 +101,10 @@ export function isOpen(lot, world, cell) {
 }
 
 export function invalidatePaths(lot) {
-  if (lot) lot.__paths = null;
+  if (lot) {
+    lot.__paths = null;
+    lot.__occ = null;
+  }
 }
 
 export function keyAt(x, z) {

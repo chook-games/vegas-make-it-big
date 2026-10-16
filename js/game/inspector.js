@@ -29,12 +29,12 @@ export function openInspector(world, key) {
   state.inspectedKey = { world, key };
   const lot = activeLot();
   const heat = getLotHeat(lot)[world];
-  const open = cell.item.isPath ? null : getPaths(lot, world).open;
+  const open = (world === 'exterior' && !cell.item.isPath) ? getPaths(lot, world).open : null;
   const stats = evaluateTileStats(world, cell, grid, heat, open);
   const upg = upgradeCost(cell);
   const refund = sellRefund(cell);
 
-  inspectRing.position.set(cell.tileMesh.position.x, 0.12, cell.tileMesh.position.z);
+  inspectRing.position.set(cell.mesh.position.x, 0.12, cell.mesh.position.z);
   inspectRing.visible = true;
 
   document.getElementById('insp-title').textContent = `${cell.item.icon} ${t(cell.item.name)} (Lv.${cell.level})`;
@@ -71,9 +71,11 @@ function onUpgrade() {
   state.cash -= cost;
   cell.level += 1;
   groupFor(world).remove(cell.mesh);
-  cell.mesh = createBuildingMesh(cell.item, cell.level, false, { theme: currentTheme() });
-  cell.mesh.position.copy(cell.tileMesh.position);
-  cell.mesh.position.y = 0.08;
+  const w = cell.w || 1, h = cell.h || 1;
+  const cx = cell.cx != null ? cell.cx : cell.gx;
+  const cz = cell.cz != null ? cell.cz : cell.gz;
+  cell.mesh = createBuildingMesh(cell.item, cell.level, false, { theme: currentTheme(), footprint: { w, h, ts: state.tileSize } });
+  cell.mesh.position.set(cx * state.tileSize, 0.08, cz * state.tileSize);
   cell.mesh.rotation.y = (cell.rotation || 0) * (Math.PI / 2);
   groupFor(world).add(cell.mesh);
   markLotDirty();
@@ -121,7 +123,7 @@ function onSell() {
   markLotDirty();
 
   playSound('confirm');
-  spawnFloatingText(cell.tileMesh.position, `+$${refund}`, '#ffd166');
+  spawnFloatingText(cell.mesh.position, `+$${refund}`, '#ffd166');
   closeInspector();
   Bus.emit(EV.CASH_CHANGED);
   Bus.emit(EV.BUILDING_SOLD, { world, item: cell.item });

@@ -26,7 +26,7 @@ function buildBody() {
     <div class="center big-stat">${state.gridSize}×${state.gridSize}</div>
     <div class="center muted">Your lot size. Each expansion adds a ring of tiles to the Strip and casino.</div>
     ${buildMap()}
-    <div class="settings-row"><span class="settings-label">Expansions bought</span><span>${Math.max(0, (state.gridSize - 1) / 2 - 5)} / ${MAX_RADIUS - 5}</span></div>
+    <div class="settings-row"><span class="settings-label">Expansions bought</span><span>${Math.max(0, (state.gridSize - 1) / 2 - 7)} / ${MAX_RADIUS - 7}</span></div>
     <div class="settings-row"><span class="settings-label">Next size</span><span>${more ? (state.gridSize + 2) + '×' + (state.gridSize + 2) : 'Max'}</span></div>
     <div class="settings-row"><span class="settings-label">Next cost</span><span style="color:${afford ? '#06d6a0' : '#ff8080'}">${more ? '$' + cost.toLocaleString() : '—'}</span></div>
     <div class="spacer"></div>

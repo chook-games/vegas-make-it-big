@@ -7,7 +7,7 @@ export function makeLot(id, theme, name) {
     id,
     name: name || `Lot ${id + 1}`,
     theme,
-    radius: 5,
+    radius: 7,
     exteriorGrid: {},
     interiorGrid: {}
   };
@@ -76,7 +76,7 @@ export function syncActiveGrids() {
   if (!lot) return;
   state.exteriorGrid = lot.exteriorGrid;
   state.interiorGrid = lot.interiorGrid;
-  state.gridSize = (lot.radius || 5) * 2 + 1;
+  state.gridSize = (lot.radius || 7) * 2 + 1;
 }
 
 syncActiveGrids();

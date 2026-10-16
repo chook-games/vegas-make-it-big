@@ -56,21 +56,22 @@ function clearMeshes(lot) {
 
 function buildMeshes(lot) {
   const theme = themeById(lot.theme);
+  const ts = state.tileSize;
   ['exterior', 'interior'].forEach(world => {
     const grid = world === 'exterior' ? lot.exteriorGrid : lot.interiorGrid;
     const group = world === 'exterior' ? exteriorGroup : interiorGroup;
-    const tiles = world === 'exterior' ? pickableTilesExt : pickableTilesInt;
     for (const k in grid) {
       const cell = grid[k];
-      const tile = findTile(tiles, cell.gx, cell.gz);
-      if (!tile) continue;
-      const mesh = createBuildingMesh(cell.item, cell.level, false, { theme });
-      mesh.position.copy(tile.position);
-      mesh.position.y = 0.08;
+      const w = cell.w || 1, h = cell.h || 1;
+      const cx = cell.cx != null ? cell.cx : cell.gx;
+      const cz = cell.cz != null ? cell.cz : cell.gz;
+      const mesh = createBuildingMesh(cell.item, cell.level, false, { theme, footprint: { w, h, ts } });
+      mesh.position.set(cx * ts, 0.08, cz * ts);
       mesh.rotation.y = (cell.rotation || 0) * (Math.PI / 2);
       group.add(mesh);
       cell.mesh = mesh;
-      cell.tileMesh = tile;
+      cell.w = w; cell.h = h; cell.cx = cx; cell.cz = cz;
+      cell.tileMesh = null;
     }
   });
 }
@@ -85,7 +86,7 @@ export function switchLot(index, force = false) {
   syncActiveGrids();
   const lot = state.lots[index];
 
-  applyRadius(lot.radius || 5);
+  applyRadius(lot.radius || 7);
   applyThemeToTiles(themeById(lot.theme));
   buildMeshes(lot);
 

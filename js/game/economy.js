@@ -68,7 +68,7 @@ export function evaluateTileStats(world, cell, grid, heat, openSet) {
 function lotTotals(lot) {
   const heat = getLotHeat(lot);
   const openExt = getPaths(lot, 'exterior').open;
-  const openInt = getPaths(lot, 'interior').open;
+  const openInt = null;
   let powerUsed = 0;
   let powerCap = 0;
   let capacity = 0;

@@ -6,7 +6,7 @@ function lim() {
 }
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
-let camRadius = 26;
+let camRadius = 24;
 let camElevation = 0.85;
 let camAngle = Math.PI / 4;
 let camTargetAngle = Math.PI / 4;

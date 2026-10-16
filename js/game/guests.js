@@ -111,7 +111,10 @@ function nextActivity(guest) {
           return;
         }
       } else {
-        guest.path = [{ x: cell.tileMesh.position.x, z: cell.tileMesh.position.z }];
+        const ts = state.tileSize;
+        const cxp = (cell.cx != null ? cell.cx : cell.gx) * ts;
+        const czp = (cell.cz != null ? cell.cz : cell.gz) * ts;
+        guest.path = [{ x: cxp, z: czp }];
         guest.pi = 0;
         guest.target = guest.path[0];
         guest.stateId = 'arriving';

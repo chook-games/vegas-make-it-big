@@ -44,15 +44,29 @@ export function createBuildingMesh(item, level = 1, isGhost = false, ctx = {}) {
   const builder = EXTERIOR[item.id] || INTERIOR[item.id];
   const group = builder ? builder(item, level, ctx) : new THREE.Group();
 
+  const fp = ctx.footprint;
+  if (fp) {
+    const base = 1.9;
+    const sx = (fp.w * fp.ts * 0.92) / base;
+    const sz = (fp.h * fp.ts * 0.92) / base;
+    const sy = (sx + sz) / 2;
+    group.scale.set(Math.max(0.05, sx), Math.max(0.05, sy), Math.max(0.05, sz));
+  }
+
   if (isGhost) {
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.05, 24), new THREE.MeshBasicMaterial({ color: 0x00f5d4, side: THREE.DoubleSide }));
-    ring.rotation.x = -Math.PI / 2;
-    at(ring, 0, 0.06, 0);
-    group.add(ring);
+    if (fp) {
+      const outline = new THREE.Mesh(
+        new THREE.BoxGeometry(fp.w * fp.ts * 0.98, 0.06, fp.h * fp.ts * 0.98),
+        new THREE.MeshBasicMaterial({ color: 0x00f5d4, transparent: true, opacity: 0.4 })
+      );
+      outline.position.y = 0.05;
+      group.userData.outline = outline;
+      group.add(outline);
+    }
     if (!item.isPath) {
       const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.45, 4), bas(0x00f5d4));
       arrow.rotation.x = Math.PI / 2;
-      at(arrow, 0, 0.18, 1.12);
+      at(arrow, 0, 0.18, fp ? fp.h * fp.ts * 0.55 : 1.12);
       group.add(arrow);
       makeTransparent(group);
     }

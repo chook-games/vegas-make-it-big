@@ -5,15 +5,15 @@ import { playSound, vibrate } from '../audio/audio.js';
 import { save } from '../core/save.js';
 import { markLotDirty } from './lots.js';
 
-export const MAX_RADIUS = 8;
+export const MAX_RADIUS = 11;
 export const MAX_PLOTS = MAX_RADIUS - 3;
 
 export function currentRadius() {
-  return activeLot().radius || 5;
+  return activeLot().radius || 7;
 }
 
 export function plotCost() {
-  return Math.round(6000 * Math.pow(2.4, currentRadius() - 5));
+  return Math.round(6000 * Math.pow(2.4, currentRadius() - 7));
 }
 
 export function canExpand() {

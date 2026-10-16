@@ -1,5 +1,5 @@
-export const GRID_SIZE = 7;
-export const TILE_SIZE = 2.2;
+export const GRID_SIZE = 15;
+export const TILE_SIZE = 1.6;
 export const MOVE_ROTATE_COST = 100;
 export const TICK_MS = 2000;
 export const DAY_LENGTH_MS = 96000;

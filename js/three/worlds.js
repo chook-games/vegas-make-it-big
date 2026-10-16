@@ -4,7 +4,7 @@ import {
   exteriorGroup, interiorGroup, pickableTilesExt, pickableTilesInt, vehicles
 } from './scene.js';
 
-const MAX_HALF = 8;
+const MAX_HALF = 11;
 
 let stripGroup = null;
 let interiorWalls = null;

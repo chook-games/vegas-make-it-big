@@ -1,6 +1,7 @@
 import { SAVE_KEY } from './constants.js';
 import { state, applyLoadedState, freshState } from './state.js';
 import { findItem } from '../data/buildings.js';
+import { effSize } from '../data/sizes.js';
 
 function serializeGrid(grid) {
   const out = {};
@@ -45,7 +46,7 @@ export function serialize() {
       id: lot.id,
       name: lot.name,
       theme: lot.theme,
-      radius: lot.radius || 5,
+      radius: lot.radius || 7,
       exteriorGrid: serializeGrid(lot.exteriorGrid),
       interiorGrid: serializeGrid(lot.interiorGrid)
     })),
@@ -86,9 +87,12 @@ function hydrateGrid(raw, world) {
     const c = raw[key];
     const item = findItem(world, c.itemId);
     if (!item) continue;
+    const rotation = c.rotation || 0;
+    const [w, h] = effSize(item.id, rotation);
     grid[key] = {
       gx: c.gx, gz: c.gz, key: c.key, world,
-      item, level: c.level || 1, rotation: c.rotation || 0,
+      item, level: c.level || 1, rotation,
+      w, h, cx: c.gx + (w - 1) / 2, cz: c.gz + (h - 1) / 2,
       mesh: null, tileMesh: null
     };
   }
@@ -105,7 +109,7 @@ export function load() {
       id: lot.id,
       name: lot.name,
       theme: lot.theme || 'american',
-      radius: lot.radius || 5,
+      radius: lot.radius || 7,
       exteriorGrid: hydrateGrid(lot.exteriorGrid, 'exterior'),
       interiorGrid: hydrateGrid(lot.interiorGrid, 'interior')
     }));

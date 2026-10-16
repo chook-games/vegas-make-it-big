@@ -18,7 +18,7 @@ function buildBody() {
       <div class="list-icon">${th.icon}</div>
       <div class="list-main">
         <div class="list-name">${lot.name} · ${th.name} ${active ? '✅' : ''}</div>
-        <div class="list-desc">${cells} buildings · size ${(lot.radius || 5) * 2 + 1}×${(lot.radius || 5) * 2 + 1}</div>
+        <div class="list-desc">${cells} buildings · size ${(lot.radius || 7) * 2 + 1}×${(lot.radius || 7) * 2 + 1}</div>
       </div>
       ${active ? '' : `<button class="staff-btn" data-goto="${i}">➡️</button>`}
     </div>`;
