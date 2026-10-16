@@ -1,4 +1,4 @@
-import { state, makeLot } from '../core/state.js';
+import { state, makeLot, syncActiveGrids } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { SCENARIOS } from '../data/campaign.js';
 import { calculateTotals } from './economy.js';
@@ -145,6 +145,20 @@ export function startFreePlayWithTheme(themeId) {
   const lot = state.lots[0];
   lot.theme = themeId;
   if (lot) switchLot(0, true);
+  save();
+}
+
+export function startFreePlayLot({ theme, radius, cash }) {
+  resetToNew();
+  state.gameMode = 'freeplay';
+  const lot = state.lots[0];
+  lot.theme = theme || 'american';
+  lot.radius = radius || 5;
+  state.plots = 0;
+  if (typeof cash === 'number') state.cash = cash;
+  syncActiveGrids();
+  switchLot(0, true);
+  Bus.emit(EV.UI_REFRESH);
   save();
 }
 

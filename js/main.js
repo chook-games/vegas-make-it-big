@@ -11,7 +11,7 @@ import { initToast, spawnFloatingText } from './ui/toast.js';
 import { initHUD, updateHUD } from './ui/hud.js';
 import { initDock, renderDock } from './ui/dock.js';
 import { initInspector, closeInspector } from './game/inspector.js';
-import { initPlacement, handleTileTap, seedStarterResort, rebuildBuildingsFromState, cancelPendingPlacement } from './game/placement.js';
+import { initPlacement, handleTileTap, hoverPlacement, seedStarterResort, rebuildBuildingsFromState, cancelPendingPlacement, rotatePendingPlacement, confirmPendingPlacement } from './game/placement.js';
 import { initTutorial, beginTutorial } from './game/tutorial.js';
 import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openLevelUpScreen } from './ui/screens.js';
 import { openStaffScreen } from './ui/staffScreen.js';
@@ -19,7 +19,7 @@ import { openLotScreen } from './ui/lotScreen.js';
 import { openCampaignScreen } from './ui/campaignScreen.js';
 import { openMainMenu } from './ui/mainMenu.js';
 import { openMapSelect } from './ui/mapSelect.js';
-import { startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
+import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { applyStaticI18n } from './i18n/i18n.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
@@ -75,6 +75,13 @@ function initUI() {
   document.getElementById('btn-sound').textContent = state.settings.sound ? '🔊' : '🔇';
 
   window.addEventListener('resize', () => { onResize(); resizePostFX(); });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') {
+      if (state.pendingPlacement) { rotatePendingPlacement(); e.preventDefault(); }
+    } else if (e.key === 'Escape') {
+      if (state.pendingPlacement) { cancelPendingPlacement(); e.preventDefault(); }
+    }
+  });
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
   unlockAudio();
@@ -222,7 +229,14 @@ function applyLightingRefresh() {
 function boot() {
   initUI();
   createWorlds();
-  initControls(handleTileTap);
+  initControls({
+    onTap: handleTileTap,
+    onHover: hoverPlacement,
+    onDesktopClick: (x, y) => {
+      if (state.pendingPlacement) confirmPendingPlacement();
+      else handleTileTap(x, y);
+    }
+  });
   applySettings();
   initPostFX();
   applyStaticI18n();
@@ -252,7 +266,7 @@ function boot() {
       onBack: () => menu()
     }),
     onFreePlay: () => openMapSelect({
-      onPick: (theme) => { startFreePlayWithTheme(theme); seedStarterResort(); beginTutorial(); Bus.emit(EV.UI_REFRESH); launch(); },
+      onPick: (lot) => { startFreePlayLot(lot); seedStarterResort(); beginTutorial(); Bus.emit(EV.UI_REFRESH); launch(); },
       onBack: () => menu()
     }),
     onSettings: () => openSettingsScreen()

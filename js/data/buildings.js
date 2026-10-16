@@ -63,7 +63,11 @@ export const CATALOG = {
     { id: 'castle', name: 'Castle', icon: '🏰', cost: 4600, income: 415, power: -4, guests: 86, tier: 3, isLandmark: true, themeOnly: 'medieval', requires: { level: 6 },
       desc: 'Medieval castle with tournaments.' },
     { id: 'robot', name: 'Giant Robot', icon: '🤖', cost: 4900, income: 455, power: -5, guests: 98, tier: 3, isLandmark: true, themeOnly: 'futuristic', requires: { level: 6 },
-      desc: 'Holographic guardian robot.' }
+      desc: 'Holographic guardian robot.' },
+    { id: 'path_concrete', name: 'Concrete Path', icon: '⬜', cost: 20, income: 0, power: 0, guests: 0, tier: 1, isPath: true,
+      desc: 'Cheap concrete walkway. Guests can only walk on paths.' },
+    { id: 'path_pavement', name: 'Pavement', icon: '🔲', cost: 80, income: 0, power: 0, guests: 0, tier: 2, isPath: true, requires: { level: 4 },
+      desc: 'Fancy paved walkway. Guests walk on it and it looks much better.' }
   ],
   interior: [
     { id: 'slots', name: 'Slots', icon: '🍒', cost: 350, income: 75, power: -1, guests: 10, noisy: true, tier: 1,

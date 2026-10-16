@@ -6,7 +6,7 @@ function lim() {
 }
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
-let camRadius = 21;
+let camRadius = 26;
 let camElevation = 0.85;
 let camAngle = Math.PI / 4;
 let camTargetAngle = Math.PI / 4;
@@ -45,14 +45,19 @@ export function screenRay(clientX, clientY) {
   return raycaster;
 }
 
-export function initControls(onTap) {
-  const tap = onTap || (() => {});
+export function initControls(opts) {
+  const o = opts || {};
+  const onTap = o.onTap || (() => {});
+  const onHover = o.onHover || (() => {});
+  const onDesktopClick = o.onDesktopClick || onTap;
   const dom = renderer.domElement;
 
   let isDragging = false;
   let startX = 0, startY = 0, lastX = 0, lastY = 0;
   let pinchDist = 0;
   let lastTouch = 0;
+
+  const hovering = () => state.selectedTool || state.pendingPlacement;
 
   dom.addEventListener('touchstart', (e) => {
     lastTouch = Date.now();
@@ -87,7 +92,7 @@ export function initControls(onTap) {
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-      camRadius = Math.max(12, Math.min(32, camRadius + (pinchDist - newDist) * 0.045));
+      camRadius = Math.max(12, Math.min(48, camRadius + (pinchDist - newDist) * 0.045));
       pinchDist = newDist;
       updateCameraPosition();
     }
@@ -96,13 +101,14 @@ export function initControls(onTap) {
   dom.addEventListener('touchend', (e) => {
     lastTouch = Date.now();
     if (!isDragging && e.changedTouches.length === 1) {
-      tap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      onTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }
   });
 
   let mouseDown = false;
   dom.addEventListener('mousedown', (e) => {
     if (Date.now() - lastTouch < 600) return;
+    if (e.button !== 0) return;
     mouseDown = true;
     isDragging = false;
     startX = lastX = e.clientX;
@@ -110,7 +116,11 @@ export function initControls(onTap) {
   });
 
   window.addEventListener('mousemove', (e) => {
-    if (!mouseDown || Date.now() - lastTouch < 600) return;
+    if (Date.now() - lastTouch < 600) return;
+    if (!mouseDown) {
+      if (hovering()) onHover(e.clientX, e.clientY);
+      return;
+    }
     if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) isDragging = true;
     if (isDragging) {
       camTarget.x = Math.max(-lim(), Math.min(lim(), camTarget.x - (e.clientX - lastX) * 0.03));
@@ -123,15 +133,17 @@ export function initControls(onTap) {
   window.addEventListener('mouseup', (e) => {
     if (Date.now() - lastTouch < 600) return;
     if (mouseDown && !isDragging && e.target === dom) {
-      tap(e.clientX, e.clientY);
+      onDesktopClick(e.clientX, e.clientY);
     }
     mouseDown = false;
   });
 
+  dom.addEventListener('contextmenu', (e) => e.preventDefault());
+
   dom.addEventListener('wheel', (e) => {
-    camRadius = Math.max(12, Math.min(32, camRadius + e.deltaY * 0.015));
+    camRadius = Math.max(12, Math.min(48, camRadius + e.deltaY * 0.015));
     updateCameraPosition();
-  });
+  }, { passive: true });
 
   updateCameraPosition();
 }

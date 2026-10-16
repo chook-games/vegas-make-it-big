@@ -27,6 +27,19 @@ function decorate(group, level) {
   }
 }
 
+function makeTransparent(group) {
+  group.traverse(obj => {
+    if (obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      mats.forEach(m => {
+        m.transparent = true;
+        m.opacity = 0.5;
+        m.depthWrite = false;
+      });
+    }
+  });
+}
+
 export function createBuildingMesh(item, level = 1, isGhost = false, ctx = {}) {
   const builder = EXTERIOR[item.id] || INTERIOR[item.id];
   const group = builder ? builder(item, level, ctx) : new THREE.Group();
@@ -35,12 +48,16 @@ export function createBuildingMesh(item, level = 1, isGhost = false, ctx = {}) {
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.05, 24), new THREE.MeshBasicMaterial({ color: 0x00f5d4, side: THREE.DoubleSide }));
     ring.rotation.x = -Math.PI / 2;
     at(ring, 0, 0.06, 0);
-    const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.45, 4), bas(0x00f5d4));
-    arrow.rotation.x = Math.PI / 2;
-    at(arrow, 0, 0.18, 1.12);
-    group.add(ring, arrow);
+    group.add(ring);
+    if (!item.isPath) {
+      const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.45, 4), bas(0x00f5d4));
+      arrow.rotation.x = Math.PI / 2;
+      at(arrow, 0, 0.18, 1.12);
+      group.add(arrow);
+      makeTransparent(group);
+    }
   } else {
-    decorate(group, level);
+    if (!item.isPath) decorate(group, level);
   }
 
   return group;

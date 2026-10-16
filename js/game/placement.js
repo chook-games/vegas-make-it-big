@@ -20,7 +20,7 @@ function gridFor(world) {
   return world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
 }
 
-export function startPendingPlacement(tileMesh, item, mode = 'new', existingData = null) {
+export function startPendingPlacement(tileMesh, item, mode = 'new', existingData = null, silent = false) {
   Bus.emit(EV.INSPECTOR_CLOSE);
 
   const { gx, gz, key, world } = tileMesh.userData;
@@ -32,7 +32,7 @@ export function startPendingPlacement(tileMesh, item, mode = 'new', existingData
     state.pendingPlacement.tileMesh = tileMesh;
     state.pendingPlacement.mesh.position.copy(tileMesh.position);
     state.pendingPlacement.mesh.position.y = 0.08;
-    playSound('preview');
+    if (!silent) playSound('preview');
     return;
   }
 
@@ -51,8 +51,30 @@ export function startPendingPlacement(tileMesh, item, mode = 'new', existingData
     rotation, level, cost, mesh: ghost, originalData: existingData
   };
 
-  playSound('preview');
+  if (!silent) playSound('preview');
   updatePlacementUI();
+}
+
+export function hoverPlacement(clientX, clientY) {
+  const ray = screenRay(clientX, clientY);
+  const targets = state.mode === 'exterior' ? pickableTilesExt : pickableTilesInt;
+  const hits = ray.intersectObjects(targets, false);
+  if (!hits.length) return;
+  const tile = hits[0].object;
+  const { key, world } = tile.userData;
+  const grid = gridFor(world);
+  if (grid[key]) return;
+
+  if (state.pendingPlacement) {
+    startPendingPlacement(tile, state.pendingPlacement.item, state.pendingPlacement.mode, state.pendingPlacement.originalData, true);
+    return;
+  }
+  if (state.selectedTool) {
+    const item = CATALOG[world].find(x => x.id === state.selectedTool);
+    if (item && isUnlocked(item, state)) {
+      startPendingPlacement(tile, item, 'new', null, true);
+    }
+  }
 }
 
 export function updatePlacementUI() {
@@ -119,12 +141,15 @@ export function confirmPendingPlacement() {
   vibrate(20);
 
   state.pendingPlacement = null;
-  state.selectedTool = null;
+  const keepTool = p.mode === 'new' && p.item.isPath;
+  state.selectedTool = keepTool ? p.item.id : null;
   updatePlacementUI();
   Bus.emit(EV.CASH_CHANGED);
   Bus.emit(EV.BUILDING_PLACED, { world: p.world, item: p.item });
   Bus.emit(EV.UI_REFRESH);
-  document.getElementById('ui-hint').innerHTML = '✅ <b>Placed!</b> Tap a building to Upgrade or Move it.';
+  document.getElementById('ui-hint').innerHTML = keepTool
+    ? '⬜ <b>Path placed.</b> Keep tapping/hovering to lay more, or pick another building.'
+    : '✅ <b>Placed!</b> Tap a building to Upgrade or Move it.';
 }
 
 export function cancelPendingPlacement() {
@@ -172,6 +197,15 @@ export function seedStarterResort() {
   placeStarterBuilding(findTile(pickableTilesInt, -1, 0), 'slots', 0);
   placeStarterBuilding(findTile(pickableTilesInt, 0, 0), 'wall', 1);
   placeStarterBuilding(findTile(pickableTilesInt, 1, 0), 'vip_bj', 0);
+
+  const half = Math.floor(state.gridSize / 2);
+  for (let gz = 2; gz <= half; gz++) {
+    placeStarterBuilding(findTile(pickableTilesExt, 0, gz), 'path_concrete', 0);
+    placeStarterBuilding(findTile(pickableTilesExt, -2, gz), 'path_concrete', 0);
+  }
+  placeStarterBuilding(findTile(pickableTilesExt, -1, 1), 'path_concrete', 0);
+  placeStarterBuilding(findTile(pickableTilesExt, 1, 1), 'path_concrete', 0);
+  markLotDirty();
 }
 
 export function rebuildBuildingsFromState() {

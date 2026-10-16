@@ -6,6 +6,7 @@ import { applyRadius, applyThemeToTiles, findTile } from '../three/worlds.js';
 import { themeById } from '../data/themes.js';
 import { save } from '../core/save.js';
 import { invalidateHeat, computeLotHeatmap } from './noise.js';
+import { invalidatePaths } from './paths.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { focusOn } from '../three/controls.js';
 
@@ -26,7 +27,9 @@ export function lotCost() {
 }
 
 export function markLotDirty(lot) {
-  invalidateHeat(lot || activeLot());
+  const l = lot || activeLot();
+  invalidateHeat(l);
+  invalidatePaths(l);
 }
 
 export function currentTheme() {
@@ -82,7 +85,7 @@ export function switchLot(index, force = false) {
   syncActiveGrids();
   const lot = state.lots[index];
 
-  applyRadius(lot.radius || 4);
+  applyRadius(lot.radius || 5);
   applyThemeToTiles(themeById(lot.theme));
   buildMeshes(lot);
 

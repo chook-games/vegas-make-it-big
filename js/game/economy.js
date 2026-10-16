@@ -5,6 +5,7 @@ import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
+import { getPaths } from './paths.js';
 
 function getNeighbors(grid, gx, gz) {
   const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -16,11 +17,15 @@ function getNeighbors(grid, gx, gz) {
   return res;
 }
 
-export function evaluateTileStats(world, cell, grid, heat) {
+export function evaluateTileStats(world, cell, grid, heat, openSet) {
   const item = cell.item;
   let inc = item.income * cell.level;
   const notes = [];
   const key = cell.key;
+
+  if (!item.isPath && openSet && !openSet.has(key) && item.income > 0) {
+    return { income: 0, notes: ['Closed: entrance not connected to a path.'] };
+  }
 
   if (world === 'interior') {
     const neighbors = getNeighbors(grid, cell.gx, cell.gz);
@@ -62,6 +67,8 @@ export function evaluateTileStats(world, cell, grid, heat) {
 
 function lotTotals(lot) {
   const heat = getLotHeat(lot);
+  const openExt = getPaths(lot, 'exterior').open;
+  const openInt = getPaths(lot, 'interior').open;
   let powerUsed = 0;
   let powerCap = 0;
   let capacity = 0;
@@ -77,14 +84,14 @@ function lotTotals(lot) {
     if (item.power > 0) powerCap += item.power * cell.level;
     else powerUsed += Math.abs(item.power);
     capacity += (item.guests || 0) * cell.level;
-    rawExt += evaluateTileStats('exterior', cell, lot.exteriorGrid, heat.exterior).income;
+    rawExt += evaluateTileStats('exterior', cell, lot.exteriorGrid, heat.exterior, openExt).income;
   }
   for (const k in lot.interiorGrid) {
     const cell = lot.interiorGrid[k];
     const item = cell.item;
     if (item.power < 0) powerUsed += Math.abs(item.power);
     capacity += (item.guests || 0) * cell.level;
-    rawInt += evaluateTileStats('interior', cell, lot.interiorGrid, heat.interior).income;
+    rawInt += evaluateTileStats('interior', cell, lot.interiorGrid, heat.interior, openInt).income;
     noise += heat.interior.noise[k] || 0;
     smell += heat.interior.smell[k] || 0;
     cells++;

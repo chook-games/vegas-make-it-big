@@ -4,7 +4,7 @@ import {
   exteriorGroup, interiorGroup, pickableTilesExt, pickableTilesInt, vehicles
 } from './scene.js';
 
-const MAX_HALF = 7;
+const MAX_HALF = 8;
 
 let stripGroup = null;
 let interiorWalls = null;
@@ -96,10 +96,18 @@ export function createWorlds() {
   stripGroup = new THREE.Group();
   const road = new THREE.Mesh(
     new THREE.BoxGeometry(44, 0.12, 4.2),
-    new THREE.MeshStandardMaterial({ color: 0x1c1c28, roughness: 0.7 })
+    new THREE.MeshStandardMaterial({ color: 0x2b2b36, roughness: 0.85 })
   );
   road.position.y = -0.02;
   stripGroup.add(road);
+
+  const sidewalkMat = new THREE.MeshStandardMaterial({ color: 0xc2c2c2, roughness: 0.95 });
+  const curbNeg = new THREE.Mesh(new THREE.BoxGeometry(46, 0.18, 1.7), sidewalkMat);
+  curbNeg.position.set(0, 0.03, -2.95);
+  const curbPos = new THREE.Mesh(new THREE.BoxGeometry(46, 0.18, 1.7), sidewalkMat);
+  curbPos.position.set(0, 0.03, 2.95);
+  stripGroup.add(curbNeg, curbPos);
+
   for (let i = -20; i <= 20; i += 2.5) {
     const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.14, 0.15), new THREE.MeshBasicMaterial({ color: 0xffd166 }));
     stripe.position.set(i, -0.01, 0);

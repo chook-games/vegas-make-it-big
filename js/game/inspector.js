@@ -9,7 +9,8 @@ import { spawnFloatingText } from '../ui/toast.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
-import { markLotDirty, currentTheme } from './lots.js';
+import { markLotDirty, currentTheme, activeLot, getLotHeat } from './lots.js';
+import { getPaths } from './paths.js';
 import { t } from '../i18n/i18n.js';
 
 function groupFor(world) {
@@ -26,7 +27,10 @@ export function openInspector(world, key) {
   if (!cell) return;
 
   state.inspectedKey = { world, key };
-  const stats = evaluateTileStats(world, cell);
+  const lot = activeLot();
+  const heat = getLotHeat(lot)[world];
+  const open = cell.item.isPath ? null : getPaths(lot, world).open;
+  const stats = evaluateTileStats(world, cell, grid, heat, open);
   const upg = upgradeCost(cell);
   const refund = sellRefund(cell);
 

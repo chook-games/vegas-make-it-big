@@ -6,6 +6,7 @@ import { XP } from '../data/levels.js';
 import { pickArchetype, CATEGORY } from './archetypes.js';
 import { heatAt } from './noise.js';
 import { activeLot } from './lots.js';
+import { getPaths, entranceKey, bfsPath, keyAt, nearestWalkable } from './paths.js';
 
 const MAX_GUESTS = 40;
 
@@ -20,10 +21,13 @@ function venueCells(world, category) {
   const grid = gridFor(world);
   const set = CATEGORY[category];
   if (!set) return [];
+  const lot = activeLot();
+  const open = world === 'exterior' ? getPaths(lot, 'exterior').open : null;
   const out = [];
   for (const k in grid) {
     const c = grid[k];
-    if (c.item.isWall || c.item.isSecurity || c.item.isGenerator || c.item.isDecor) continue;
+    if (c.item.isWall || c.item.isSecurity || c.item.isGenerator || c.item.isDecor || c.item.isPath) continue;
+    if (open && !open.has(k)) continue;
     if (set.has(c.item.id)) out.push(c);
   }
   return out;
@@ -45,29 +49,29 @@ function makeMesh(arch) {
   return g;
 }
 
-function exitPoint() {
+function spawnPos(world) {
+  const lot = activeLot();
   const r = Math.floor(state.gridSize / 2) * state.tileSize;
-  const side = Math.floor(Math.random() * 4);
-  if (side === 0) return { x: (Math.random() - 0.5) * r, z: r };
-  if (side === 1) return { x: (Math.random() - 0.5) * r, z: -r };
-  if (side === 2) return { x: r, z: (Math.random() - 0.5) * r };
-  return { x: -r, z: (Math.random() - 0.5) * r };
-}
-
-function securityStrength() {
-  let s = 0;
-  for (const k in state.interiorGrid) {
-    if (state.interiorGrid[k].item.isSecurity) s += 0.25;
+  if (world === 'exterior') {
+    const p = getPaths(lot, 'exterior');
+    const candidates = [];
+    for (const k of p.connected) {
+      const pos = p.walkable.get(k);
+      if (pos) candidates.push(pos);
+    }
+    if (!candidates.length) return null;
+    const pos = candidates[Math.floor(Math.random() * candidates.length)];
+    return { x: pos.x, z: pos.z };
   }
-  s += (state.staff.security || 0) * 0.06;
-  return Math.min(0.9, s);
+  return { x: (Math.random() - 0.5) * r, z: r + 1.5 };
 }
 
 function spawnGuest(world) {
+  const pos = spawnPos(world);
+  if (!pos) return null;
   const arch = pickArchetype(state);
   const mesh = makeMesh(arch);
-  const r = Math.floor(state.gridSize / 2) * state.tileSize;
-  mesh.position.set((Math.random() - 0.5) * r, 0.08, r + 1.5);
+  mesh.position.set(pos.x, 0.08, pos.z);
   groupFor(world).add(mesh);
 
   const guest = {
@@ -76,8 +80,10 @@ function spawnGuest(world) {
     planIndex: 0,
     stateId: 'idle',
     venue: null,
-    target: exitPoint(),
-    speed: 0.9 + Math.random() * 0.7,
+    path: null,
+    pi: 0,
+    target: { x: pos.x, z: pos.z },
+    speed: 1.1 + Math.random() * 0.7,
     timer: 0,
     usingTick: 0
   };
@@ -86,21 +92,61 @@ function spawnGuest(world) {
 }
 
 function nextActivity(guest) {
+  const lot = activeLot();
   while (guest.planIndex < guest.plan.length) {
     const category = guest.plan[guest.planIndex];
     const cells = venueCells(guest.world, category);
     if (cells.length) {
       const cell = cells[Math.floor(Math.random() * cells.length)];
       guest.venue = cell;
-      guest.target = { x: cell.tileMesh.position.x, z: cell.tileMesh.position.z };
-      guest.stateId = 'arriving';
-      return;
+      if (guest.world === 'exterior') {
+        const ek = entranceKey(cell);
+        const startKey = keyAt(guest.mesh.position.x, guest.mesh.position.z);
+        const wp = bfsPath(lot, 'exterior', startKey, ek);
+        if (wp.length) {
+          guest.path = wp;
+          guest.pi = 0;
+          guest.target = wp[wp.length - 1];
+          guest.stateId = 'arriving';
+          return;
+        }
+      } else {
+        guest.path = [{ x: cell.tileMesh.position.x, z: cell.tileMesh.position.z }];
+        guest.pi = 0;
+        guest.target = guest.path[0];
+        guest.stateId = 'arriving';
+        return;
+      }
     }
     guest.planIndex++;
   }
+  leave(guest);
+}
+
+function leave(guest) {
+  const lot = activeLot();
   guest.venue = null;
+  if (guest.world === 'exterior') {
+    const p = getPaths(lot, 'exterior');
+    let front = null, fz = -Infinity;
+    for (const k of p.connected) {
+      const pos = p.walkable.get(k);
+      const c = lot.exteriorGrid[k];
+      if (c && c.gz > fz) { fz = c.gz; front = pos; }
+    }
+    const startKey = keyAt(guest.mesh.position.x, guest.mesh.position.z);
+    const targetKey = front ? keyAt(front.x, front.z) : startKey;
+    const wp = bfsPath(lot, 'exterior', startKey, targetKey);
+    guest.path = wp.length ? wp : [{ x: guest.mesh.position.x, z: guest.mesh.position.z }];
+    guest.pi = 0;
+    guest.target = guest.path[guest.path.length - 1];
+    guest.stateId = 'leaving';
+    return;
+  }
   guest.stateId = 'leaving';
-  guest.target = exitPoint();
+  guest.target = { x: guest.mesh.position.x, z: guest.mesh.position.z + 2 };
+  guest.path = [guest.target];
+  guest.pi = 0;
 }
 
 function spend(guest) {
@@ -117,9 +163,7 @@ function spend(guest) {
     const pressure = Math.min(1, (h.noise + h.smell) * 0.8);
     amount = Math.round(amount * (1 - pressure * 0.7));
     if (pressure > 0.55 && Math.random() < 0.4) {
-      guest.venue = null;
-      guest.stateId = 'leaving';
-      guest.target = exitPoint();
+      leave(guest);
       Bus.emit(EV.TOAST, { text: '🎩 A High Roller left because of noise/smell!', kind: 'bad' });
       return;
     }
@@ -129,7 +173,6 @@ function spend(guest) {
     if (Math.random() < 0.5) {
       if (Math.random() < securityStrength()) {
         state.cash += amount * 3;
-        guest.cheatCaught = true;
         Bus.emit(EV.FLOATING, { position: guest.mesh.position, text: 'Cheater caught!', color: '#00f5d4' });
       } else {
         const loss = amount * 2;
@@ -152,6 +195,15 @@ function spend(guest) {
   }
 }
 
+function securityStrength() {
+  let s = 0;
+  for (const k in state.interiorGrid) {
+    if (state.interiorGrid[k].item.isSecurity) s += 0.25;
+  }
+  s += (state.staff.security || 0) * 0.06;
+  return Math.min(0.9, s);
+}
+
 function removeGuest(i) {
   const g = walkers[i];
   groupFor(g.world).remove(g.mesh);
@@ -166,8 +218,18 @@ export function updateGuests(dtMs, totals) {
   let extCount = walkers.filter(w => w.world === 'exterior').length;
   let intCount = walkers.filter(w => w.world === 'interior').length;
 
-  while (extCount < extDesired && walkers.length < MAX_GUESTS) { walkers.push(spawnGuest('exterior')); extCount++; }
-  while (intCount < intDesired && walkers.length < MAX_GUESTS) { walkers.push(spawnGuest('interior')); intCount++; }
+  while (extCount < extDesired && walkers.length < MAX_GUESTS) {
+    const g = spawnGuest('exterior');
+    if (!g) break;
+    walkers.push(g);
+    extCount++;
+  }
+  while (intCount < intDesired && walkers.length < MAX_GUESTS) {
+    const g = spawnGuest('interior');
+    if (!g) break;
+    walkers.push(g);
+    intCount++;
+  }
 
   for (let i = walkers.length - 1; i >= 0; i--) {
     const w = walkers[i];
@@ -180,39 +242,39 @@ export function animateGuests(dtMs) {
   const dt = dtMs / 1000;
   for (let i = walkers.length - 1; i >= 0; i--) {
     const g = walkers[i];
-    const t = g.target;
-    const dx = t.x - g.mesh.position.x;
-    const dz = t.z - g.mesh.position.z;
-    const dist = Math.hypot(dx, dz);
-
-    if (g.stateId !== 'using') {
-      if (dist > 0.12) {
-        const step = Math.min(dist, g.speed * dt);
-        g.mesh.position.x += (dx / dist) * step;
-        g.mesh.position.z += (dz / dist) * step;
-        g.mesh.position.y = 0.08 + Math.abs(Math.sin(performance.now() * 0.008 + i)) * 0.04;
-      } else {
-        if (g.stateId === 'arriving') {
-          g.stateId = 'using';
-          g.timer = 2.5 + Math.random() * 3;
-          g.usingTick = 0;
-        } else if (g.stateId === 'leaving') {
-          removeGuest(i);
-          addXP(XP.guestServed);
-          continue;
-        }
+    if (!g.path || g.pi >= g.path.length) {
+      if (g.stateId === 'arriving') {
+        g.stateId = 'using';
+        g.timer = 2.5 + Math.random() * 3;
+        g.usingTick = 0;
+        continue;
       }
+      if (g.stateId === 'leaving') {
+        removeGuest(i);
+        addXP(XP.guestServed);
+        continue;
+      }
+      continue;
+    }
+
+    const wp = g.path[g.pi];
+    const dx = wp.x - g.mesh.position.x;
+    const dz = wp.z - g.mesh.position.z;
+    const dist = Math.hypot(dx, dz);
+    if (dist > 0.12) {
+      const step = Math.min(dist, g.speed * dt);
+      g.mesh.position.x += (dx / dist) * step;
+      g.mesh.position.z += (dz / dist) * step;
+      g.mesh.position.y = 0.08 + Math.abs(Math.sin(performance.now() * 0.008 + i)) * 0.04;
     } else {
+      g.pi++;
+    }
+
+    if (g.stateId === 'using') {
       g.timer -= dt;
       g.usingTick += dt;
-      if (g.usingTick >= 1.3 && g.venue) {
-        g.usingTick = 0;
-        spend(g);
-      }
-      if (g.timer <= 0) {
-        g.planIndex++;
-        nextActivity(g);
-      }
+      if (g.usingTick >= 1.3 && g.venue) { g.usingTick = 0; spend(g); }
+      if (g.timer <= 0) { g.planIndex++; nextActivity(g); }
     }
   }
 }

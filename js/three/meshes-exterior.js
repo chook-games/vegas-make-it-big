@@ -341,5 +341,18 @@ export const EXTERIOR = {
     ring.rotation.x = Math.PI / 2;
     spin(ring); g.add(ring);
     return g;
+  },
+  path_concrete(item, level) {
+    const g = new THREE.Group();
+    g.add(at(box(2.05, 0.1, 2.05, std(0x9a9a9a, { roughness: 0.95 })), 0, 0.02, 0));
+    return g;
+  },
+  path_pavement(item, level) {
+    const g = new THREE.Group();
+    g.add(at(box(2.1, 0.1, 2.1, std(0xd8d2c4, { roughness: 0.8 })), 0, 0.02, 0));
+    for (const [x, z] of [[-0.5, -0.5], [0.5, 0.5]]) {
+      g.add(at(box(0.95, 0.11, 0.95, std(0x8a7a5a, { roughness: 0.8 })), x, 0.03, z));
+    }
+    return g;
   }
 };

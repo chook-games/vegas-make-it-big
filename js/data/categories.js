@@ -5,6 +5,7 @@ export const EXT_CATEGORIES = [
   { id: 'food', name: 'Food & Shops', icon: '🍽️' },
   { id: 'utility', name: 'Utilities', icon: '⚡' },
   { id: 'transport', name: 'Transport', icon: '🅿️' },
+  { id: 'paths', name: 'Paths', icon: '⬜' },
   { id: 'decor', name: 'Decor', icon: '🌳' }
 ];
 
@@ -49,7 +50,9 @@ const EXT_MAP = {
   saloon: 'attraction',
   volcano: 'attraction',
   castle: 'attraction',
-  robot: 'attraction'
+  robot: 'attraction',
+  path_concrete: 'paths',
+  path_pavement: 'paths'
 };
 
 const INT_MAP = {
