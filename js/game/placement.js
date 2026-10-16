@@ -283,6 +283,16 @@ export function seedStarterResort() {
   placeBuildingAt('exterior', 'path_concrete', -2, 3, 0);
   placeBuildingAt('exterior', 'path_concrete', -1, 3, 0);
   placeBuildingAt('exterior', 'path_concrete', 0, 3, 0);
+
+  const th = currentTheme();
+  const grid = gridFor('exterior');
+  if (th && th.decor) {
+    [[2, 4], [3, 3], [-2, 5]].forEach(([x, z]) => {
+      if (Math.abs(x) <= half && Math.abs(z) <= half && !grid[`${x},${z}`]) {
+        placeBuildingAt('exterior', th.decor, x, z, 0);
+      }
+    });
+  }
   markLotDirty();
 }
 

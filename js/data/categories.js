@@ -54,7 +54,17 @@ const EXT_MAP = {
   castle: 'attraction',
   robot: 'attraction',
   path_concrete: 'paths',
-  path_pavement: 'paths'
+  path_pavement: 'paths',
+  decor_flag: 'decor',
+  decor_wave: 'decor',
+  decor_ufo: 'decor',
+  decor_fern: 'decor',
+  decor_lantern: 'decor',
+  decor_obelisk: 'decor',
+  decor_cactus: 'decor',
+  decor_palm: 'decor',
+  decor_banner: 'decor',
+  decor_pillar: 'decor'
 };
 
 const INT_MAP = {

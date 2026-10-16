@@ -342,6 +342,93 @@ export const EXTERIOR = {
     spin(ring); g.add(ring);
     return g;
   },
+  decor_flag(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.04, 0.04, 1.7, 6, std(0xdddddd)), 0, 0.85, 0));
+    g.add(at(box(0.34, 0.05, 0.02, bas(0xef233c)), 0.18, 1.5, 0));
+    g.add(at(box(0.34, 0.05, 0.02, bas(0xffffff)), 0.18, 1.4, 0));
+    g.add(at(box(0.34, 0.09, 0.02, bas(0x3a86ff)), 0.18, 1.6, 0));
+    return g;
+  },
+  decor_wave(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.14, 0.2, 0.5, 8, std(0xf1f3f8)), 0, 0.25, 0));
+    const shell = at(new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), std(0x9b5de5)), 0, 0.6, 0);
+    shell.rotation.x = 0.5; spin(shell); g.add(shell);
+    return g;
+  },
+  decor_ufo(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.4, 0.3, 0.16, 12, std(0x9aa0b5)), 0, 0.6, 0));
+    g.add(at(cyl(0.14, 0.2, 0.22, 10, glow(0x00f5d4, 0.6)), 0, 0.42, 0));
+    g.add(at(cyl(0.05, 0.05, 0.5, 6, std(0x666666)), 0, 0.25, 0));
+    return g;
+  },
+  decor_fern(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.05, 0.07, 0.4, 6, std(0x6b4423)), 0, 0.2, 0));
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2;
+      const leaf = at(cone(0.12, 0.7, 5, std(0x2ecc71)), Math.cos(a) * 0.2, 0.6, Math.sin(a) * 0.2);
+      leaf.rotation.z = Math.cos(a) * 0.5;
+      leaf.rotation.x = Math.sin(a) * 0.5;
+      g.add(leaf);
+    }
+    return g;
+  },
+  decor_lantern(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.04, 0.04, 1.4, 6, std(0x5a3320)), 0, 0.7, 0));
+    const lantern = at(sphere(0.24, 10, glow(0xff2a2a, 0.7)), 0, 1.4, 0);
+    spin(lantern); g.add(lantern);
+    g.add(at(cyl(0.03, 0.03, 0.4, 6, std(0x5a3320)), 0.15, 1.5, 0));
+    return g;
+  },
+  decor_obelisk(item, level) {
+    const g = new THREE.Group();
+    g.add(at(box(0.4, 0.1, 0.4, std(0x8a6d1f)), 0, 0.05, 0));
+    const obel = at(cone(0.22, 1.6, 4, std(0xd9b24a)), 0, 0.85, 0);
+    obel.rotation.y = Math.PI / 4; g.add(obel);
+    const top = at(sphere(0.1, 8, glow(0xffd166, 0.9)), 0, 1.62, 0);
+    g.add(top);
+    return g;
+  },
+  decor_cactus(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.12, 0.14, 0.9, 8, std(0x2e7d32)), 0, 0.45, 0));
+    g.add(at(cyl(0.07, 0.07, 0.4, 6, std(0x2e7d32)), 0.22, 0.5, 0));
+    g.add(at(cyl(0.07, 0.07, 0.3, 6, std(0x2e7d32)), -0.22, 0.3, 0));
+    return g;
+  },
+  decor_palm(item, level) {
+    const g = new THREE.Group();
+    const trunk = at(cyl(0.07, 0.11, 1.3, 6, std(0x8d6e4a)), 0, 0.65, 0);
+    trunk.rotation.z = 0.08; g.add(trunk);
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const frond = at(cone(0.14, 0.8, 5, std(0x2f9e44)), Math.cos(a) * 0.28, 1.35, Math.sin(a) * 0.28);
+      frond.rotation.z = Math.cos(a) * 1.1;
+      frond.rotation.x = Math.sin(a) * 1.1;
+      g.add(frond);
+    }
+    return g;
+  },
+  decor_banner(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.05, 0.05, 1.5, 6, std(0x6b4423)), 0, 0.75, 0));
+    g.add(at(box(0.5, 0.7, 0.03, std(0xe63946)), 0.28, 1.1, 0));
+    g.add(at(box(0.16, 0.16, 0.04, bas(0xffd166)), 0.28, 1.1, 0.03));
+    return g;
+  },
+  decor_pillar(item, level) {
+    const g = new THREE.Group();
+    g.add(at(cyl(0.2, 0.24, 1.6, 10, std(0x1b1035)), 0, 0.8, 0));
+    const beam = at(cyl(0.1, 0.1, 1.6, 8, glow(0xff2a85, 0.9)), 0, 0.8, 0.24);
+    g.add(beam);
+    const top = at(sphere(0.14, 8, glow(0x00f5d4, 0.9)), 0, 1.7, 0);
+    spin(top); g.add(top);
+    return g;
+  },
   waterpump(item, level) {
     const g = new THREE.Group();
     const s = scaleFor(level);

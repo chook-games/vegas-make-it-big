@@ -71,7 +71,17 @@ export const CATALOG = {
     { id: 'path_concrete', name: 'Concrete Path', icon: '⬜', cost: 20, income: 0, power: 0, guests: 0, tier: 1, isPath: true,
       desc: 'Cheap concrete walkway. Guests can only walk on paths.' },
     { id: 'path_pavement', name: 'Pavement', icon: '🔲', cost: 80, income: 0, power: 0, guests: 0, tier: 2, isPath: true, requires: { level: 4 },
-      desc: 'Fancy paved walkway. Guests walk on it and it looks much better.' }
+      desc: 'Fancy paved walkway. Guests walk on it and it looks much better.' },
+    { id: 'decor_flag', name: 'Flag Pole', icon: '🇺🇸', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'american', desc: 'Stars and stripes decor.' },
+    { id: 'decor_wave', name: 'Sea Sculpture', icon: '🐚', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'ocean', desc: 'Oceanic shell sculpture.' },
+    { id: 'decor_ufo', name: 'UFO Prop', icon: '🛸', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'space', desc: 'A parked flying saucer.' },
+    { id: 'decor_fern', name: 'Giant Fern', icon: '🌿', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'prehistoric', desc: 'Prehistoric greenery.' },
+    { id: 'decor_lantern', name: 'Paper Lantern', icon: '🏮', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'oriental', desc: 'Glowing paper lantern.' },
+    { id: 'decor_obelisk', name: 'Obelisk', icon: '🗿', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'egyptian', desc: 'Ancient carved obelisk.' },
+    { id: 'decor_cactus', name: 'Cactus', icon: '🌵', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'western', desc: 'Desert cactus.' },
+    { id: 'decor_palm', name: 'Palm Tree', icon: '🌴', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'tropical', desc: 'Tropical palm.' },
+    { id: 'decor_banner', name: 'Knight Banner', icon: '🛡️', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'medieval', desc: 'A heraldic banner.' },
+    { id: 'decor_pillar', name: 'Neon Pillar', icon: '🔮', cost: 150, income: 0, power: 0, guests: 4, tier: 1, isDecor: true, themeOnly: 'futuristic', desc: 'Holographic neon pillar.' }
   ],
   interior: [
     { id: 'slots', name: 'Slots', icon: '🍒', cost: 350, income: 75, power: -1, guests: 10, noisy: true, tier: 1,
