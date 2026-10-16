@@ -88,6 +88,7 @@ export function switchLot(index, force = false) {
   if (cur) clearMeshes(cur);
 
   state.activeLot = index;
+  state.interiorLayer = 0;
   syncActiveGrids();
   const lot = state.lots[index];
 

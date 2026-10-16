@@ -31,7 +31,7 @@ export function rankFor(level) {
 export const XP = {
   build: 0.02,
   upgrade: 0.015,
-  income: 0.00002,
+  income: 0.00001,
   quest: 60,
   achievement: 40,
   guestServed: 0.5,

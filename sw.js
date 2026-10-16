@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v18';
+const CACHE = 'vegas-mib-v19';
 const CORE = [
   './',
   './index.html',
@@ -68,6 +68,7 @@ const CORE = [
   './js/ui/lotScreen.js',
   './js/ui/campaignScreen.js',
   './js/ui/rivalsScreen.js',
+  './js/ui/statsScreen.js',
   './js/ui/mainMenu.js',
   './js/ui/mapSelect.js',
   './js/ui/sandboxScreen.js',

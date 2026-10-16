@@ -27,6 +27,8 @@ function clearAllBuildings() {
   state.lots.forEach(lot => {
     Object.values(lot.exteriorGrid).forEach(c => { if (c.mesh) exteriorGroup.remove(c.mesh); });
     Object.values(lot.interiorGrid).forEach(c => { if (c.mesh) interiorGroup.remove(c.mesh); });
+    const up = lot.interiorUpperGrid || {};
+    Object.values(up).forEach(c => { if (c.mesh) interiorGroup.remove(c.mesh); });
   });
   const theme = state.lots[0] ? state.lots[0].theme : 'american';
   state.lots = [makeLot(0, theme, 'Lot 1')];
