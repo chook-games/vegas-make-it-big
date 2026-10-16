@@ -1,0 +1,155 @@
+import { state, makeLot } from '../core/state.js';
+import { Bus, EV } from '../core/events.js';
+import { SCENARIOS } from '../data/campaign.js';
+import { calculateTotals } from './economy.js';
+import { switchLot } from './lots.js';
+import { resetToNew, save } from '../core/save.js';
+import { playSound, vibrate } from '../audio/audio.js';
+
+export function inCampaign() {
+  return state.gameMode === 'campaign';
+}
+
+export function currentScenario() {
+  if (!inCampaign()) return null;
+  return SCENARIOS[state.campaignIndex] || null;
+}
+
+function totalBuildings() {
+  let n = 0;
+  for (const lot of state.lots) {
+    n += Object.keys(lot.exteriorGrid).length + Object.keys(lot.interiorGrid).length;
+  }
+  return n;
+}
+
+function lotBuildings() {
+  return Object.keys(state.exteriorGrid).length + Object.keys(state.interiorGrid).length;
+}
+
+function hasLandmark(id) {
+  for (const k in state.exteriorGrid) if (state.exteriorGrid[k].item.id === id) return true;
+  for (const k in state.interiorGrid) if (state.interiorGrid[k].item.id === id) return true;
+  return false;
+}
+
+function totalStaffCount() {
+  let n = 0;
+  for (const id in state.staff) n += state.staff[id];
+  return n;
+}
+
+function goalCurrent(g) {
+  switch (g.type) {
+    case 'cash': return Math.floor(state.cash);
+    case 'rep': return Math.round(state.reputation);
+    case 'level': return state.level;
+    case 'lots': return state.lots.length;
+    case 'staff': return totalStaffCount();
+    case 'buildings': return totalBuildings();
+    case 'lotBuildings': return lotBuildings();
+    case 'guests': return calculateTotals().guests;
+    case 'landmark': return hasLandmark(g.target) ? 1 : 0;
+    default: return 0;
+  }
+}
+
+export function goalStatus() {
+  const sc = currentScenario();
+  if (!sc) return [];
+  return sc.goals.map(g => {
+    const target = typeof g.target === 'number' ? g.target : 1;
+    const current = goalCurrent(g);
+    return {
+      label: g.label,
+      current,
+      target,
+      done: current >= target,
+      pct: Math.min(100, (current / target) * 100)
+    };
+  });
+}
+
+export function allGoalsDone() {
+  const st = goalStatus();
+  return st.length > 0 && st.every(g => g.done);
+}
+
+function computeStars(sc) {
+  const daysUsed = Math.max(1, state.clock.day - state.scenarioStartDay + 1);
+  if (daysUsed <= sc.targetDays) return 3;
+  if (daysUsed <= Math.ceil(sc.targetDays * 1.6)) return 2;
+  return 1;
+}
+
+export function checkCampaign() {
+  if (!inCampaign()) return;
+  const sc = currentScenario();
+  if (!sc) return;
+  if (!allGoalsDone()) return;
+  completeScenario(sc);
+}
+
+function completeScenario(sc) {
+  const stars = computeStars(sc);
+  state.campaignStars[sc.id] = Math.max(state.campaignStars[sc.id] || 0, stars);
+  if (sc.reward) {
+    if (sc.reward.cash) state.cash += sc.reward.cash;
+    if (sc.reward.gold) state.gold += sc.reward.gold;
+  }
+  playSound('achievement');
+  vibrate([20, 40, 20, 40]);
+  state.campaignIndex += 1;
+  const hasNext = state.campaignIndex < SCENARIOS.length;
+  Bus.emit('campaign:complete', { scenario: sc, stars, reward: sc.reward, hasNext });
+  Bus.emit(EV.UI_REFRESH);
+  save();
+  if (hasNext) setupScenario(state.campaignIndex);
+  else finishCampaign();
+}
+
+function finishCampaign() {
+  Bus.emit(EV.TOAST, { text: '👑 Ολοκλήρωσες το Campaign! Είσαι ο Αυτοκράτορας της Vegas!', kind: 'good' });
+}
+
+export function setupScenario(i) {
+  const sc = SCENARIOS[i];
+  if (!sc) return;
+  while (state.lots.length <= i) {
+    const lot = makeLot(state.lots.length, sc.theme, `Lot ${state.lots.length + 1}`);
+    state.lots.push(lot);
+  }
+  state.lots[i].theme = sc.theme;
+  if (state.cash < sc.startCash) state.cash = sc.startCash;
+  switchLot(i, true);
+  state.scenarioStartDay = state.clock.day;
+  Bus.emit(EV.UI_REFRESH);
+  save();
+}
+
+export function startCampaign() {
+  resetToNew();
+  state.gameMode = 'campaign';
+  state.campaignIndex = 0;
+  state.campaignStars = {};
+  setupScenario(0);
+  Bus.emit(EV.TOAST, { text: '🎯 Ξεκίνησε το Campaign!', kind: 'good' });
+  Bus.emit(EV.UI_REFRESH);
+  save();
+}
+
+export function startFreePlay() {
+  resetToNew();
+  state.gameMode = 'freeplay';
+  Bus.emit(EV.UI_REFRESH);
+  save();
+}
+
+export function campaignProgress() {
+  return {
+    index: state.campaignIndex,
+    total: SCENARIOS.length,
+    stars: Object.values(state.campaignStars).reduce((a, b) => a + b, 0),
+    maxStars: SCENARIOS.length * 3
+  };
+}

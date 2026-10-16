@@ -15,6 +15,7 @@ export function prestigeGoal() {
 }
 
 export function canPrestige() {
+  if (state.gameMode === 'campaign') return false;
   return state.cash >= prestigeGoal();
 }
 

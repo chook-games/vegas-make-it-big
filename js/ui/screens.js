@@ -81,15 +81,19 @@ export function openPrestigeScreen() {
 
   openModal({
     title: '💎 Prestige - Ξανά από την Αρχή',
-    bodyHTML: body,
-    actions: [
-      { label: ready ? `Prestige τώρα (+${pts} πόντοι)` : `Χρειάζεσαι $${goal.toLocaleString()}`, cls: 'btn-gold', onClick: () => {
-        if (!ready) { playSound('error'); return; }
-        doPrestige();
-        closeModal();
-      } },
-      { label: 'Κλείσιμο', cls: 'btn-ghost', onClick: closeModal }
-    ]
+    bodyHTML: state.gameMode === 'campaign'
+      ? '<div class="center muted">Το Prestige είναι διαθέσιμο μόνο στο Free Play.</div>'
+      : body,
+    actions: state.gameMode === 'campaign'
+      ? [{ label: 'Κλείσιμο', cls: 'btn-ghost', onClick: closeModal }]
+      : [
+          { label: ready ? `Prestige τώρα (+${pts} πόντοι)` : `Χρειάζεσαι $${goal.toLocaleString()}`, cls: 'btn-gold', onClick: () => {
+            if (!ready) { playSound('error'); return; }
+            doPrestige();
+            closeModal();
+          } },
+          { label: 'Κλείσιμο', cls: 'btn-ghost', onClick: closeModal }
+        ]
   });
 }
 
@@ -115,7 +119,7 @@ const TUTORIAL_PREVIEW = [
   { icon: '💎', text: 'Κάνε Prestige για μόνιμα bonuses και νέα κτίρια.' }
 ];
 
-export function openWelcomeScreen({ hasSave, onContinue, onNew }) {
+export function openWelcomeScreen({ hasSave, onContinue, onNew, onCampaign }) {
   const preview = TUTORIAL_PREVIEW.map(t => `<div class="list-row"><div class="list-icon">${t.icon}</div><div class="list-main"><div class="list-name">${t.text}</div></div></div>`).join('');
   openModal({
     title: 'Vegas: Make It Big',
@@ -127,7 +131,8 @@ export function openWelcomeScreen({ hasSave, onContinue, onNew }) {
     `,
     actions: [
       hasSave ? { label: 'Συνέχεια', cls: 'btn-green', onClick: () => { closeModal(); onContinue && onContinue(); } } : null,
-      { label: hasSave ? 'Νέο Παιχνίδι' : 'Ξεκίνα', cls: 'btn-primary', onClick: () => { closeModal(); onNew && onNew(); } }
+      { label: '🎯 Campaign', cls: 'btn-primary', onClick: () => { closeModal(); onCampaign && onCampaign(); } },
+      { label: hasSave ? '🎮 Free Play' : '🎮 Ξεκίνα Free Play', cls: 'btn-ghost', onClick: () => { closeModal(); onNew && onNew(); } }
     ].filter(Boolean)
   });
 }
@@ -155,4 +160,19 @@ export function openLevelUpScreen({ level, reward }) {
   });
 }
 
-export function initScreens() {}
+export function initScreens() {
+  Bus.on('campaign:complete', ({ scenario, stars, reward, hasNext }) => {
+    const rewardTxt = reward && reward.cash ? `+$${reward.cash.toLocaleString()}${reward.gold ? ` · +${reward.gold} 💎` : ''}` : '';
+    openModal({
+      title: '🎉 Ολοκληρώθηκε!',
+      bodyHTML: `
+        <div class="center big-stat">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        <div class="center">«${scenario.title}» ολοκληρώθηκε!</div>
+        <div class="center muted">Ανταμοιβή: ${rewardTxt}</div>
+        <div class="spacer"></div>
+        <div class="center muted">${hasNext ? 'Ξεκινά το επόμενο scenario...' : 'Ολοκλήρωσες όλο το Campaign!'}</div>
+      `,
+      actions: [{ label: hasNext ? 'Επόμενο ▶' : 'Τέλεια!', cls: 'btn-green', onClick: closeModal }]
+    });
+  });
+}

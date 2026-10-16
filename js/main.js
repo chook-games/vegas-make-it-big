@@ -16,6 +16,8 @@ import { initTutorial, beginTutorial } from './game/tutorial.js';
 import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openWelcomeScreen, openLevelUpScreen } from './ui/screens.js';
 import { openStaffScreen } from './ui/staffScreen.js';
 import { openLotScreen } from './ui/lotScreen.js';
+import { openCampaignScreen } from './ui/campaignScreen.js';
+import { startCampaign, startFreePlay, checkCampaign } from './game/campaign.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
 import { toggleHeatmap, initHeatmap, applyHeatmap } from './ui/heatmap.js';
@@ -48,6 +50,7 @@ function initUI() {
   document.getElementById('btn-staff').addEventListener('click', () => { closeInspector(); openStaffScreen(); });
   document.getElementById('btn-plots').addEventListener('click', () => { closeInspector(); openPlotsScreen(); });
   document.getElementById('btn-lots').addEventListener('click', () => { closeInspector(); openLotScreen(); });
+  document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
   document.getElementById('btn-heat').addEventListener('click', () => toggleHeatmap());
   document.getElementById('btn-quests').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
   document.getElementById('btn-ach').addEventListener('click', () => { closeInspector(); openAchievementsScreen(); });
@@ -165,6 +168,7 @@ function incomeTick() {
   checkProgress();
   refreshPrestigeAlert();
   if (state.heatmap) applyHeatmap();
+  checkCampaign();
 }
 
 function refreshPrestigeAlert() {
@@ -236,7 +240,8 @@ function boot() {
   openWelcomeScreen({
     hasSave: existing,
     onContinue: () => { startContinue(raw || {}); launch(); },
-    onNew: () => { startNewGame(); launch(); }
+    onNew: () => { startNewGame(); launch(); },
+    onCampaign: () => { startCampaign(); seedStarterResort(); beginTutorial(); Bus.emit(EV.UI_REFRESH); launch(); }
   });
 }
 

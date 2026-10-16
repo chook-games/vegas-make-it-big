@@ -72,8 +72,9 @@ function buildMeshes(lot) {
   });
 }
 
-export function switchLot(index) {
-  if (index < 0 || index >= state.lots.length || index === state.activeLot) return;
+export function switchLot(index, force = false) {
+  if (index < 0 || index >= state.lots.length) return;
+  if (index === state.activeLot && !force) return;
   const cur = state.lots[state.activeLot];
   if (cur) clearMeshes(cur);
 

@@ -26,6 +26,8 @@ export function freshState() {
     lots: [makeLot(0, 'american', 'Lot 1')],
     activeLot: 0,
     campaignIndex: 0,
+    campaignStars: {},
+    scenarioStartDay: 1,
     gameMode: 'freeplay',
     heatmap: false,
     inspectedKey: null,

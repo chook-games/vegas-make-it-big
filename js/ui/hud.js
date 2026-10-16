@@ -6,6 +6,7 @@ import { levelProgress } from '../game/leveling.js';
 import { totalStaff } from '../game/staff.js';
 import { activeLot } from '../game/lots.js';
 import { themeById } from '../data/themes.js';
+import { inCampaign, currentScenario, goalStatus } from '../game/campaign.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -41,6 +42,19 @@ export function updateHUD() {
   const lot = activeLot();
   const lotEl = document.getElementById('ui-lot');
   if (lotEl && lot) lotEl.textContent = `${themeById(lot.theme).icon} ${lot.name}`;
+
+  const goalEl = document.getElementById('ui-goal');
+  if (goalEl) {
+    if (inCampaign()) {
+      const sc = currentScenario();
+      const st = goalStatus();
+      const done = st.filter(x => x.done).length;
+      goalEl.style.display = '';
+      goalEl.textContent = `🎯 ${sc ? sc.title : ''} (${done}/${st.length})`;
+    } else {
+      goalEl.style.display = 'none';
+    }
+  }
 
   return totals;
 }

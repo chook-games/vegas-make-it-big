@@ -29,6 +29,8 @@ export function serialize() {
     activeLot: state.activeLot,
     gameMode: state.gameMode,
     campaignIndex: state.campaignIndex,
+    campaignStars: state.campaignStars,
+    scenarioStartDay: state.scenarioStartDay,
     prestigeLevel: state.prestigeLevel,
     prestigePoints: state.prestigePoints,
     questIndex: state.questIndex,
