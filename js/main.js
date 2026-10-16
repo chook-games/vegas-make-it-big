@@ -24,6 +24,7 @@ import { openSandboxScreen } from './ui/sandboxScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
 import { applyStaticI18n } from './i18n/i18n.js';
+import { setAllEdges } from './data/betting.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
 import { toggleHeatmap, initHeatmap, applyHeatmap } from './ui/heatmap.js';
@@ -72,6 +73,7 @@ function initUI() {
     state.houseEdge = parseInt(e.target.value, 10);
     document.getElementById('ui-odds-val').textContent = `${state.houseEdge}%`;
     document.getElementById('odds-modal-label').textContent = `${state.houseEdge}% House Edge`;
+    setAllEdges(state.houseEdge);
     Bus.emit('odds:set', state.houseEdge);
     updateHUD();
   });

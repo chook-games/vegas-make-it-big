@@ -2,6 +2,7 @@ import { SAVE_KEY } from './constants.js';
 import { state, applyLoadedState, freshState } from './state.js';
 import { findItem } from '../data/buildings.js';
 import { effSize } from '../data/sizes.js';
+import { isGambling, defaultBetIndex } from '../data/betting.js';
 
 function serializeGrid(grid) {
   const out = {};
@@ -96,6 +97,10 @@ function hydrateGrid(raw, world) {
       w, h, cx: c.gx + (w - 1) / 2, cz: c.gz + (h - 1) / 2,
       mesh: null, tileMesh: null
     };
+    if (isGambling(world, item.id)) {
+      grid[key].edge = c.edge != null ? c.edge : 12;
+      grid[key].betIndex = c.betIndex != null ? c.betIndex : defaultBetIndex(item.tier);
+    }
   }
   return grid;
 }

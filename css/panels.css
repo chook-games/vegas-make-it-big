@@ -142,6 +142,29 @@
   height: 28px;
 }
 
+.bet-box {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.bet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #dfe3ff;
+  margin-top: 5px;
+}
+.bet-stepper { display: flex; align-items: center; gap: 8px; }
+.bet-stepper button {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: rgba(0, 245, 212, 0.16); color: var(--neon-cyan);
+  font-size: 18px; font-weight: 800; cursor: pointer; line-height: 1;
+}
+.bet-stepper button:active { transform: scale(0.94); }
+.bet-stepper span { min-width: 70px; text-align: center; color: var(--gold); }
+
 .bottom-dock {
   position: fixed;
   bottom: var(--safe-bottom);

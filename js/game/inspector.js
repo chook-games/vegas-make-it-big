@@ -12,6 +12,7 @@ import { XP, xpForCost } from '../data/levels.js';
 import { markLotDirty, currentTheme, activeLot, getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
 import { utilOf } from '../data/utilities.js';
+import { isGambling, BET_STEPS, betLabel, edgeLabel } from '../data/betting.js';
 import { t } from '../i18n/i18n.js';
 
 function groupFor(world) {
@@ -49,11 +50,50 @@ export function openInspector(world, key) {
   else if (u.w) utilParts.push(`💧 ${u.w}`);
   if (utilParts.length) html += `<div style="margin-top:2px; color:#8fd0ff;">${utilParts.join(' · ')}</div>`;
   if (stats.notes.length) html += `<div style="margin-top:4px; color:#ffd166;">${stats.notes.join('<br>')}</div>`;
+
+  const gambling = isGambling(world, cell.item.id);
+  if (gambling) {
+    const edge = cell.edge != null ? cell.edge : 12;
+    const bi = cell.betIndex != null ? cell.betIndex : 0;
+    html += `<div class="bet-box">
+      <div class="bet-row"><span>Bet Range</span>
+        <div class="bet-stepper">
+          <button id="insp-bet-dec">−</button>
+          <span id="insp-bet">${betLabel(bi)}</span>
+          <button id="insp-bet-inc">+</button>
+        </div>
+      </div>
+      <div class="bet-row"><span>House Edge</span><span id="insp-edge" style="color:var(--neon-cyan)">${edge}% · ${edgeLabel(edge)}</span></div>
+      <input type="range" class="odds-slider" id="insp-edge-slider" min="4" max="28" value="${edge}">
+    </div>`;
+  }
+
   document.getElementById('insp-body').innerHTML = html;
   document.getElementById('insp-upgrade').textContent = `⬆️ Upgrade ($${upg})`;
   document.getElementById('insp-move').textContent = `🔄 Move ($${MOVE_ROTATE_COST})`;
   document.getElementById('insp-sell').textContent = `🗑️ Sell (+$${refund})`;
   document.getElementById('inspector').style.display = 'block';
+
+  if (gambling) {
+    const dec = document.getElementById('insp-bet-dec');
+    const inc = document.getElementById('insp-bet-inc');
+    const slider = document.getElementById('insp-edge-slider');
+    if (dec) dec.addEventListener('click', () => {
+      cell.betIndex = Math.max(0, (cell.betIndex || 0) - 1);
+      markLotDirty(); playSound('rotate'); openInspector(world, key); Bus.emit(EV.UI_REFRESH);
+    });
+    if (inc) inc.addEventListener('click', () => {
+      cell.betIndex = Math.min(BET_STEPS.length - 1, (cell.betIndex || 0) + 1);
+      markLotDirty(); playSound('rotate'); openInspector(world, key); Bus.emit(EV.UI_REFRESH);
+    });
+    if (slider) slider.addEventListener('input', (e) => {
+      cell.edge = parseInt(e.target.value, 10);
+      const el = document.getElementById('insp-edge');
+      if (el) el.textContent = `${cell.edge}% · ${edgeLabel(cell.edge)}`;
+      markLotDirty();
+      Bus.emit(EV.UI_REFRESH);
+    });
+  }
 }
 
 export function closeInspector() {

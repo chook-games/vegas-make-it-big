@@ -4,6 +4,7 @@ import { getTimeFactors, seasonInfo } from './daynight.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
 import { utilOf } from '../data/utilities.js';
+import { stationIncomeFactor } from '../data/betting.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
@@ -64,7 +65,7 @@ export function evaluateTileStats(world, cell, grid, heat, openSet) {
     }
   }
 
-  return { income: Math.round(inc), notes };
+  return { income: Math.round(inc * stationIncomeFactor(world, cell)), notes };
 }
 
 function lotTotals(lot) {
@@ -142,7 +143,6 @@ export function calculateTotals() {
   const avgSmell = lotCount ? smellSum / lotCount : 0;
 
   const edge = state.houseEdge;
-  const edgeIncomeFactor = edge <= 15 ? 0.75 + (edge / 15) * 0.45 : Math.max(0.35, 1.2 - (edge - 15) * 0.06);
   const edgeGuestFactor = edge <= 15 ? 1 + (15 - edge) * 0.02 : Math.max(0.5, 1 - (edge - 15) * 0.05);
 
   const repFactor = 0.6 + (state.reputation / 100) * 0.9;
@@ -168,7 +168,7 @@ export function calculateTotals() {
 
   const grossIncome = Math.round(
     (rawExt * time.dayFactor + rawInt * time.nightFactor) *
-    edgeIncomeFactor * repFactor * happyFactor * nuisancePenalty *
+    repFactor * happyFactor * nuisancePenalty *
     season.incomeMul * eventIncome * powerPenalty * prestigeMul * staffIncomeMul
   );
 
@@ -189,7 +189,7 @@ export function calculateTotals() {
     powerShort, waterShort,
     capacity, guests, fill,
     rawExt, rawInt, totalIncome, grossIncome, wages, hasBlackout,
-    edgeIncomeFactor, edgeGuestFactor, repFactor, happyFactor,
+    edgeGuestFactor, repFactor, happyFactor,
     prestigeMul, eventIncome, eventGuest, staffEff: eff,
     avgNoise, avgSmell, nuisancePenalty
   };

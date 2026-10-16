@@ -12,6 +12,7 @@ import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
 import { markLotDirty, currentTheme, activeLot } from './lots.js';
 import { getOccupancy } from './paths.js';
+import { isGambling, defaultBetIndex } from '../data/betting.js';
 import { t } from '../i18n/i18n.js';
 
 function groupFor(world) {
@@ -193,6 +194,10 @@ export function confirmPendingPlacement() {
     w: p.w, h: p.h, cx: p.cx, cz: p.cz,
     mesh: finalMesh, tileMesh: null
   };
+  if (isGambling(p.world, p.item.id)) {
+    grid[p.originKey].edge = state.houseEdge;
+    grid[p.originKey].betIndex = defaultBetIndex(p.item.tier);
+  }
 
   if (p.mode === 'new') state.stats.buildingsBuilt++;
   markLotDirty();
@@ -253,6 +258,10 @@ export function placeBuildingAt(world, itemId, ox, oz, rotation = 0) {
   groupFor(world).add(mesh);
   const key = `${ox},${oz}`;
   grid[key] = { gx: ox, gz: oz, key, world, item, level: 1, rotation, w, h, cx, cz, mesh, tileMesh: null };
+  if (isGambling(world, itemId)) {
+    grid[key].edge = state.houseEdge;
+    grid[key].betIndex = defaultBetIndex(item.tier);
+  }
 }
 
 export function seedStarterResort() {
