@@ -29,6 +29,7 @@ const EXT_MAP = {
   waterpump: 'utility',
   waterplant: 'utility',
   parking: 'transport',
+  tramstop: 'transport',
   helipad: 'transport',
   restaurant: 'food',
   mall: 'food',

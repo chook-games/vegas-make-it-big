@@ -12,6 +12,8 @@ export const CATALOG = {
       desc: 'Produces +8 Power for your lot.' },
     { id: 'parking', name: 'Parking', icon: '🅿️', cost: 600, income: 55, power: 0, guests: 35, tier: 2, requires: { level: 3 },
       desc: 'Multi-storey car park. Draws visitors from all over town.' },
+    { id: 'tramstop', name: 'Tram Stop', icon: '🚋', cost: 550, income: 45, power: -1, guests: 50, tier: 2, requires: { level: 5 },
+      desc: 'Streetcar stop on the Strip. Brings in a steady stream of tourists.' },
     { id: 'restaurant', name: 'Restaurant', icon: '🍽️', cost: 800, income: 130, power: -2, guests: 20, tier: 2, requires: { level: 5, rep: 20 },
       desc: 'Fine-dining chef restaurant. Makes guests stay longer.' },
     { id: 'solar', name: 'Solar Panels', icon: '☀️', cost: 900, income: 20, power: 12, guests: -3, tier: 2, isGenerator: true, requires: { level: 7 },

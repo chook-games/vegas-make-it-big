@@ -113,6 +113,37 @@ export function createWorlds() {
     stripe.position.set(i, -0.01, 0);
     stripGroup.add(stripe);
   }
+
+  const railMat = new THREE.MeshStandardMaterial({ color: 0x6a6f7a, metalness: 0.6, roughness: 0.4 });
+  for (const rz of [-0.9, -0.5]) {
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(44, 0.1, 0.09), railMat);
+    rail.position.set(0, 0.0, rz);
+    stripGroup.add(rail);
+  }
+
+  for (const cx of [-9, -3, 3, 9]) {
+    for (let cz = -1.7; cz <= 1.7; cz += 0.55) {
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.15, 0.28), new THREE.MeshBasicMaterial({ color: 0xf2f2f2 }));
+      bar.position.set(cx, -0.005, cz);
+      stripGroup.add(bar);
+    }
+  }
+
+  const tram = new THREE.Group();
+  const tramBody = new THREE.Mesh(
+    new THREE.BoxGeometry(3.4, 0.8, 0.62),
+    new THREE.MeshStandardMaterial({ color: 0xf1c40f, roughness: 0.4 })
+  );
+  tramBody.position.y = 0.55;
+  const tramRoof = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.14, 0.7), new THREE.MeshStandardMaterial({ color: 0xd62828 }));
+  tramRoof.position.y = 1.0;
+  const tramWin = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.34, 0.66), new THREE.MeshBasicMaterial({ color: 0x9ad0ff }));
+  tramWin.position.y = 0.62;
+  tram.add(tramBody, tramRoof, tramWin);
+  tram.position.set(-14, 0.06, -0.7);
+  stripGroup.add(tram);
+  vehicles.push({ mesh: tram, speed: 0.03 });
+
   exteriorGroup.add(stripGroup);
 
   floorMesh = new THREE.Mesh(

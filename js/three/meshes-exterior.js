@@ -429,6 +429,18 @@ export const EXTERIOR = {
     spin(top); g.add(top);
     return g;
   },
+  tramstop(item, level) {
+    const g = new THREE.Group();
+    g.add(at(box(1.7, 0.12, 0.9, std(0x8d99ae)), 0, 0.06, 0));
+    for (const x of [-0.7, 0.7]) {
+      g.add(at(cyl(0.05, 0.05, 0.9, 6, std(0x6c757d)), x, 0.5, -0.3));
+    }
+    g.add(at(box(1.8, 0.1, 1.0, std(0xd62828)), 0, 0.98, -0.05));
+    g.add(at(box(0.9, 0.28, 0.06, bas(0xfff1a8)), 0, 0.9, 0.42));
+    const lamp = at(sphere(0.09, 8, glow(0x00f5d4, 0.9)), 0, 1.15, -0.05);
+    g.add(lamp);
+    return g;
+  },
   waterpump(item, level) {
     const g = new THREE.Group();
     const s = scaleFor(level);

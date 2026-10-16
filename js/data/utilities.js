@@ -7,6 +7,7 @@ const U = {
   solar: { p: 0, w: 0, gp: 40 },
   powerplant: { p: 4, w: 0, gp: 120 },
   parking: { p: 10, w: 5 },
+  tramstop: { p: 8, w: 3 },
   restaurant: { p: 18, w: 20 },
   pool: { p: 12, w: 60 },
   gardens: { p: 4, w: 30 },
