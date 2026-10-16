@@ -13,11 +13,13 @@ import { initDock, renderDock } from './ui/dock.js';
 import { initInspector, closeInspector } from './game/inspector.js';
 import { initPlacement, handleTileTap, seedStarterResort, rebuildBuildingsFromState, cancelPendingPlacement } from './game/placement.js';
 import { initTutorial, beginTutorial } from './game/tutorial.js';
-import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openWelcomeScreen, openLevelUpScreen } from './ui/screens.js';
+import { initScreens, openQuestsScreen, openAchievementsScreen, openPrestigeScreen, openOfflineScreen, openLevelUpScreen } from './ui/screens.js';
 import { openStaffScreen } from './ui/staffScreen.js';
 import { openLotScreen } from './ui/lotScreen.js';
 import { openCampaignScreen } from './ui/campaignScreen.js';
-import { startCampaign, startFreePlay, checkCampaign } from './game/campaign.js';
+import { openMainMenu } from './ui/mainMenu.js';
+import { openMapSelect } from './ui/mapSelect.js';
+import { startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
 import { toggleHeatmap, initHeatmap, applyHeatmap } from './ui/heatmap.js';
@@ -123,8 +125,10 @@ function loop() {
   const t = clock.getElapsedTime();
 
   updateCamera();
-  updateDayNight(dt);
-  updateEvents(dt);
+  if (booted) {
+    updateDayNight(dt);
+    updateEvents(dt);
+  }
 
   if (state.pendingPlacement && state.pendingPlacement.mesh) {
     state.pendingPlacement.mesh.position.y = 0.12 + Math.sin(t * 6) * 0.06;
@@ -134,18 +138,18 @@ function loop() {
 
   vehicles.forEach(v => {
     v.mesh.position.x += v.speed;
-    if (v.mesh.position.x > 16) v.mesh.position.x = -16;
-    if (v.mesh.position.x < -16) v.mesh.position.x = 16;
+    if (v.mesh.position.x > 20) v.mesh.position.x = -20;
+    if (v.mesh.position.x < -20) v.mesh.position.x = 20;
   });
 
   lastGuestUpdate += dt;
-  if (lastGuestUpdate > 500) {
+  if (booted && lastGuestUpdate > 500) {
     lastGuestUpdate = 0;
     const totals = calculateTotals();
     state._blackout = totals.hasBlackout;
     updateGuests(dt, totals);
   }
-  animateGuests(dt);
+  if (booted) animateGuests(dt);
   updateParticles(dt / 1000);
 
   renderFrame();
@@ -237,12 +241,22 @@ function boot() {
 
   document.getElementById('loading').classList.add('hide');
 
-  openWelcomeScreen({
-    hasSave: existing,
-    onContinue: () => { startContinue(raw || {}); launch(); },
-    onNew: () => { startNewGame(); launch(); },
-    onCampaign: () => { startCampaign(); seedStarterResort(); beginTutorial(); Bus.emit(EV.UI_REFRESH); launch(); }
+  const menu = () => openMainMenu({
+    hasSave: hasSave(),
+    onContinue: () => { const r = load() || raw || {}; startContinue(r); launch(); },
+    onCampaign: () => openCampaignScreen({
+      fromMenu: true,
+      onStarted: () => { beginTutorial(); launch(); },
+      onBack: () => menu()
+    }),
+    onFreePlay: () => openMapSelect({
+      onPick: (theme) => { startFreePlayWithTheme(theme); seedStarterResort(); beginTutorial(); Bus.emit(EV.UI_REFRESH); launch(); },
+      onBack: () => menu()
+    }),
+    onSettings: () => openSettingsScreen()
   });
+
+  menu();
 }
 
 setInterval(() => { if (booted) save(); }, SAVE_INTERVAL_MS);

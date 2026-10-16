@@ -82,6 +82,10 @@ function computeStars(sc) {
   return 1;
 }
 
+export function isScenarioUnlocked(i) {
+  return i <= state.campaignIndex;
+}
+
 export function checkCampaign() {
   if (!inCampaign()) return;
   const sc = currentScenario();
@@ -104,44 +108,43 @@ function completeScenario(sc) {
   Bus.emit('campaign:complete', { scenario: sc, stars, reward: sc.reward, hasNext });
   Bus.emit(EV.UI_REFRESH);
   save();
-  if (hasNext) setupScenario(state.campaignIndex);
-  else finishCampaign();
 }
 
-function finishCampaign() {
-  Bus.emit(EV.TOAST, { text: '👑 Ολοκλήρωσες το Campaign! Είσαι ο Αυτοκράτορας της Vegas!', kind: 'good' });
-}
-
-export function setupScenario(i) {
+export function startScenario(i) {
   const sc = SCENARIOS[i];
   if (!sc) return;
-  while (state.lots.length <= i) {
-    const lot = makeLot(state.lots.length, sc.theme, `Lot ${state.lots.length + 1}`);
-    state.lots.push(lot);
-  }
-  state.lots[i].theme = sc.theme;
+  const stars = state.campaignStars;
+  resetToNew();
+  state.gameMode = 'campaign';
+  state.campaignStars = stars || {};
+  state.campaignIndex = i;
+  const lot = state.lots[0];
+  lot.theme = sc.theme;
   if (state.cash < sc.startCash) state.cash = sc.startCash;
-  switchLot(i, true);
+  switchLot(0, true);
   state.scenarioStartDay = state.clock.day;
+  Bus.emit(EV.TOAST, { text: `🎬 Scenario ${i + 1}: ${sc.title}`, kind: 'good' });
   Bus.emit(EV.UI_REFRESH);
   save();
 }
 
 export function startCampaign() {
-  resetToNew();
-  state.gameMode = 'campaign';
-  state.campaignIndex = 0;
   state.campaignStars = {};
-  setupScenario(0);
-  Bus.emit(EV.TOAST, { text: '🎯 Ξεκίνησε το Campaign!', kind: 'good' });
-  Bus.emit(EV.UI_REFRESH);
-  save();
+  startScenario(0);
 }
 
 export function startFreePlay() {
   resetToNew();
   state.gameMode = 'freeplay';
   Bus.emit(EV.UI_REFRESH);
+  save();
+}
+
+export function startFreePlayWithTheme(themeId) {
+  startFreePlay();
+  const lot = state.lots[0];
+  lot.theme = themeId;
+  if (lot) switchLot(0, true);
   save();
 }
 

@@ -135,9 +135,9 @@ export function createWorlds() {
     cabin.position.y = 0.65;
     car.add(body, cabin);
     const dir = i % 2 === 0 ? 1 : -1;
-    car.position.set((Math.random() - 0.5) * 26, 0.05, dir * 0.85);
+    car.position.set((Math.random() - 0.5) * 26, 0.06, dir * 0.95);
     car.userData.dir = dir;
-    exteriorGroup.add(car);
+    stripGroup.add(car);
     vehicles.push({ mesh: car, speed: (0.06 + Math.random() * 0.05) * dir });
   }
 
