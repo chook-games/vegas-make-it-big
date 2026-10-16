@@ -94,6 +94,8 @@ export const CATALOG = {
       desc: 'High-roller table. Loses 50% income next to Slots without a VIP Wall.' },
     { id: 'wall', name: 'VIP Wall', icon: '🧱', cost: 150, income: 0, power: 0, guests: 2, isWall: true, tier: 1,
       desc: 'Golden soundproof wall. Rotate 90 for horizontal or vertical.' },
+    { id: 'stairs', name: 'Stairs', icon: '🪜', cost: 350, income: 0, power: 0, guests: 4, tier: 1, isStairs: true,
+      desc: 'Connects to the Upper floor. Build these, then switch to the Upper layer to build on the mezzanine.' },
     { id: 'security', name: 'Security', icon: '🛡️', cost: 500, income: -10, power: -1, guests: 5, isSecurity: true, tier: 1,
       desc: 'Security station with cameras. +35% income for nearby tables.' },
     { id: 'cashier', name: 'Cashier', icon: '💵', cost: 400, income: 40, power: -1, guests: 5, tier: 2, requires: { level: 4 },

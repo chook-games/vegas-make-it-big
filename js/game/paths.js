@@ -104,6 +104,7 @@ export function invalidatePaths(lot) {
   if (lot) {
     lot.__paths = null;
     lot.__occ = null;
+    lot.__occUpper = null;
   }
 }
 
@@ -152,4 +153,70 @@ export function bfsPath(lot, world, startKey, goalKey) {
 
 export function connectedCount(lot, world) {
   return getPaths(lot, world).connected.size;
+}
+
+function upperGridOf(lot) {
+  return lot.interiorUpperGrid || {};
+}
+
+export function getUpperOccupancy(lot) {
+  if (!lot) return new Map();
+  if (!lot.__occUpper) {
+    const grid = upperGridOf(lot);
+    const map = new Map();
+    for (const k in grid) {
+      const c = grid[k];
+      const w = c.w || 1, h = c.h || 1;
+      for (let dx = 0; dx < w; dx++) for (let dz = 0; dz < h; dz++) {
+        const kk = `${c.gx + dx},${c.gz + dz}`;
+        if (!map.has(kk)) map.set(kk, k);
+      }
+    }
+    lot.__occUpper = map;
+  }
+  return lot.__occUpper;
+}
+
+export function upperSupport(lot) {
+  const upper = upperGridOf(lot);
+  const ground = lot.interiorGrid || {};
+  const stairCols = [];
+  for (const k in ground) {
+    if (ground[k].item && ground[k].item.isStairs) {
+      const parts = k.split(',');
+      stairCols.push([parseInt(parts[0], 10), parseInt(parts[1], 10)]);
+    }
+  }
+  const placed = new Set(Object.keys(upper));
+  const near = (gx, gz) => stairCols.some(([sx, sz]) => (Math.abs(sx - gx) + Math.abs(sz - gz)) === 1);
+  const reach = new Set();
+  const q = [];
+  for (const k of placed) {
+    const parts = k.split(',');
+    const gx = parseInt(parts[0], 10), gz = parseInt(parts[1], 10);
+    if (near(gx, gz)) { reach.add(k); q.push([gx, gz]); }
+  }
+  while (q.length) {
+    const [gx, gz] = q.shift();
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const k = `${gx + dx},${gz + dz}`;
+      if (placed.has(k) && !reach.has(k)) { reach.add(k); q.push([gx + dx, gz + dz]); }
+    }
+  }
+  const support = new Set();
+  for (const [sx, sz] of stairCols) {
+    support.add(`${sx},${sz}`);
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) support.add(`${sx + dx},${sz + dz}`);
+  }
+  for (const k of reach) {
+    support.add(k);
+    const parts = k.split(',');
+    const gx = parseInt(parts[0], 10), gz = parseInt(parts[1], 10);
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) support.add(`${gx + dx},${gz + dz}`);
+  }
+  return support;
+}
+
+export function invalidateUpper(lot) {
+  if (lot) lot.__occUpper = null;
 }

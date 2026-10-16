@@ -93,6 +93,7 @@ const INT_MAP = {
   restroom: 'support',
   security: 'security',
   wall: 'decor',
+  stairs: 'support',
   plants: 'decor'
 };
 

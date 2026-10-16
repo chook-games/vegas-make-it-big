@@ -42,10 +42,16 @@ export function getLotHeat(lot) {
   return l.__heat;
 }
 
+function gridList(lot) {
+  return [
+    { world: 'exterior', grid: lot.exteriorGrid, group: exteriorGroup, layer: 0 },
+    { world: 'interior', grid: lot.interiorGrid, group: interiorGroup, layer: 0 },
+    { world: 'interior', grid: lot.interiorUpperGrid || {}, group: interiorGroup, layer: 1 }
+  ];
+}
+
 function clearMeshes(lot) {
-  ['exterior', 'interior'].forEach(world => {
-    const grid = world === 'exterior' ? lot.exteriorGrid : lot.interiorGrid;
-    const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+  gridList(lot).forEach(({ grid, group }) => {
     for (const k in grid) {
       if (grid[k].mesh) group.remove(grid[k].mesh);
       grid[k].mesh = null;
@@ -57,20 +63,19 @@ function clearMeshes(lot) {
 function buildMeshes(lot) {
   const theme = themeById(lot.theme);
   const ts = state.tileSize;
-  ['exterior', 'interior'].forEach(world => {
-    const grid = world === 'exterior' ? lot.exteriorGrid : lot.interiorGrid;
-    const group = world === 'exterior' ? exteriorGroup : interiorGroup;
+  gridList(lot).forEach(({ grid, group, layer }) => {
     for (const k in grid) {
       const cell = grid[k];
       const w = cell.w || 1, h = cell.h || 1;
       const cx = cell.cx != null ? cell.cx : cell.gx;
       const cz = cell.cz != null ? cell.cz : cell.gz;
-      const mesh = createBuildingMesh(cell.item, cell.level, false, { theme, footprint: { w, h, ts } });
-      mesh.position.set(cx * ts, 0.08, cz * ts);
+      const mesh = createBuildingMesh(cell.item, cell.level, false, { theme, footprint: { w, h, ts }, elevated: layer });
+      mesh.position.set(cx * ts, 0.08 + (layer ? 1.15 : 0), cz * ts);
       mesh.rotation.y = (cell.rotation || 0) * (Math.PI / 2);
       group.add(mesh);
       cell.mesh = mesh;
       cell.w = w; cell.h = h; cell.cx = cx; cell.cz = cz;
+      cell.layer = layer;
       cell.tileMesh = null;
     }
   });

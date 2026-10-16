@@ -116,6 +116,19 @@ function lotTotals(lot, staffing) {
     smell += heat.interior.smell[k] || 0;
     cells++;
   }
+  const upper = lot.interiorUpperGrid || {};
+  for (const k in upper) {
+    const cell = upper[k];
+    const item = cell.item;
+    const u = utilOf(item.id);
+    powerGen += (u.gp || 0) * cell.level;
+    powerDemand += (u.p || 0) * cell.level;
+    waterGen += (u.gw || 0) * cell.level;
+    waterDemand += (u.w || 0) * cell.level;
+    capacity += (item.guests || 0) * cell.level;
+    rawInt += evaluateTileStats('interior', cell, upper, null, null, staffing).income;
+    cells++;
+  }
 
   return { powerDemand, powerGen, waterDemand, waterGen, capacity: Math.max(0, capacity), rawExt, rawInt,
     avgNoise: cells ? noise / cells : 0, avgSmell: cells ? smell / cells : 0 };

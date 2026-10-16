@@ -53,6 +53,12 @@ export function createBuildingMesh(item, level = 1, isGhost = false, ctx = {}) {
     group.scale.set(Math.max(0.05, sx), Math.max(0.05, sy), Math.max(0.05, sz));
   }
 
+  if (ctx.elevated) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(2.12, 0.18, 2.12), new THREE.MeshStandardMaterial({ color: 0x3a3f4b, roughness: 0.9 }));
+    slab.position.y = -0.02;
+    group.add(slab);
+  }
+
   if (isGhost) {
     if (fp) {
       const outline = new THREE.Mesh(

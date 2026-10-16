@@ -43,6 +43,14 @@ export const INTERIOR = {
     g.add(at(box(1.95, 1.55 * s, 0.38, std(0xd4af37, { metalness: 0.6, roughness: 0.3 })), 0, 0.77 * s, 0));
     return g;
   },
+  stairs(item, level) {
+    const g = new THREE.Group();
+    for (let i = 0; i < 4; i++) {
+      g.add(at(box(0.7, 0.22, 0.22, std(0x8d99ae)), 0, 0.11 + i * 0.22, 0.33 - i * 0.22));
+    }
+    g.add(at(box(0.8, 0.06, 0.06, bas(0xffd166)), 0, 0.98, -0.33));
+    return g;
+  },
   security(item, level) {
     const g = new THREE.Group();
     g.add(at(box(1.2, 0.85, 0.9, std(0x1d3557)), 0, 0.42, 0));

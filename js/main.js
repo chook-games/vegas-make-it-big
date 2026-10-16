@@ -61,6 +61,18 @@ function initUI() {
   document.getElementById('btn-lots').addEventListener('click', () => { closeInspector(); openLotScreen(); });
   document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
   document.getElementById('btn-rivals').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
+  document.getElementById('btn-layer').addEventListener('click', () => {
+    if (state.mode !== 'interior') return;
+    state.interiorLayer = state.interiorLayer === 1 ? 0 : 1;
+    if (state.pendingPlacement) cancelPendingPlacement();
+    closeInspector();
+    const lb = document.getElementById('btn-layer');
+    lb.textContent = state.interiorLayer === 1 ? '⬇️' : '⬆️';
+    document.getElementById('ui-hint').innerHTML = state.interiorLayer === 1
+      ? '⬆️ <b>Upper floor:</b> build on the mezzanine (needs a Stairs below).'
+      : '⬇️ <b>Ground floor.</b> Build on the casino floor.';
+    renderDock();
+  });
   document.getElementById('btn-heat').addEventListener('click', () => toggleHeatmap());
   document.getElementById('btn-quests').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
   document.getElementById('btn-ach').addEventListener('click', () => { closeInspector(); openAchievementsScreen(); });
@@ -123,12 +135,16 @@ function switchView() {
     interiorGroup.visible = true;
     state.stats.viewedInterior = true;
     document.getElementById('btn-switch-view').textContent = '🌴 Exit to Strip';
+    document.getElementById('btn-layer').style.display = '';
+    document.getElementById('btn-layer').textContent = state.interiorLayer === 1 ? '⬇️' : '⬆️';
     document.getElementById('ui-hint').innerHTML = '🃏 <b>Casino:</b> Pick a table below or tap one to Rotate/Upgrade!';
   } else {
     state.mode = 'exterior';
     interiorGroup.visible = false;
     exteriorGroup.visible = true;
+    state.interiorLayer = 0;
     document.getElementById('btn-switch-view').textContent = '🎰 Enter Casino';
+    document.getElementById('btn-layer').style.display = 'none';
     document.getElementById('ui-hint').innerHTML = '🌴 <b>Strip:</b> Tap a building to Upgrade/Move or build a new one!';
   }
   Bus.emit(EV.VIEW_SWITCH, state.mode);

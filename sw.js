@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v17';
+const CACHE = 'vegas-mib-v18';
 const CORE = [
   './',
   './index.html',

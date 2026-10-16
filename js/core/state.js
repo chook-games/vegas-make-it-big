@@ -9,7 +9,8 @@ export function makeLot(id, theme, name) {
     theme,
     radius: 7,
     exteriorGrid: {},
-    interiorGrid: {}
+    interiorGrid: {},
+    interiorUpperGrid: {}
   };
 }
 
@@ -24,8 +25,10 @@ export function freshState() {
     tileSize: TILE_SIZE,
     exteriorGrid: {},
     interiorGrid: {},
+    interiorUpperGrid: {},
     lots: [makeLot(0, 'american', 'Lot 1')],
     activeLot: 0,
+    interiorLayer: 0,
     campaignIndex: 0,
     campaignStars: {},
     scenarioStartDay: 1,
@@ -83,8 +86,10 @@ export function activeLot() {
 export function syncActiveGrids() {
   const lot = activeLot();
   if (!lot) return;
+  if (!lot.interiorUpperGrid) lot.interiorUpperGrid = {};
   state.exteriorGrid = lot.exteriorGrid;
   state.interiorGrid = lot.interiorGrid;
+  state.interiorUpperGrid = lot.interiorUpperGrid;
   state.gridSize = (lot.radius || 7) * 2 + 1;
 }
 
@@ -110,6 +115,11 @@ export function applyLoadedState(data) {
     state.activeLot = 0;
   }
   if (state.activeLot == null || state.activeLot >= state.lots.length) state.activeLot = 0;
+  for (const lot of state.lots) {
+    if (!lot.exteriorGrid) lot.exteriorGrid = {};
+    if (!lot.interiorGrid) lot.interiorGrid = {};
+    if (!lot.interiorUpperGrid) lot.interiorUpperGrid = {};
+  }
   syncActiveGrids();
 }
 

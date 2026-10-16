@@ -18,17 +18,18 @@ import { t } from '../i18n/i18n.js';
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
 }
-function gridFor(world) {
-  return world === 'exterior' ? state.exteriorGrid : state.interiorGrid;
+function gridFor(world, layer) {
+  if (world === 'exterior') return state.exteriorGrid;
+  return layer ? state.interiorUpperGrid : state.interiorGrid;
 }
 
-export function openInspector(world, key) {
+export function openInspector(world, key, layer = 0) {
   if (state.pendingPlacement) return;
-  const grid = gridFor(world);
+  const grid = gridFor(world, layer);
   const cell = grid[key];
   if (!cell) return;
 
-  state.inspectedKey = { world, key };
+  state.inspectedKey = { world, key, layer };
   const lot = activeLot();
   const heat = getLotHeat(lot)[world];
   const open = (world === 'exterior' && !cell.item.isPath) ? getPaths(lot, world).open : null;
@@ -36,7 +37,7 @@ export function openInspector(world, key) {
   const upg = upgradeCost(cell);
   const refund = sellRefund(cell);
 
-  inspectRing.position.set(cell.mesh.position.x, 0.12, cell.mesh.position.z);
+  inspectRing.position.set(cell.mesh.position.x, 0.12 + (layer ? 1.15 : 0), cell.mesh.position.z);
   inspectRing.visible = true;
 
   document.getElementById('insp-title').textContent = `${cell.item.icon} ${t(cell.item.name)} (Lv.${cell.level})`;
@@ -80,11 +81,11 @@ export function openInspector(world, key) {
     const slider = document.getElementById('insp-edge-slider');
     if (dec) dec.addEventListener('click', () => {
       cell.betIndex = Math.max(0, (cell.betIndex || 0) - 1);
-      markLotDirty(); playSound('rotate'); openInspector(world, key); Bus.emit(EV.UI_REFRESH);
+      markLotDirty(); playSound('rotate'); openInspector(world, key, layer); Bus.emit(EV.UI_REFRESH);
     });
     if (inc) inc.addEventListener('click', () => {
       cell.betIndex = Math.min(BET_STEPS.length - 1, (cell.betIndex || 0) + 1);
-      markLotDirty(); playSound('rotate'); openInspector(world, key); Bus.emit(EV.UI_REFRESH);
+      markLotDirty(); playSound('rotate'); openInspector(world, key, layer); Bus.emit(EV.UI_REFRESH);
     });
     if (slider) slider.addEventListener('input', (e) => {
       cell.edge = parseInt(e.target.value, 10);
@@ -104,8 +105,8 @@ export function closeInspector() {
 
 function onUpgrade() {
   if (!state.inspectedKey) return;
-  const { world, key } = state.inspectedKey;
-  const grid = gridFor(world);
+    const { world, key, layer } = state.inspectedKey;
+    const grid = gridFor(world, layer);
   const cell = grid[key];
   if (!cell) return;
 
@@ -133,15 +134,15 @@ function onUpgrade() {
   vibrate(25);
   addXP(xpForCost(cost, XP.upgrade));
   spawnFloatingText(cell.mesh.position, `Level ${cell.level}!`, '#00f5d4');
-  openInspector(world, key);
+  openInspector(world, key, layer);
   Bus.emit(EV.CASH_CHANGED);
   Bus.emit(EV.UI_REFRESH);
 }
 
 function onMove() {
   if (!state.inspectedKey) return;
-  const { world, key } = state.inspectedKey;
-  const grid = gridFor(world);
+    const { world, key, layer } = state.inspectedKey;
+    const grid = gridFor(world, layer);
   const cell = grid[key];
   if (!cell) return;
 
@@ -160,8 +161,8 @@ function onMove() {
 
 function onSell() {
   if (!state.inspectedKey) return;
-  const { world, key } = state.inspectedKey;
-  const grid = gridFor(world);
+    const { world, key, layer } = state.inspectedKey;
+    const grid = gridFor(world, layer);
   const cell = grid[key];
   if (!cell) return;
 
@@ -184,6 +185,6 @@ export function initInspector() {
   document.getElementById('insp-upgrade').addEventListener('click', onUpgrade);
   document.getElementById('insp-move').addEventListener('click', onMove);
   document.getElementById('insp-sell').addEventListener('click', onSell);
-  Bus.on(EV.INSPECTOR_OPEN, ({ world, key }) => openInspector(world, key));
+  Bus.on(EV.INSPECTOR_OPEN, ({ world, key, layer }) => openInspector(world, key, layer || 0));
   Bus.on(EV.INSPECTOR_CLOSE, () => closeInspector());
 }

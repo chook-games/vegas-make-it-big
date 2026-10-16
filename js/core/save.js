@@ -54,7 +54,8 @@ export function serialize() {
       theme: lot.theme,
       radius: lot.radius || 7,
       exteriorGrid: serializeGrid(lot.exteriorGrid),
-      interiorGrid: serializeGrid(lot.interiorGrid)
+      interiorGrid: serializeGrid(lot.interiorGrid),
+      interiorUpperGrid: serializeGrid(lot.interiorUpperGrid || {})
     })),
     lastSavedAt: Date.now()
   };
@@ -121,14 +122,16 @@ export function load() {
       theme: lot.theme || 'american',
       radius: lot.radius || 7,
       exteriorGrid: hydrateGrid(lot.exteriorGrid, 'exterior'),
-      interiorGrid: hydrateGrid(lot.interiorGrid, 'interior')
+      interiorGrid: hydrateGrid(lot.interiorGrid, 'interior'),
+      interiorUpperGrid: hydrateGrid(lot.interiorUpperGrid, 'interior')
     }));
     data.activeLot = Math.min(raw.activeLot || 0, data.lots.length - 1);
   } else {
     data.lots = [{
-      id: 0, name: 'Lot 1', theme: 'american', radius: 3,
+      id: 0, name: 'Lot 1', theme: 'american', radius: 7,
       exteriorGrid: hydrateGrid(raw.exteriorGrid, 'exterior'),
-      interiorGrid: hydrateGrid(raw.interiorGrid, 'interior')
+      interiorGrid: hydrateGrid(raw.interiorGrid, 'interior'),
+      interiorUpperGrid: {}
     }];
     data.activeLot = 0;
   }
