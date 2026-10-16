@@ -167,6 +167,13 @@ function incomeTick() {
   const totals = doIncomeTick();
   updateHUD();
 
+  if (totals.hasBlackout && !state._wasShort) {
+    const what = totals.powerShort && totals.waterShort ? 'Power & Water'
+      : totals.powerShort ? 'Power' : 'Water';
+    Bus.emit(EV.TOAST, { text: `⚠️ ${what} shortage! Build supply or guests will leave.`, kind: 'bad' });
+  }
+  state._wasShort = totals.hasBlackout;
+
   const activeGrid = state.mode === 'exterior' ? state.exteriorGrid : state.interiorGrid;
   let shown = 0;
   Object.values(activeGrid).forEach(cell => {

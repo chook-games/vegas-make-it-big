@@ -342,6 +342,26 @@ export const EXTERIOR = {
     spin(ring); g.add(ring);
     return g;
   },
+  waterpump(item, level) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.0, 0.8 * s, 0.9, std(0x3a7ca5)), 0, 0.4 * s, -0.2));
+    g.add(at(cyl(0.35, 0.35, 0.9, 10, std(0xbde0fe)), -0.5, 0.7 * s, 0.4));
+    g.add(at(cyl(0.06, 0.06, 0.6, 6, std(0x8d99ae)), 0.4, 0.3, 0.5));
+    const drop = at(new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), glow(0x00b4d8, 0.9)), 0.4, 0.7 * s, 0.5);
+    spin(drop); g.add(drop);
+    return g;
+  },
+  waterplant(item, level) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.2, 0.7 * s, 1.0, std(0x2a6f97)), 0, 0.35 * s, -0.4));
+    for (const x of [-0.5, 0.5]) g.add(at(cyl(0.3, 0.3, 1.2 * s, 12, std(0xa9d6f5)), x, 0.7 * s, 0.3));
+    g.add(at(cyl(0.07, 0.07, 1.0, 8, std(0x8d99ae)), 0, 0.6, -0.2));
+    const drop = at(new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 10), glow(0x00b4d8, 0.9)), 0, 1.4 * s, 0.3);
+    spin(drop); g.add(drop);
+    return g;
+  },
   path_concrete(item, level) {
     const g = new THREE.Group();
     g.add(at(box(2.05, 0.1, 2.05, std(0x9a9a9a, { roughness: 0.95 })), 0, 0.02, 0));

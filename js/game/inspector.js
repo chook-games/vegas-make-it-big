@@ -11,6 +11,7 @@ import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
 import { markLotDirty, currentTheme, activeLot, getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
+import { utilOf } from '../data/utilities.js';
 import { t } from '../i18n/i18n.js';
 
 function groupFor(world) {
@@ -38,8 +39,15 @@ export function openInspector(world, key) {
   inspectRing.visible = true;
 
   document.getElementById('insp-title').textContent = `${cell.item.icon} ${t(cell.item.name)} (Lv.${cell.level})`;
+  const u = utilOf(cell.item.id);
   let html = `<div>${t(cell.item.desc)}</div>`;
   html += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / cycle</div>`;
+  const utilParts = [];
+  if (u.gp) utilParts.push(`+${u.gp} kW`);
+  else if (u.p) utilParts.push(`⚡ ${u.p} kW`);
+  if (u.gw) utilParts.push(`+${u.gw} water`);
+  else if (u.w) utilParts.push(`💧 ${u.w}`);
+  if (utilParts.length) html += `<div style="margin-top:2px; color:#8fd0ff;">${utilParts.join(' · ')}</div>`;
   if (stats.notes.length) html += `<div style="margin-top:4px; color:#ffd166;">${stats.notes.join('<br>')}</div>`;
   document.getElementById('insp-body').innerHTML = html;
   document.getElementById('insp-upgrade').textContent = `⬆️ Upgrade ($${upg})`;

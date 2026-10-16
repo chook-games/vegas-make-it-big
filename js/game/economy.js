@@ -1,8 +1,9 @@
 import { state } from '../core/state.js';
-import { BASE_POWER_CAP, BASE_GUESTS } from '../core/constants.js';
+import { BASE_GUESTS, BASE_POWER, BASE_WATER } from '../core/constants.js';
 import { getTimeFactors, seasonInfo } from './daynight.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
+import { utilOf } from '../data/utilities.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
@@ -69,8 +70,10 @@ function lotTotals(lot) {
   const heat = getLotHeat(lot);
   const openExt = getPaths(lot, 'exterior').open;
   const openInt = null;
-  let powerUsed = 0;
-  let powerCap = 0;
+  let powerDemand = 0;
+  let powerGen = BASE_POWER;
+  let waterDemand = 0;
+  let waterGen = BASE_WATER;
   let capacity = 0;
   let rawExt = 0;
   let rawInt = 0;
@@ -81,15 +84,22 @@ function lotTotals(lot) {
   for (const k in lot.exteriorGrid) {
     const cell = lot.exteriorGrid[k];
     const item = cell.item;
-    if (item.power > 0) powerCap += item.power * cell.level;
-    else powerUsed += Math.abs(item.power);
+    const u = utilOf(item.id);
+    powerGen += (u.gp || 0) * cell.level;
+    powerDemand += (u.p || 0) * cell.level;
+    waterGen += (u.gw || 0) * cell.level;
+    waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
     rawExt += evaluateTileStats('exterior', cell, lot.exteriorGrid, heat.exterior, openExt).income;
   }
   for (const k in lot.interiorGrid) {
     const cell = lot.interiorGrid[k];
     const item = cell.item;
-    if (item.power < 0) powerUsed += Math.abs(item.power);
+    const u = utilOf(item.id);
+    powerGen += (u.gp || 0) * cell.level;
+    powerDemand += (u.p || 0) * cell.level;
+    waterGen += (u.gw || 0) * cell.level;
+    waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
     rawInt += evaluateTileStats('interior', cell, lot.interiorGrid, heat.interior, openInt).income;
     noise += heat.interior.noise[k] || 0;
@@ -97,13 +107,15 @@ function lotTotals(lot) {
     cells++;
   }
 
-  return { powerUsed, powerCap, capacity: Math.max(0, capacity), rawExt, rawInt,
+  return { powerDemand, powerGen, waterDemand, waterGen, capacity: Math.max(0, capacity), rawExt, rawInt,
     avgNoise: cells ? noise / cells : 0, avgSmell: cells ? smell / cells : 0 };
 }
 
 export function calculateTotals() {
-  let powerUsed = 0;
-  let powerCap = BASE_POWER_CAP;
+  let powerDemand = 0;
+  let powerGen = 0;
+  let waterDemand = 0;
+  let waterGen = 0;
   let capacity = BASE_GUESTS;
   let rawExt = 0;
   let rawInt = 0;
@@ -113,8 +125,10 @@ export function calculateTotals() {
 
   for (const lot of state.lots) {
     const lt = lotTotals(lot);
-    powerUsed += lt.powerUsed;
-    powerCap += lt.powerCap;
+    powerDemand += lt.powerDemand;
+    powerGen += lt.powerGen;
+    waterDemand += lt.waterDemand;
+    waterGen += lt.waterGen;
     capacity += lt.capacity;
     rawExt += lt.rawExt;
     rawInt += lt.rawInt;
@@ -134,8 +148,10 @@ export function calculateTotals() {
   const happyFactor = 0.7 + (state.happiness / 200) + state.lots.length * 0.03;
   const prestigeMul = 1 + state.prestigeLevel * 0.15;
 
-  const hasBlackout = powerUsed > powerCap;
-  const powerPenalty = hasBlackout ? 0.4 : 1.0;
+  const powerShort = powerDemand > powerGen;
+  const waterShort = waterDemand > waterGen;
+  const hasBlackout = powerShort || waterShort;
+  const powerPenalty = hasBlackout ? 0.25 : 1.0;
 
   const time = getTimeFactors();
   const season = seasonInfo();
@@ -160,13 +176,16 @@ export function calculateTotals() {
 
   const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct);
   let guests = Math.round(capacity * Math.min(demandFactor, 3.0));
-  if (hasBlackout) guests = Math.round(guests * 0.6);
+  if (hasBlackout) guests = Math.round(guests * 0.35);
   guests = Math.max(0, guests);
 
   const fill = capacity > 0 ? guests / capacity : 0;
 
   return {
-    powerUsed, powerCap, capacity, guests, fill,
+    powerUsed: powerDemand, powerCap: powerGen,
+    waterUsed: waterDemand, waterCap: waterGen,
+    powerShort, waterShort,
+    capacity, guests, fill,
     rawExt, rawInt, totalIncome, grossIncome, wages, hasBlackout,
     edgeIncomeFactor, edgeGuestFactor, repFactor, happyFactor,
     prestigeMul, eventIncome, eventGuest, staffEff: eff,

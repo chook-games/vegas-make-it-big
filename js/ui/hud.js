@@ -18,8 +18,14 @@ export function updateHUD() {
   incEl.style.color = totals.totalIncome >= 0 ? '#06d6a0' : '#ff4d4d';
 
   const powEl = document.getElementById('ui-power');
-  powEl.textContent = `${totals.powerUsed}/${totals.powerCap}`;
-  powEl.style.color = totals.hasBlackout ? '#ff4d4d' : '#00f5d4';
+  powEl.textContent = `${totals.powerUsed}/${totals.powerCap} kW`;
+  powEl.style.color = totals.powerShort ? '#ff4d4d' : '#00f5d4';
+
+  const watEl = document.getElementById('ui-water');
+  if (watEl) {
+    watEl.textContent = `${totals.waterUsed}/${totals.waterCap}`;
+    watEl.style.color = totals.waterShort ? '#ff4d4d' : '#4da6ff';
+  }
 
   document.getElementById('ui-guests').textContent = `${totals.guests}`;
 

@@ -12,7 +12,7 @@
 
 .stats-bar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
   background: var(--dark-bg);
   backdrop-filter: blur(10px);
@@ -42,7 +42,7 @@
 }
 
 .stat-val {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--gold);
   white-space: nowrap;

@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v8';
+const CACHE = 'vegas-mib-v9';
 const CORE = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const CORE = [
   './js/data/buildings.js',
   './js/data/categories.js',
   './js/data/sizes.js',
+  './js/data/utilities.js',
   './js/data/quests.js',
   './js/data/achievements.js',
   './js/data/randomEvents.js',

@@ -26,6 +26,8 @@ const EXT_MAP = {
   generator: 'utility',
   solar: 'utility',
   powerplant: 'utility',
+  waterpump: 'utility',
+  waterplant: 'utility',
   parking: 'transport',
   helipad: 'transport',
   restaurant: 'food',
