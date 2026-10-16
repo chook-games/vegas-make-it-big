@@ -4,7 +4,7 @@ import { getTimeFactors, seasonInfo } from './daynight.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
 import { utilOf } from '../data/utilities.js';
-import { stationIncomeFactor } from '../data/betting.js';
+import { stationIncomeFactor, isGambling } from '../data/betting.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
@@ -20,7 +20,7 @@ function getNeighbors(grid, gx, gz) {
   return res;
 }
 
-export function evaluateTileStats(world, cell, grid, heat, openSet) {
+export function evaluateTileStats(world, cell, grid, heat, openSet, staffing) {
   const item = cell.item;
   let inc = item.income * cell.level;
   const notes = [];
@@ -65,10 +65,17 @@ export function evaluateTileStats(world, cell, grid, heat, openSet) {
     }
   }
 
-  return { income: Math.round(inc * stationIncomeFactor(world, cell)), notes };
+  if (isGambling(world, cell.item.id)) {
+    inc *= stationIncomeFactor(world, cell);
+    if (staffing != null && staffing < 0.999) {
+      inc *= staffing;
+      if (staffing < 0.6) notes.push('Not enough croupiers - stations run slow.');
+    }
+  }
+  return { income: Math.round(inc), notes };
 }
 
-function lotTotals(lot) {
+function lotTotals(lot, staffing) {
   const heat = getLotHeat(lot);
   const openExt = getPaths(lot, 'exterior').open;
   const openInt = null;
@@ -92,7 +99,7 @@ function lotTotals(lot) {
     waterGen += (u.gw || 0) * cell.level;
     waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
-    rawExt += evaluateTileStats('exterior', cell, lot.exteriorGrid, heat.exterior, openExt).income;
+    rawExt += evaluateTileStats('exterior', cell, lot.exteriorGrid, heat.exterior, openExt, staffing).income;
   }
   for (const k in lot.interiorGrid) {
     const cell = lot.interiorGrid[k];
@@ -103,7 +110,7 @@ function lotTotals(lot) {
     waterGen += (u.gw || 0) * cell.level;
     waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
-    rawInt += evaluateTileStats('interior', cell, lot.interiorGrid, heat.interior, openInt).income;
+    rawInt += evaluateTileStats('interior', cell, lot.interiorGrid, heat.interior, openInt, staffing).income;
     noise += heat.interior.noise[k] || 0;
     smell += heat.interior.smell[k] || 0;
     cells++;
@@ -125,8 +132,17 @@ export function calculateTotals() {
   let smellSum = 0;
   let lotCount = 0;
 
+  let stations = 0;
   for (const lot of state.lots) {
-    const lt = lotTotals(lot);
+    for (const k in lot.interiorGrid) if (isGambling('interior', lot.interiorGrid[k].item.id)) stations++;
+    for (const k in lot.exteriorGrid) if (isGambling('exterior', lot.exteriorGrid[k].item.id)) stations++;
+  }
+  const croupiers = (state.staff && state.staff.dealer) || 0;
+  const staffed = Math.min(croupiers, stations);
+  const staffing = stations > 0 ? (staffed + (stations - staffed) * 0.4) / stations : 1;
+
+  for (const lot of state.lots) {
+    const lt = lotTotals(lot, staffing);
     powerDemand += lt.powerDemand;
     powerGen += lt.powerGen;
     waterDemand += lt.waterDemand;
@@ -165,10 +181,11 @@ export function calculateTotals() {
   if (event && event.id === 'ev_hackers') eventIncome = eventIncome + (1 - eventIncome) * eff.crime;
 
   const nuisancePenalty = 1 - Math.min(0.25, (avgNoise * 0.15 + avgSmell * 0.12));
+  const condFactor = 0.6 + 0.4 * (Math.max(0, Math.min(100, state.condition)) / 100);
 
   const grossIncome = Math.round(
     (rawExt * time.dayFactor + rawInt * time.nightFactor) *
-    repFactor * happyFactor * nuisancePenalty *
+    repFactor * happyFactor * nuisancePenalty * condFactor *
     season.incomeMul * eventIncome * powerPenalty * prestigeMul * staffIncomeMul
   );
 
@@ -191,7 +208,8 @@ export function calculateTotals() {
     rawExt, rawInt, totalIncome, grossIncome, wages, hasBlackout,
     edgeGuestFactor, repFactor, happyFactor,
     prestigeMul, eventIncome, eventGuest, staffEff: eff,
-    avgNoise, avgSmell, nuisancePenalty
+    avgNoise, avgSmell, nuisancePenalty, condFactor,
+    staffing, stations, croupiers
   };
 }
 
@@ -222,6 +240,15 @@ export function doIncomeTick() {
   state.cash += totals.totalIncome;
   state.stats.totalEarned += Math.max(0, totals.totalIncome);
   updateHappinessAndReputation(totals);
+
+  let buildings = 0;
+  for (const lot of state.lots) {
+    buildings += Object.keys(lot.exteriorGrid).length + Object.keys(lot.interiorGrid).length;
+  }
+  const decay = buildings * 0.06;
+  const repair = totals.staffEff ? totals.staffEff.repair : 0;
+  state.condition = Math.max(0, Math.min(100, state.condition + (repair - decay) * 0.12));
+
   if (totals.totalIncome > 0) addXP(Math.max(0.5, totals.totalIncome * XP.income));
   return totals;
 }

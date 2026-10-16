@@ -31,7 +31,7 @@ export function updateHUD() {
   document.getElementById('ui-guests').textContent = `${totals.guests}`;
 
   const repEl = document.getElementById('ui-rep');
-  repEl.textContent = `⭐ Rep ${Math.round(state.reputation)} · 😊 ${Math.round(state.happiness)}%`;
+  repEl.textContent = `⭐ Rep ${Math.round(state.reputation)} · 😊 ${Math.round(state.happiness)}% · 🛠 ${Math.round(state.condition)}%`;
 
   document.getElementById('ui-clock').textContent = formatClock();
   const s = seasonInfo();

@@ -59,7 +59,7 @@ export function fire(id) {
 }
 
 export function staffEffects() {
-  const eff = { incomePct: 0, guestPct: 0, happiness: 0, crime: 0 };
+  const eff = { incomePct: 0, guestPct: 0, happiness: 0, crime: 0, repair: 0 };
   for (const def of STAFF) {
     const n = countOf(def.id);
     if (!n) continue;
@@ -67,10 +67,12 @@ export function staffEffects() {
     if (def.effect.guestPct) eff.guestPct += def.effect.guestPct * n;
     if (def.effect.happiness) eff.happiness += def.effect.happiness * n;
     if (def.effect.crime) eff.crime += def.effect.crime * n;
+    if (def.effect.repair) eff.repair += def.effect.repair * n;
   }
   eff.incomePct = Math.min(eff.incomePct, 3.0);
   eff.guestPct = Math.min(eff.guestPct, 2.0);
   eff.happiness = Math.min(eff.happiness, 40);
   eff.crime = Math.min(eff.crime, 0.9);
+  eff.repair = Math.min(eff.repair, 40);
   return eff;
 }

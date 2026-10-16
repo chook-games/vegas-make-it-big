@@ -40,6 +40,7 @@ export function freshState() {
     pendingPlacement: null,
     reputation: START_REPUTATION,
     happiness: 70,
+    condition: 100,
     level: 1,
     xp: 0,
     gold: 0,

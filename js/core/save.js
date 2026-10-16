@@ -23,6 +23,7 @@ export function serialize() {
     houseEdge: state.houseEdge,
     reputation: state.reputation,
     happiness: state.happiness,
+    condition: state.condition,
     level: state.level,
     xp: state.xp,
     gold: state.gold,

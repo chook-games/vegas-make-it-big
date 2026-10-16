@@ -2,8 +2,21 @@ import { state } from '../core/state.js';
 import { openModal, closeModal } from './modals.js';
 import { STAFF, staffUnlocked, staffMax, staffLockLabel } from '../data/staff.js';
 import { countOf, hire, fire, totalWages, totalStaff } from '../game/staff.js';
+import { isGambling } from '../data/betting.js';
+
+function gamblingStations() {
+  let n = 0;
+  for (const lot of state.lots) {
+    for (const k in lot.interiorGrid) if (isGambling('interior', lot.interiorGrid[k].item.id)) n++;
+    for (const k in lot.exteriorGrid) if (isGambling('exterior', lot.exteriorGrid[k].item.id)) n++;
+  }
+  return n;
+}
 
 function buildBody() {
+  const stations = gamblingStations();
+  const croupiers = countOf('dealer');
+  const cover = stations > 0 ? Math.min(100, Math.round((croupiers / stations) * 100)) : 100;
   const rows = STAFF.map(def => {
     const unlocked = staffUnlocked(def, state);
     const count = countOf(def.id);
@@ -33,6 +46,7 @@ function buildBody() {
   }).join('');
 
   return `<div class="center muted">Total: <b>${totalStaff()}</b> staff · Wages <b>$${totalWages()}</b> / cycle</div>
+    <div class="center ${cover < 100 ? 'muted' : 'muted'}" style="color:${cover < 100 ? '#ff8080' : '#06d6a0'}">Croupiers: ${croupiers}/${stations} gambling stations covered (${cover}%)</div>
     <div class="spacer"></div>${rows}`;
 }
 
