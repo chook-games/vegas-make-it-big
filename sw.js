@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v10';
+const CACHE = 'vegas-mib-v11';
 const CORE = [
   './',
   './index.html',
@@ -36,6 +36,7 @@ const CORE = [
   './js/three/sky.js',
   './js/three/particles.js',
   './js/three/postfx.js',
+  './js/three/icons.js',
   './js/game/economy.js',
   './js/game/daynight.js',
   './js/game/randomEvents.js',
@@ -66,6 +67,7 @@ const CORE = [
   './js/ui/rivalsScreen.js',
   './js/ui/mainMenu.js',
   './js/ui/mapSelect.js',
+  './js/ui/sandboxScreen.js',
   './js/ui/heatmap.js',
   './js/ui/settings.js'
 ];

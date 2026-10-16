@@ -178,6 +178,7 @@ export function calculateTotals() {
   const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct) * competitionFactor();
   let guests = Math.round(capacity * Math.min(demandFactor, 3.0));
   if (hasBlackout) guests = Math.round(guests * 0.35);
+  if (state.maxPopulation > 0) guests = Math.min(guests, state.maxPopulation);
   guests = Math.max(0, guests);
 
   const fill = capacity > 0 ? guests / capacity : 0;

@@ -7,6 +7,7 @@ import { pickArchetype, CATEGORY } from './archetypes.js';
 import { heatAt } from './noise.js';
 import { activeLot } from './lots.js';
 import { getPaths, entranceKey, bfsPath, keyAt, nearestWalkable } from './paths.js';
+import { iconTexture, CATEGORY_ICON } from '../three/icons.js';
 
 const MAX_GUESTS = 40;
 
@@ -46,7 +47,22 @@ function makeMesh(arch) {
   );
   head.position.y = 0.66;
   g.add(torso, head);
+
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: iconTexture('🎰'), transparent: true, depthTest: false }));
+  sprite.scale.set(0.5, 0.5, 0.5);
+  sprite.position.y = 1.05;
+  sprite.visible = false;
+  g.add(sprite);
+  g.userData.sprite = sprite;
   return g;
+}
+
+function setGuestIcon(guest, icon) {
+  const sprite = guest.mesh.userData.sprite;
+  if (!sprite) return;
+  const tex = iconTexture(icon);
+  if (sprite.material) sprite.material.map = tex;
+  sprite.visible = true;
 }
 
 function spawnPos(world) {
@@ -99,6 +115,7 @@ function nextActivity(guest) {
     if (cells.length) {
       const cell = cells[Math.floor(Math.random() * cells.length)];
       guest.venue = cell;
+      setGuestIcon(guest, CATEGORY_ICON[category] || '🎲');
       if (guest.world === 'exterior') {
         const ek = entranceKey(cell);
         const startKey = keyAt(guest.mesh.position.x, guest.mesh.position.z);
@@ -129,6 +146,7 @@ function nextActivity(guest) {
 function leave(guest) {
   const lot = activeLot();
   guest.venue = null;
+  setGuestIcon(guest, CATEGORY_ICON.leaving);
   if (guest.world === 'exterior') {
     const p = getPaths(lot, 'exterior');
     let front = null, fz = -Infinity;

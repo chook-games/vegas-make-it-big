@@ -173,6 +173,27 @@
   font-weight: 700;
 }
 
+.sb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-top: 10px;
+  color: #dfe3ff;
+}
+.sb-row span { color: var(--gold); }
+.sb-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-top: 14px;
+  color: #dfe3ff;
+}
+.sb-check input { width: 18px; height: 18px; accent-color: var(--neon-green); }
+
 .big-stat {
   text-align: center;
   font-size: 34px;

@@ -139,6 +139,7 @@ export function allItems() {
 
 export function isUnlocked(item, state) {
   if (!item.requires) return true;
+  if (state.unlockAll) return true;
   const r = item.requires;
   if (r.level != null && state.level < r.level) return false;
   if (r.rep != null && state.reputation < r.rep) return false;

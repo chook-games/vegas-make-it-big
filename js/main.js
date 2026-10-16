@@ -20,6 +20,7 @@ import { openCampaignScreen } from './ui/campaignScreen.js';
 import { openMainMenu } from './ui/mainMenu.js';
 import { openMapSelect } from './ui/mapSelect.js';
 import { openRivalsScreen } from './ui/rivalsScreen.js';
+import { openSandboxScreen } from './ui/sandboxScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
 import { applyStaticI18n } from './i18n/i18n.js';
@@ -212,6 +213,14 @@ function computeOffline(raw) {
   }
 }
 
+function applySandbox(cfg) {
+  state.maxPopulation = cfg.maxPopulation || 0;
+  state.eventsFreq = cfg.eventsFreq != null ? cfg.eventsFreq : 1;
+  state.disastersFreq = cfg.disastersFreq != null ? cfg.disastersFreq : 1;
+  state.unlockAll = !!cfg.unlockAll;
+  if (cfg.startHour != null) state.clock.hour = cfg.startHour;
+}
+
 function startNewGame() {
   resetToNew();
   applyRadius(activeLot().radius || 3);
@@ -277,7 +286,18 @@ function boot() {
       onBack: () => menu()
     }),
     onFreePlay: () => openMapSelect({
-      onPick: (lot) => { startFreePlayLot(lot); seedStarterResort(); beginTutorial(); Bus.emit(EV.UI_REFRESH); launch(); },
+      onPick: (lot) => openSandboxScreen({
+        defaultCash: lot.cash,
+        onStart: (cfg) => {
+          startFreePlayLot({ theme: lot.theme, radius: lot.radius, cash: cfg.cash });
+          applySandbox(cfg);
+          seedStarterResort();
+          beginTutorial();
+          Bus.emit(EV.UI_REFRESH);
+          launch();
+        },
+        onBack: () => menu()
+      }),
       onBack: () => menu()
     }),
     onSettings: () => openSettingsScreen()
