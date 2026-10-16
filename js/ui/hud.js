@@ -7,6 +7,7 @@ import { totalStaff } from '../game/staff.js';
 import { activeLot } from '../game/lots.js';
 import { themeById } from '../data/themes.js';
 import { inCampaign, currentScenario, goalStatus } from '../game/campaign.js';
+import { playerRank } from '../game/npc.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -48,6 +49,13 @@ export function updateHUD() {
   const lot = activeLot();
   const lotEl = document.getElementById('ui-lot');
   if (lotEl && lot) lotEl.textContent = `${themeById(lot.theme).icon} ${lot.name}`;
+
+  const rankEl = document.getElementById('ui-rank');
+  if (rankEl) {
+    const r = playerRank();
+    rankEl.textContent = `🏁 #${r.rank}/${r.total}`;
+    rankEl.style.color = r.rank === 1 ? '#06d6a0' : '#ff9ebb';
+  }
 
   const goalEl = document.getElementById('ui-goal');
   if (goalEl) {

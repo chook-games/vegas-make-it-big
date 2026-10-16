@@ -30,6 +30,7 @@ export function freshState() {
     campaignStars: {},
     scenarioStartDay: 1,
     gameMode: 'freeplay',
+    npcs: [],
     heatmap: false,
     inspectedKey: null,
     pendingPlacement: null,

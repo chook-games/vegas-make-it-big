@@ -7,6 +7,7 @@ import { utilOf } from '../data/utilities.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
+import { competitionFactor } from './npc.js';
 
 function getNeighbors(grid, gx, gz) {
   const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -174,7 +175,7 @@ export function calculateTotals() {
   const wages = totalWages();
   const totalIncome = grossIncome - wages;
 
-  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct);
+  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct) * competitionFactor();
   let guests = Math.round(capacity * Math.min(demandFactor, 3.0));
   if (hasBlackout) guests = Math.round(guests * 0.35);
   guests = Math.max(0, guests);

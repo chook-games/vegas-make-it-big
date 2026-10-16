@@ -19,7 +19,9 @@ import { openLotScreen } from './ui/lotScreen.js';
 import { openCampaignScreen } from './ui/campaignScreen.js';
 import { openMainMenu } from './ui/mainMenu.js';
 import { openMapSelect } from './ui/mapSelect.js';
+import { openRivalsScreen } from './ui/rivalsScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
+import { npcTick } from './game/npc.js';
 import { applyStaticI18n } from './i18n/i18n.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
@@ -54,6 +56,7 @@ function initUI() {
   document.getElementById('btn-plots').addEventListener('click', () => { closeInspector(); openPlotsScreen(); });
   document.getElementById('btn-lots').addEventListener('click', () => { closeInspector(); openLotScreen(); });
   document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
+  document.getElementById('btn-rivals').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
   document.getElementById('btn-heat').addEventListener('click', () => toggleHeatmap());
   document.getElementById('btn-quests').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
   document.getElementById('btn-ach').addEventListener('click', () => { closeInspector(); openAchievementsScreen(); });
@@ -165,6 +168,7 @@ function loop() {
 
 function incomeTick() {
   const totals = doIncomeTick();
+  npcTick();
   updateHUD();
 
   if (totals.hasBlackout && !state._wasShort) {
