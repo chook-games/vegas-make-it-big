@@ -10,6 +10,7 @@ import { playSound, vibrate } from '../audio/audio.js';
 import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
 import { markLotDirty, currentTheme } from './lots.js';
+import { t } from '../i18n/i18n.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -32,14 +33,14 @@ export function openInspector(world, key) {
   inspectRing.position.set(cell.tileMesh.position.x, 0.12, cell.tileMesh.position.z);
   inspectRing.visible = true;
 
-  document.getElementById('insp-title').textContent = `${cell.item.icon} ${cell.item.name} (Lv.${cell.level})`;
-  let html = `<div>${cell.item.desc}</div>`;
-  html += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Απόδοση: $${stats.income} / κύκλο</div>`;
+  document.getElementById('insp-title').textContent = `${cell.item.icon} ${t(cell.item.name)} (Lv.${cell.level})`;
+  let html = `<div>${t(cell.item.desc)}</div>`;
+  html += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / cycle</div>`;
   if (stats.notes.length) html += `<div style="margin-top:4px; color:#ffd166;">${stats.notes.join('<br>')}</div>`;
   document.getElementById('insp-body').innerHTML = html;
-  document.getElementById('insp-upgrade').textContent = `⬆️ Αναβάθμιση ($${upg})`;
-  document.getElementById('insp-move').textContent = `🔄 Μετακίνηση ($${MOVE_ROTATE_COST})`;
-  document.getElementById('insp-sell').textContent = `🗑️ Πώληση (+$${refund})`;
+  document.getElementById('insp-upgrade').textContent = `⬆️ Upgrade ($${upg})`;
+  document.getElementById('insp-move').textContent = `🔄 Move ($${MOVE_ROTATE_COST})`;
+  document.getElementById('insp-sell').textContent = `🗑️ Sell (+$${refund})`;
   document.getElementById('inspector').style.display = 'block';
 }
 
@@ -58,7 +59,7 @@ function onUpgrade() {
 
   const cost = upgradeCost(cell);
   if (state.cash < cost) {
-    spawnFloatingText(cell.mesh.position, 'Δεν φτάνουν τα $!', '#ff4d4d');
+    spawnFloatingText(cell.mesh.position, 'Not enough cash!', '#ff4d4d');
     playSound('error');
     return;
   }
@@ -90,7 +91,7 @@ function onMove() {
   if (!cell) return;
 
   if (state.cash < MOVE_ROTATE_COST) {
-    spawnFloatingText(cell.mesh.position, `Χρειάζεσαι $${MOVE_ROTATE_COST}!`, '#ff4d4d');
+    spawnFloatingText(cell.mesh.position, `You need $${MOVE_ROTATE_COST}!`, '#ff4d4d');
     playSound('error');
     return;
   }

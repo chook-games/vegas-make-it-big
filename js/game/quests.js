@@ -29,7 +29,7 @@ export function checkQuests() {
     advanced = true;
     playSound('quest');
     const rewardTxt = q.reward && q.reward.cash ? ` +$${q.reward.cash}` : '';
-    Bus.emit(EV.TOAST, { text: `📜 Ολοκληρώθηκε: ${q.title}!${rewardTxt}`, kind: 'good' });
+    Bus.emit(EV.TOAST, { text: `📜 Quest complete: ${q.title}!${rewardTxt}`, kind: 'good' });
     Bus.emit('quest:completed', q);
   }
   if (advanced) {
@@ -49,7 +49,7 @@ export function checkAchievements() {
       unlocked++;
       playSound('achievement');
       const rewardTxt = a.reward && a.reward.cash ? ` +$${a.reward.cash}` : '';
-      Bus.emit(EV.TOAST, { text: `🏆 Επίτευγμα: ${a.title}!${rewardTxt}`, kind: 'good' });
+      Bus.emit(EV.TOAST, { text: `🏆 Achievement: ${a.title}!${rewardTxt}`, kind: 'good' });
     }
   }
   if (unlocked) {

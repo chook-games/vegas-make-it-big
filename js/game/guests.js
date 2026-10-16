@@ -120,7 +120,7 @@ function spend(guest) {
       guest.venue = null;
       guest.stateId = 'leaving';
       guest.target = exitPoint();
-      Bus.emit(EV.TOAST, { text: '🎩 Ένας High Roller έφυγε λόγω θορύβου/μυρωδιάς!', kind: 'bad' });
+      Bus.emit(EV.TOAST, { text: '🎩 A High Roller left because of noise/smell!', kind: 'bad' });
       return;
     }
   }
@@ -130,7 +130,7 @@ function spend(guest) {
       if (Math.random() < securityStrength()) {
         state.cash += amount * 3;
         guest.cheatCaught = true;
-        Bus.emit(EV.FLOATING, { position: guest.mesh.position, text: 'Συνέλαβαν cheater!', color: '#00f5d4' });
+        Bus.emit(EV.FLOATING, { position: guest.mesh.position, text: 'Cheater caught!', color: '#00f5d4' });
       } else {
         const loss = amount * 2;
         state.cash -= loss;

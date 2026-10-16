@@ -4,27 +4,27 @@ import { save } from '../core/save.js';
 
 const STEPS = [
   {
-    text: 'Καλώς ήρθες στη Vegas! Διάλεξε ένα κτίριο από το κάτω μενού για να το χτίσεις.',
+    text: 'Welcome to Vegas! Pick a building from the menu at the bottom to start building.',
     trigger: 'tool:select'
   },
   {
-    text: 'Τώρα πάτησε σε ένα κενό πλακίδιο του χάρτη για να το τοποθετήσεις.',
+    text: 'Now tap an empty tile on the map to place it.',
     trigger: ''
   },
   {
-    text: 'Τέλεια! Πάτησε το κουμπί «Καζίνο» πάνω δεξιά για να μπεις μέσα.',
+    text: 'Nice! Tap the "Casino" button at the top to go inside.',
     trigger: 'view:switch'
   },
   {
-    text: 'Μέσα στο καζίνο χτίσε ένα τραπέζι (π.χ. Slots ή Ρουλέτα).',
+    text: 'Inside the casino, build a table (e.g. Slots or Roulette).',
     trigger: 'building:placed'
   },
   {
-    text: 'Ρύθμισε το House Edge από το κουμπί 🎲 — χαμηλό φέρνει περισσότερους VIP.',
+    text: 'Set the House Edge from the 🎲 button - a low edge draws more VIPs.',
     trigger: 'odds:set'
   },
   {
-    text: 'Έτοιμος! Ανέβασε Φήμη, ολοκλήρωσε αποστολές και κάνε Prestige για μόνιμα bonuses.',
+    text: 'Done! Raise Reputation, finish quests and Prestige for permanent bonuses.',
     trigger: 'tutorial:next'
   }
 ];
@@ -50,9 +50,9 @@ function render() {
   }
   const step = STEPS[state.tutorial];
   el.innerHTML = `
-    <div class="tut-step">Οδηγός ${state.tutorial + 1}/${STEPS.length}</div>
+    <div class="tut-step">Guide ${state.tutorial + 1}/${STEPS.length}</div>
     <div>${step.text}</div>
-    <button class="tut-skip" id="tut-skip">Παράλειψη οδηγού</button>
+    <button class="tut-skip" id="tut-skip">Skip guide</button>
   `;
   el.classList.add('show');
   const skip = document.getElementById('tut-skip');
@@ -77,7 +77,7 @@ function finishTutorial() {
   active = false;
   state.tutorialDone = true;
   document.getElementById('tutorial-banner').classList.remove('show');
-  Bus.emit(EV.TOAST, { text: '✅ Οδηγός ολοκληρώθηκε! Καλή διασκέδαση.', kind: 'good' });
+  Bus.emit(EV.TOAST, { text: '✅ Guide complete! Have fun.', kind: 'good' });
   save();
 }
 

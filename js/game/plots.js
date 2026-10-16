@@ -5,11 +5,11 @@ import { playSound, vibrate } from '../audio/audio.js';
 import { save } from '../core/save.js';
 import { markLotDirty } from './lots.js';
 
-export const MAX_RADIUS = 6;
+export const MAX_RADIUS = 7;
 export const MAX_PLOTS = MAX_RADIUS - 3;
 
 export function currentRadius() {
-  return activeLot().radius || 3;
+  return activeLot().radius || 4;
 }
 
 export function plotCost() {
@@ -22,13 +22,13 @@ export function canExpand() {
 
 export function buyPlot() {
   if (!canExpand()) {
-    Bus.emit(EV.TOAST, { text: 'Έφτασες τη μέγιστη έκταση αυτού του οικοπέδου.', kind: 'info' });
+    Bus.emit(EV.TOAST, { text: 'You reached the maximum size for this lot.', kind: 'info' });
     playSound('error');
     return false;
   }
   const cost = plotCost();
   if (state.cash < cost) {
-    Bus.emit(EV.TOAST, { text: `Χρειάζεσαι $${cost.toLocaleString()}!`, kind: 'bad' });
+    Bus.emit(EV.TOAST, { text: `You need $${cost.toLocaleString()}!`, kind: 'bad' });
     playSound('error');
     return false;
   }
@@ -41,7 +41,7 @@ export function buyPlot() {
   markLotDirty(lot);
   playSound('levelup');
   vibrate(30);
-  Bus.emit(EV.TOAST, { text: `🗺️ Το οικόπεδο επεκτάθηκε! Νέα έκταση ${lot.radius * 2 + 1}×${lot.radius * 2 + 1}.`, kind: 'good' });
+  Bus.emit(EV.TOAST, { text: `🗺️ Lot expanded! New size ${lot.radius * 2 + 1}×${lot.radius * 2 + 1}.`, kind: 'good' });
   Bus.emit(EV.UI_REFRESH);
   Bus.emit(EV.CASH_CHANGED);
   save();

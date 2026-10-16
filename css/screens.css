@@ -163,6 +163,16 @@
 .toggle.on { background: var(--neon-green); }
 .toggle.on::after { transform: translateX(21px); }
 
+.lang-select {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .big-stat {
   text-align: center;
   font-size: 34px;

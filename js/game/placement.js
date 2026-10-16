@@ -11,6 +11,7 @@ import { playSound, vibrate } from '../audio/audio.js';
 import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
 import { markLotDirty, currentTheme } from './lots.js';
+import { t } from '../i18n/i18n.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -63,13 +64,13 @@ export function updatePlacementUI() {
   const p = state.pendingPlacement;
   bar.style.display = 'flex';
   if (p.mode === 'new') {
-    document.getElementById('place-title').textContent = `${p.item.icon} ${p.item.name}`;
-    document.getElementById('place-sub').textContent = 'Πάτησε άλλο πλακίδιο για μετακίνηση ή Rotate';
-    document.getElementById('btn-place-confirm').textContent = `Χτίσιμο ($${p.cost})`;
+    document.getElementById('place-title').textContent = `${p.item.icon} ${t(p.item.name)}`;
+    document.getElementById('place-sub').textContent = t('Tap another tile to move, or Rotate');
+    document.getElementById('btn-place-confirm').textContent = `Build ($${p.cost})`;
   } else {
-    document.getElementById('place-title').textContent = `Μετακίνηση: ${p.item.name}`;
-    document.getElementById('place-sub').textContent = 'Πάτησε σε κενό πλακίδιο ή γύρισέ το';
-    document.getElementById('btn-place-confirm').textContent = `Επιβεβαίωση ($${p.cost})`;
+    document.getElementById('place-title').textContent = `Move: ${t(p.item.name)}`;
+    document.getElementById('place-sub').textContent = t('Tap an empty tile or rotate it');
+    document.getElementById('btn-place-confirm').textContent = `Confirm ($${p.cost})`;
   }
 }
 
@@ -88,7 +89,7 @@ export function confirmPendingPlacement() {
   const grid = gridFor(p.world);
 
   if (state.cash < p.cost) {
-    spawnFloatingText(p.tileMesh.position, 'Δεν φτάνουν τα $!', '#ff4d4d');
+    spawnFloatingText(p.tileMesh.position, 'Not enough cash!', '#ff4d4d');
     playSound('error');
     return;
   }
@@ -113,7 +114,7 @@ export function confirmPendingPlacement() {
 
   addXP(xpForCost(p.cost, p.mode === 'new' ? XP.build : XP.upgrade));
 
-  spawnFloatingText(p.tileMesh.position, p.mode === 'new' ? `-$${p.cost}` : `Μετακινήθηκε (-$${p.cost})`, '#06d6a0');
+  spawnFloatingText(p.tileMesh.position, p.mode === 'new' ? `-$${p.cost}` : `Moved (-$${p.cost})`, '#06d6a0');
   playSound('confirm');
   vibrate(20);
 
@@ -123,7 +124,7 @@ export function confirmPendingPlacement() {
   Bus.emit(EV.CASH_CHANGED);
   Bus.emit(EV.BUILDING_PLACED, { world: p.world, item: p.item });
   Bus.emit(EV.UI_REFRESH);
-  document.getElementById('ui-hint').innerHTML = '✅ <b>Τοποθετήθηκε!</b> Πάτησε σε κτίριο για Αναβάθμιση ή Μετακίνηση.';
+  document.getElementById('ui-hint').innerHTML = '✅ <b>Placed!</b> Tap a building to Upgrade or Move it.';
 }
 
 export function cancelPendingPlacement() {
@@ -208,7 +209,7 @@ export function handleTileTap(clientX, clientY) {
     if (!existing) {
       startPendingPlacement(tile, state.pendingPlacement.item, state.pendingPlacement.mode, state.pendingPlacement.originalData);
     } else {
-      spawnFloatingText(tile.position, 'Το πλακίδιο είναι πιασμένο!', '#ff4d4d');
+      spawnFloatingText(tile.position, 'Tile is occupied!', '#ff4d4d');
       playSound('error');
     }
     return;
@@ -223,7 +224,7 @@ export function handleTileTap(clientX, clientY) {
     const item = CATALOG[world].find(x => x.id === state.selectedTool);
     if (item) {
       if (!isUnlocked(item, state)) {
-        spawnFloatingText(tile.position, 'Είναι κλειδωμένο!', '#ff4d4d');
+        spawnFloatingText(tile.position, 'It is locked!', '#ff4d4d');
         playSound('error');
         return;
       }

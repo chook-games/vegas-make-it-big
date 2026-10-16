@@ -1,10 +1,10 @@
 export const ARCHETYPES = [
   {
-    id: 'tourist', name: 'Τουρίστας', icon: '🧳', color: 0x00bbf9,
+    id: 'tourist', name: 'Tourist', icon: '🧳', color: 0x00bbf9,
     visits: 5, tipMul: 1, activities: ['gamble', 'food', 'drink', 'fun', 'restroom']
   },
   {
-    id: 'family', name: 'Οικογένεια', icon: '👪', color: 0xff9ebb,
+    id: 'family', name: 'Family', icon: '👪', color: 0xff9ebb,
     visits: 4, tipMul: 0.8, activities: ['fun', 'food', 'restroom', 'fun']
   },
   {

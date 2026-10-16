@@ -53,14 +53,14 @@ export function doPrestige() {
 
   clearAllBuildings();
   const lot = state.lots[0];
-  applyRadius(lot.radius || 3);
+  applyRadius(lot.radius || 4);
   applyThemeToTiles(themeById(lot.theme));
   markLotDirty(lot);
   seedStarterResort();
 
   playSound('achievement');
   vibrate([20, 40, 20]);
-  Bus.emit(EV.TOAST, { text: `💎 Prestige ${state.prestigeLevel}! +${pts} πόντοι. Μόνιμο bonus +${state.prestigeLevel * 15}%`, kind: 'good' });
+  Bus.emit(EV.TOAST, { text: `💎 Prestige ${state.prestigeLevel}! +${pts} points. Permanent bonus +${state.prestigeLevel * 15}%`, kind: 'good' });
   Bus.emit(EV.UI_REFRESH);
   save();
   return true;

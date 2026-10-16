@@ -12,14 +12,14 @@ export function levelReward(level) {
 }
 
 export const RANKS = [
-  { min: 1, name: 'Νέος Επενδυτής' },
-  { min: 4, name: 'Ξενοδόχος' },
-  { min: 8, name: 'Ιδιοκτήτης Καζίνο' },
-  { min: 13, name: 'Μεγιστάνας' },
-  { min: 19, name: 'Βαρόνος του Strip' },
-  { min: 26, name: 'Πρίγκιπας της Vegas' },
-  { min: 34, name: 'Θρύλος του Χρυσού' },
-  { min: 43, name: 'Αυτοκράτορας της Vegas' }
+  { min: 1, name: 'New Investor' },
+  { min: 4, name: 'Hotelier' },
+  { min: 8, name: 'Casino Owner' },
+  { min: 13, name: 'Tycoon' },
+  { min: 19, name: 'Strip Baron' },
+  { min: 26, name: 'Prince of Vegas' },
+  { min: 34, name: 'Gold Legend' },
+  { min: 43, name: 'Emperor of Vegas' }
 ];
 
 export function rankFor(level) {

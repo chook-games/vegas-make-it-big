@@ -9,10 +9,10 @@ function buildBody() {
     const count = countOf(def.id);
     const max = staffMax(def, state);
     const lockTxt = unlocked ? '' : `<div class="list-reward" style="color:#ff8080;">🔒 ${staffLockLabel(def)}</div>`;
-    const effTxt = def.effect.incomePct ? `+${Math.round(def.effect.incomePct * 100)}% έσοδα`
-      : def.effect.guestPct ? `+${Math.round(def.effect.guestPct * 100)}% επισκέπτες`
-      : def.effect.happiness ? `+${def.effect.happiness} διάθεση`
-      : def.effect.crime ? `-${Math.round(def.effect.crime * 100)}% ζημιές` : '';
+    const effTxt = def.effect.incomePct ? `+${Math.round(def.effect.incomePct * 100)}% income`
+      : def.effect.guestPct ? `+${Math.round(def.effect.guestPct * 100)}% guests`
+      : def.effect.happiness ? `+${def.effect.happiness} mood`
+      : def.effect.crime ? `-${Math.round(def.effect.crime * 100)}% losses` : '';
     const controls = unlocked
       ? `<div class="staff-controls">
            <button class="staff-btn" data-fire="${def.id}" ${count <= 0 ? 'disabled' : ''}>−</button>
@@ -25,20 +25,20 @@ function buildBody() {
       <div class="list-main">
         <div class="list-name">${def.name} ${effTxt ? `<span class="staff-eff">${effTxt}</span>` : ''}</div>
         <div class="list-desc">${def.desc}</div>
-        <div class="list-reward">Κόστος $${def.cost} · Μισθός $${def.wage}/κύκλο</div>
+        <div class="list-reward">Cost $${def.cost.toLocaleString()} · Wage $${def.wage}/cycle</div>
         ${lockTxt}
       </div>
       ${controls}
     </div>`;
   }).join('');
 
-  return `<div class="center muted">Σύνολο: <b>${totalStaff()}</b> εργαζόμενοι · Μισθοδοσία <b>$${totalWages()}</b> / κύκλο</div>
+  return `<div class="center muted">Total: <b>${totalStaff()}</b> staff · Wages <b>$${totalWages()}</b> / cycle</div>
     <div class="spacer"></div>${rows}`;
 }
 
 function render() {
   openModal({
-    title: '👔 Προσωπικό',
+    title: '👔 Staff',
     bodyHTML: buildBody(),
     onOpen: (bodyEl) => {
       bodyEl.querySelectorAll('[data-hire]').forEach(b => b.addEventListener('click', () => {

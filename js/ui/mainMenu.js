@@ -6,12 +6,12 @@ export function openMainMenu({ hasSave, onContinue, onCampaign, onFreePlay, onSe
       <div class="mm-logo">VEGAS</div>
       <div class="mm-tag">Make It Big</div>
       <div class="mm-buttons">
-        ${hasSave ? '<button class="btn btn-green" data-act="continue">▶ Συνέχεια</button>' : ''}
+        ${hasSave ? '<button class="btn btn-green" data-act="continue">▶ Continue</button>' : ''}
         <button class="btn btn-primary" data-act="campaign">🎯 Campaign</button>
         <button class="btn btn-gold" data-act="freeplay">🎮 Free Play</button>
-        <button class="btn btn-ghost" data-act="settings">⚙️ Ρυθμίσεις</button>
+        <button class="btn btn-ghost" data-act="settings">⚙️ Settings</button>
       </div>
-      <div class="mm-foot">Παίζει σε κινητό & υπολογιστή</div>
+      <div class="mm-foot">Plays on mobile & desktop</div>
     </div>`;
   document.body.appendChild(el);
 

@@ -7,7 +7,7 @@ export function makeLot(id, theme, name) {
     id,
     name: name || `Lot ${id + 1}`,
     theme,
-    radius: 3,
+    radius: 4,
     exteriorGrid: {},
     interiorGrid: {}
   };
@@ -19,6 +19,7 @@ export function freshState() {
     houseEdge: START_HOUSE_EDGE,
     mode: 'exterior',
     selectedTool: null,
+    dockCategory: { exterior: 'casino', interior: 'slots' },
     gridSize: GRID_SIZE,
     tileSize: TILE_SIZE,
     exteriorGrid: {},
@@ -46,6 +47,7 @@ export function freshState() {
     questIndex: 0,
     achievements: {},
     settings: {
+      lang: 'en',
       sound: true,
       music: true,
       vibration: true,
@@ -74,7 +76,7 @@ export function syncActiveGrids() {
   if (!lot) return;
   state.exteriorGrid = lot.exteriorGrid;
   state.interiorGrid = lot.interiorGrid;
-  state.gridSize = (lot.radius || 3) * 2 + 1;
+  state.gridSize = (lot.radius || 4) * 2 + 1;
 }
 
 syncActiveGrids();

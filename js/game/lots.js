@@ -82,7 +82,7 @@ export function switchLot(index, force = false) {
   syncActiveGrids();
   const lot = state.lots[index];
 
-  applyRadius(lot.radius || 3);
+  applyRadius(lot.radius || 4);
   applyThemeToTiles(themeById(lot.theme));
   buildMeshes(lot);
 
@@ -98,13 +98,13 @@ export function switchLot(index, force = false) {
 
 export function buyLot(themeId) {
   if (!canBuyLot()) {
-    Bus.emit(EV.TOAST, { text: 'Έφτασες το μέγιστο αριθμό οικοπέδων.', kind: 'info' });
+    Bus.emit(EV.TOAST, { text: 'You reached the maximum number of lots.', kind: 'info' });
     playSound('error');
     return false;
   }
   const cost = lotCost();
   if (state.cash < cost) {
-    Bus.emit(EV.TOAST, { text: `Χρειάζεσαι $${cost.toLocaleString()}!`, kind: 'bad' });
+    Bus.emit(EV.TOAST, { text: `You need $${cost.toLocaleString()}!`, kind: 'bad' });
     playSound('error');
     return false;
   }
@@ -114,7 +114,7 @@ export function buyLot(themeId) {
   state.lots.push(lot);
   playSound('levelup');
   vibrate(30);
-  Bus.emit(EV.TOAST, { text: `🏗️ Αγόρασες νέο οικόπεδο με θέμα ${themeById(lot.theme).name}!`, kind: 'good' });
+  Bus.emit(EV.TOAST, { text: `🏗️ Bought a new lot with the ${themeById(lot.theme).name} theme!`, kind: 'good' });
   switchLot(id);
   Bus.emit(EV.CASH_CHANGED);
   return true;

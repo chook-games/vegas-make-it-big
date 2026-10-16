@@ -1,9 +1,10 @@
 import { state } from '../core/state.js';
+import { themeById } from '../data/themes.js';
 import {
   exteriorGroup, interiorGroup, pickableTilesExt, pickableTilesInt, vehicles
 } from './scene.js';
 
-const MAX_HALF = 6;
+const MAX_HALF = 7;
 
 let stripGroup = null;
 let interiorWalls = null;
@@ -142,6 +143,9 @@ export function createWorlds() {
   }
 
   applyRadius(Math.floor(state.gridSize / 2));
+  if (state.lots && state.lots[state.activeLot]) {
+    applyThemeToTiles(themeById(state.lots[state.activeLot].theme));
+  }
 }
 
 export function expandWorld() {

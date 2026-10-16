@@ -117,7 +117,7 @@ html, body {
 
 #tutorial-banner {
   position: fixed;
-  bottom: calc(var(--safe-bottom) + 168px);
+  bottom: calc(var(--safe-bottom) + 268px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 25;

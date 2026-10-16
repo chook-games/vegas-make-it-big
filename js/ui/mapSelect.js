@@ -20,8 +20,8 @@ export function openMapSelect({ onPick, onBack }) {
   el.className = 'map-select';
   el.innerHTML = `
     <div class="ms-inner">
-      <div class="ms-title">Vegas Strip — Διάλεξε Οικόπεδο</div>
-      <div class="ms-sub">Ξεκίνα από ένα από τα διαθέσιμα οικόπεδα της λεωφόρου.</div>
+      <div class="ms-title">Vegas Strip — Pick a Lot</div>
+      <div class="ms-sub">Start from one of the available lots on the boulevard.</div>
       <div class="map-viewport">
         <div class="map-road">
           <div class="map-lane-line"></div>
@@ -40,8 +40,8 @@ export function openMapSelect({ onPick, onBack }) {
         </div>
       </div>
       <div class="spacer"></div>
-      <button class="btn btn-primary" data-random>🎲 Τυχαίο Οικόπεδο</button>
-      <button class="btn btn-ghost" data-back>Πίσω στο Μενού</button>
+      <button class="btn btn-primary" data-random>🎲 Random Lot</button>
+      <button class="btn btn-ghost" data-back>Back to Menu</button>
     </div>`;
   document.body.appendChild(el);
 

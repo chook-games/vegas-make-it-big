@@ -34,25 +34,25 @@ export function evaluateTileStats(world, cell, grid, heat) {
       let pressure = Math.min(1, hNoise * 0.7 + hSmell * 0.6);
       if (wall) pressure *= 0.5;
       inc *= (1 - pressure * 0.6);
-      if (pressure > 0.4) notes.push('Θόρυβος/Δυσοσμία ενοχλούν τους VIP (-έσοδα). Χτίσε τοίχο ή βάλε φυτά.');
-      else if (wall) notes.push('Ηχομόνωση τοίχου: προστατευμένο VIP.');
+      if (pressure > 0.4) notes.push('Noise/Smell annoy the VIPs (-income). Build a wall or add plants.');
+      else if (wall) notes.push('Soundproof wall: VIP protected.');
     } else if (inc > 0) {
       const nuisance = Math.min(0.5, (hNoise + hSmell) * 0.35);
       inc *= (1 - nuisance);
-      if (nuisance > 0.2) notes.push('Ενοχλητικός θόρυβος/μυρωδιά (-έσοδα).');
+      if (nuisance > 0.2) notes.push('Annoying noise/smell (-income).');
     }
 
     if (security && inc > 0) {
       inc *= 1.35;
-      notes.push('Security κάλυψη (+35% κέρδη).');
+      notes.push('Security coverage (+35% income).');
     }
   } else {
-    if (item.isGenerator) notes.push('Παράγει ενέργεια για το οικόπεδο.');
+    if (item.isGenerator) notes.push('Produces power for the lot.');
     if (item.id === 'fountain') {
       const neigh = getNeighbors(grid, cell.gx, cell.gz);
       if (neigh.length >= 2) {
         inc *= 1.2;
-        notes.push('Πολυσύχναστο σημείο (+20%).');
+        notes.push('Busy spot (+20%).');
       }
     }
   }

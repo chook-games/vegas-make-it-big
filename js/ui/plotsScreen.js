@@ -1,7 +1,7 @@
 import { state } from '../core/state.js';
 import { openModal, closeModal } from './modals.js';
 import { worldRadius } from '../three/worlds.js';
-import { plotCost, canExpand, buyPlot, MAX_PLOTS } from '../game/plots.js';
+import { plotCost, canExpand, buyPlot, MAX_RADIUS } from '../game/plots.js';
 
 function buildMap() {
   const cur = worldRadius();
@@ -24,27 +24,27 @@ function buildBody() {
   const more = canExpand();
   return `
     <div class="center big-stat">${state.gridSize}×${state.gridSize}</div>
-    <div class="center muted">Η έκταση του Resort σου. Κάθε επέκταση προσθέτει έναν δακτύλιο πλακιδίων σε Strip & Καζίνο.</div>
+    <div class="center muted">Your lot size. Each expansion adds a ring of tiles to the Strip and casino.</div>
     ${buildMap()}
-    <div class="settings-row"><span class="settings-label">Επεκτάσεις που έγιναν</span><span>${state.plots} / ${MAX_PLOTS}</span></div>
-    <div class="settings-row"><span class="settings-label">Επόμενη έκταση</span><span>${more ? (state.gridSize + 2) + '×' + (state.gridSize + 2) : 'Μέγιστη'}</span></div>
-    <div class="settings-row"><span class="settings-label">Κόστος επόμενης</span><span style="color:${afford ? '#06d6a0' : '#ff8080'}">${more ? '$' + cost.toLocaleString() : '—'}</span></div>
+    <div class="settings-row"><span class="settings-label">Expansions bought</span><span>${Math.max(0, (state.gridSize - 1) / 2 - 4)} / ${MAX_RADIUS - 4}</span></div>
+    <div class="settings-row"><span class="settings-label">Next size</span><span>${more ? (state.gridSize + 2) + '×' + (state.gridSize + 2) : 'Max'}</span></div>
+    <div class="settings-row"><span class="settings-label">Next cost</span><span style="color:${afford ? '#06d6a0' : '#ff8080'}">${more ? '$' + cost.toLocaleString() : '—'}</span></div>
     <div class="spacer"></div>
-    <div class="muted">Τα υπάρχοντα κτίρια μένουν στη θέση τους. Οι νέοι δακτύλιοι εμφανίζονται με έντονο χρώμα στον χάρτη.</div>
+    <div class="muted">Existing buildings stay in place. New rings show in bright colour on the map.</div>
   `;
 }
 
 function render() {
   openModal({
-    title: '🗺️ Επέκταση Χάρτη',
+    title: '🗺️ Expand Lot',
     bodyHTML: buildBody(),
     actions: [
       {
-        label: canExpand() ? (state.cash >= plotCost() ? `Αγορά Plot ($${plotCost().toLocaleString()})` : `Χρειάζεσαι $${plotCost().toLocaleString()}`) : 'Μέγιστη έκταση',
+        label: canExpand() ? (state.cash >= plotCost() ? `Buy Plot ($${plotCost().toLocaleString()})` : `Need $${plotCost().toLocaleString()}`) : 'Maximum size',
         cls: 'btn-gold',
         onClick: () => { if (buyPlot()) render(); }
       },
-      { label: 'Κλείσιμο', cls: 'btn-ghost', onClick: closeModal }
+      { label: 'Close', cls: 'btn-ghost', onClick: closeModal }
     ]
   });
 }

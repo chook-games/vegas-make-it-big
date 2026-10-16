@@ -5,8 +5,9 @@ import { refreshMusic, playSound } from '../audio/audio.js';
 import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
 import { resetToNew, save } from '../core/save.js';
+import { LANGS, getLang, setLang, applyStaticI18n } from '../i18n/i18n.js';
 
-function toggleRow(label, sub, key, onChange) {
+function toggleRow(label, sub, key) {
   return `<div class="settings-row">
     <div>
       <div class="settings-label">${label}</div>
@@ -18,33 +19,42 @@ function toggleRow(label, sub, key, onChange) {
 
 export function openSettingsScreen() {
   const body = `
-    ${toggleRow('🔊 Ηχητικά εφέ', 'Ήχοι κατασκευής & UI', 'sound')}
-    ${toggleRow('🎵 Μουσική', 'Απαλό ambient loop', 'music')}
-    ${toggleRow('📳 Δόνηση', 'Haptic feedback (mobile)', 'vibration')}
-    ${toggleRow('🌑 Σκιές', 'Πιο όμορφα αλλά πιο βαρύ', 'shadows')}
-    ${bloomAvailable() ? toggleRow('✨ Bloom (Neon Glow)', 'Λάμψη στα φώτα, πιο βαρύ', 'bloom') : ''}
     <div class="settings-row">
       <div>
-        <div class="settings-label">🖥️ Πλήρης Οθόνη</div>
-        <div class="settings-sub">Καλύτερη εμπειρία σε κινητό</div>
+        <div class="settings-label">🌐 Language</div>
+        <div class="settings-sub">More languages coming soon</div>
       </div>
-      <button class="btn btn-ghost" id="set-fullscreen" style="width:auto;margin:0;padding:8px 14px;">Άνοιγμα</button>
+      <select id="set-lang" class="lang-select">
+        ${LANGS.map(l => `<option value="${l.code}" ${l.code === getLang() ? 'selected' : ''}>${l.name}</option>`).join('')}
+      </select>
+    </div>
+    ${toggleRow('🔊 Sound effects', 'Building & UI sounds', 'sound')}
+    ${toggleRow('🎵 Music', 'Soft ambient loop', 'music')}
+    ${toggleRow('📳 Vibration', 'Haptic feedback (mobile)', 'vibration')}
+    ${toggleRow('🌑 Shadows', 'Prettier but heavier', 'shadows')}
+    ${bloomAvailable() ? toggleRow('✨ Bloom (Neon Glow)', 'Glow on lights, heavier', 'bloom') : ''}
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">🖥️ Fullscreen</div>
+        <div class="settings-sub">Better experience on mobile</div>
+      </div>
+      <button class="btn btn-ghost" id="set-fullscreen" style="width:auto;margin:0;padding:8px 14px;">Enter</button>
     </div>
     <div class="settings-row">
       <div>
-        <div class="settings-label">♻️ Επαναφορά Παιχνιδιού</div>
-        <div class="settings-sub" style="color:#ff8080;">Διαγράφει όλη την πρόοδο</div>
+        <div class="settings-label">♻️ Reset Game</div>
+        <div class="settings-sub" style="color:#ff8080;">Deletes all progress</div>
       </div>
       <button class="btn btn-danger" id="set-reset" style="width:auto;margin:0;padding:8px 14px;">Reset</button>
     </div>
   `;
 
-  openModal({ title: '⚙️ Ρυθμίσεις', bodyHTML: body, onOpen: (bodyEl) => {
-    bodyEl.querySelectorAll('.toggle').forEach(t => {
-      t.addEventListener('click', () => {
-        const key = t.dataset.key;
+  openModal({ title: '⚙️ Settings', bodyHTML: body, onOpen: (bodyEl) => {
+    bodyEl.querySelectorAll('.toggle').forEach(tg => {
+      tg.addEventListener('click', () => {
+        const key = tg.dataset.key;
         state.settings[key] = !state.settings[key];
-        t.classList.toggle('on', state.settings[key]);
+        tg.classList.toggle('on', state.settings[key]);
         if (key === 'music') refreshMusic();
         if (key === 'shadows') applySettings();
         if (key === 'bloom') setBloom(state.settings.bloom);
@@ -52,21 +62,28 @@ export function openSettingsScreen() {
         save();
       });
     });
+    const langSel = bodyEl.querySelector('#set-lang');
+    if (langSel) langSel.addEventListener('change', (e) => {
+      setLang(e.target.value);
+      applyStaticI18n();
+      Bus.emit(EV.UI_REFRESH);
+      save();
+    });
     const fs = bodyEl.querySelector('#set-fullscreen');
-    fs.addEventListener('click', () => {
+    if (fs) fs.addEventListener('click', () => {
       try {
         if (document.fullscreenElement) document.exitFullscreen();
         else document.documentElement.requestFullscreen();
       } catch (e) {}
     });
     const rs = bodyEl.querySelector('#set-reset');
-    rs.addEventListener('click', () => {
+    if (rs) rs.addEventListener('click', () => {
       openModal({
-        title: '⚠️ Επαναφορά',
-        bodyHTML: '<div class="center">Σίγουρα; Όλη η πρόοδος θα χαθεί οριστικά.</div>',
+        title: '⚠️ Reset',
+        bodyHTML: '<div class="center">Are you sure? All progress will be lost.</div>',
         actions: [
-          { label: 'Ναι, Reset', cls: 'btn-danger', onClick: () => { resetToNew(); location.reload(); } },
-          { label: 'Άκυρο', cls: 'btn-ghost', onClick: () => { closeModal(); openSettingsScreen(); } }
+          { label: 'Yes, Reset', cls: 'btn-danger', onClick: () => { resetToNew(); location.reload(); } },
+          { label: 'Cancel', cls: 'btn-ghost', onClick: () => { closeModal(); openSettingsScreen(); } }
         ]
       });
     });

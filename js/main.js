@@ -20,6 +20,7 @@ import { openCampaignScreen } from './ui/campaignScreen.js';
 import { openMainMenu } from './ui/mainMenu.js';
 import { openMapSelect } from './ui/mapSelect.js';
 import { startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
+import { applyStaticI18n } from './i18n/i18n.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
 import { toggleHeatmap, initHeatmap, applyHeatmap } from './ui/heatmap.js';
@@ -104,14 +105,14 @@ function switchView() {
     exteriorGroup.visible = false;
     interiorGroup.visible = true;
     state.stats.viewedInterior = true;
-    document.getElementById('btn-switch-view').textContent = '🌴 Βγες στο Strip';
-    document.getElementById('ui-hint').innerHTML = '🃏 <b>Καζίνο:</b> Επίλεξε τραπέζι από κάτω ή πάτησε σε υπάρχον για Rotate/Αναβάθμιση!';
+    document.getElementById('btn-switch-view').textContent = '🌴 Exit to Strip';
+    document.getElementById('ui-hint').innerHTML = '🃏 <b>Casino:</b> Pick a table below or tap one to Rotate/Upgrade!';
   } else {
     state.mode = 'exterior';
     interiorGroup.visible = false;
     exteriorGroup.visible = true;
-    document.getElementById('btn-switch-view').textContent = '🎰 Μπες στο Καζίνο';
-    document.getElementById('ui-hint').innerHTML = '🌴 <b>Strip:</b> Πάτησε σε κτίριο για Αναβάθμιση/Μετακίνηση ή χτίσε νέο!';
+    document.getElementById('btn-switch-view').textContent = '🎰 Enter Casino';
+    document.getElementById('ui-hint').innerHTML = '🌴 <b>Strip:</b> Tap a building to Upgrade/Move or build a new one!';
   }
   Bus.emit(EV.VIEW_SWITCH, state.mode);
   renderDock();
@@ -224,6 +225,7 @@ function boot() {
   initControls(handleTileTap);
   applySettings();
   initPostFX();
+  applyStaticI18n();
 
   const existing = hasSave();
   let raw = null;

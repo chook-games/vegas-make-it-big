@@ -24,7 +24,7 @@ export function updateHUD() {
   document.getElementById('ui-guests').textContent = `${totals.guests}`;
 
   const repEl = document.getElementById('ui-rep');
-  repEl.textContent = `⭐ Φήμη ${Math.round(state.reputation)} · 😊 ${Math.round(state.happiness)}%`;
+  repEl.textContent = `⭐ Rep ${Math.round(state.reputation)} · 😊 ${Math.round(state.happiness)}%`;
 
   document.getElementById('ui-clock').textContent = formatClock();
   const s = seasonInfo();
@@ -37,7 +37,7 @@ export function updateHUD() {
   document.getElementById('ui-level').textContent = `Lv.${lp.level} · ${lp.rank} · ${lp.xp}/${lp.need} XP`;
 
   document.getElementById('ui-gold').textContent = `💎 ${state.gold}`;
-  document.getElementById('ui-staff').textContent = `👔 ${totalStaff()} εργαζόμενοι`;
+  document.getElementById('ui-staff').textContent = `👔 ${totalStaff()} staff`;
 
   const lot = activeLot();
   const lotEl = document.getElementById('ui-lot');

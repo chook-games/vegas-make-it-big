@@ -70,11 +70,11 @@ function lerpColor(a, b, t) {
   return new THREE.Color(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t);
 }
 
-const dayTop = new THREE.Color(0x2a6fdb);
-const dayBottom = new THREE.Color(0x9cc4ff);
-const nightTop = new THREE.Color(0x05060f);
-const nightBottom = new THREE.Color(0x1a0f2e);
-const duskBottom = new THREE.Color(0xff8c42);
+const dayTop = new THREE.Color(0x3d8bef);
+const dayBottom = new THREE.Color(0xd6e8ff);
+const nightTop = new THREE.Color(0x101a33);
+const nightBottom = new THREE.Color(0x24304f);
+const duskBottom = new THREE.Color(0xffa45c);
 
 export function updateSky(hour, nightAmount) {
   group.visible = state.mode === 'exterior';

@@ -45,7 +45,7 @@ export function serialize() {
       id: lot.id,
       name: lot.name,
       theme: lot.theme,
-      radius: lot.radius || 3,
+      radius: lot.radius || 4,
       exteriorGrid: serializeGrid(lot.exteriorGrid),
       interiorGrid: serializeGrid(lot.interiorGrid)
     })),
@@ -105,7 +105,7 @@ export function load() {
       id: lot.id,
       name: lot.name,
       theme: lot.theme || 'american',
-      radius: lot.radius || 3,
+      radius: lot.radius || 4,
       exteriorGrid: hydrateGrid(lot.exteriorGrid, 'exterior'),
       interiorGrid: hydrateGrid(lot.interiorGrid, 'interior')
     }));

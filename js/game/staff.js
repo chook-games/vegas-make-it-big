@@ -24,17 +24,17 @@ export function hire(id) {
   const def = findStaff(id);
   if (!def) return false;
   if (!staffUnlocked(def, state)) {
-    Bus.emit(EV.TOAST, { text: `🔒 Απαιτεί ${staffLockLabel(def)}.`, kind: 'bad' });
+    Bus.emit(EV.TOAST, { text: `🔒 Requires ${staffLockLabel(def)}.`, kind: 'bad' });
     playSound('error');
     return false;
   }
   if (countOf(id) >= staffMax(def, state)) {
-    Bus.emit(EV.TOAST, { text: 'Έφτασες το μέγιστο για αυτή τη θέση.', kind: 'info' });
+    Bus.emit(EV.TOAST, { text: 'You reached the max for this role.', kind: 'info' });
     playSound('error');
     return false;
   }
   if (state.cash < def.cost) {
-    Bus.emit(EV.TOAST, { text: 'Δεν φτάνουν τα χρήματα!', kind: 'bad' });
+    Bus.emit(EV.TOAST, { text: 'Not enough cash!', kind: 'bad' });
     playSound('error');
     return false;
   }

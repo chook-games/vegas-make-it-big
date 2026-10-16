@@ -8,22 +8,20 @@ function stars(count) {
   return '⭐'.repeat(count) + '☆'.repeat(3 - count);
 }
 
-function scenarioRow(sc, i, fromMenu) {
+function scenarioRow(sc, i) {
   const th = themeById(sc.theme);
   const done = i < state.campaignIndex;
   const current = i === state.campaignIndex;
   const unlocked = isScenarioUnlocked(i);
   const gotStars = state.campaignStars[sc.id];
   const reward = sc.reward ? `$${sc.reward.cash.toLocaleString()}${sc.reward.gold ? ` +${sc.reward.gold}💎` : ''}` : '';
-  const action = (fromMenu && unlocked)
-    ? `<button class="staff-btn" data-start="${i}">▶️</button>`
-    : (unlocked && !fromMenu ? `<button class="staff-btn" data-start="${i}">▶️</button>` : '');
+  const action = unlocked ? `<button class="staff-btn" data-start="${i}">▶️</button>` : '';
   return `<div class="list-row ${done ? 'done' : ''} ${!unlocked ? 'locked' : ''}">
     <div class="list-icon">${!unlocked ? '🔒' : th.icon}</div>
     <div class="list-main">
       <div class="list-name">${i + 1}. ${sc.title}</div>
-      <div class="list-desc">${unlocked ? sc.desc : 'Κλείδωσε το ολοκληρώνοντας το προηγούμενο scenario.'}</div>
-      <div class="list-reward">Ανταμοιβή: ${reward} ${done && gotStars ? '· ' + stars(gotStars) : ''}</div>
+      <div class="list-desc">${unlocked ? sc.desc : 'Unlock it by finishing the previous scenario.'}</div>
+      <div class="list-reward">Reward: ${reward} ${done && gotStars ? '· ' + stars(gotStars) : ''}</div>
     </div>
     <div class="list-check">${done ? '✅' : current ? '▶️' : ''}</div>
     ${action}
@@ -34,7 +32,7 @@ function currentGoalsHTML() {
   const st = goalStatus();
   if (!st.length) return '';
   return `<div class="spacer"></div>
-    <div class="muted">Στόχοι τρέχοντος scenario:</div>
+    <div class="muted">Current scenario goals:</div>
     ${st.map(g => `<div class="list-row ${g.done ? 'done' : ''}">
       <div class="list-main">
         <div class="list-name">${g.done ? '✅ ' : ''}${g.label}</div>
@@ -47,25 +45,25 @@ function currentGoalsHTML() {
 function buildBody(fromMenu) {
   const prog = campaignProgress();
   if (fromMenu) {
-    return `<div class="center muted">Επίλεξε scenario. Ξεκλειδώνει ένα-ένα καθώς ολοκληρώνεις το προηγούμενο.</div>
-      <div class="center muted">Ολοκληρωμένα: ${state.campaignIndex}/${SCENARIOS.length} · ⭐ ${prog.stars}/${prog.maxStars}</div>
+    return `<div class="center muted">Pick a scenario. They unlock one by one as you finish the previous.</div>
+      <div class="center muted">Completed: ${state.campaignIndex}/${SCENARIOS.length} · ⭐ ${prog.stars}/${prog.maxStars}</div>
       <div class="spacer"></div>
-      ${SCENARIOS.map((s, i) => scenarioRow(s, i, true)).join('')}`;
+      ${SCENARIOS.map((s, i) => scenarioRow(s, i)).join('')}`;
   }
   const sc = currentScenario();
   const header = sc
     ? `<div class="center muted">Scenario ${prog.index + 1}/${prog.total} · ⭐ ${prog.stars}/${prog.maxStars}</div>`
-    : `<div class="center big-stat">👑 Ολοκλήρωσες το Campaign!</div>`;
+    : `<div class="center big-stat">👑 You finished the Campaign!</div>`;
   return `${header}
     ${currentGoalsHTML()}
     <div class="spacer"></div>
-    ${SCENARIOS.map((s, i) => scenarioRow(s, i, false)).join('')}`;
+    ${SCENARIOS.map((s, i) => scenarioRow(s, i)).join('')}`;
 }
 
 function render(fromMenu, onStarted, onBack) {
   const actions = [];
-  if (fromMenu) actions.push({ label: 'Πίσω στο Μενού', cls: 'btn-ghost', onClick: () => { closeModal(); onBack && onBack(); } });
-  else actions.push({ label: 'Κλείσιμο', cls: 'btn-ghost', onClick: closeModal });
+  if (fromMenu) actions.push({ label: 'Back to Menu', cls: 'btn-ghost', onClick: () => { closeModal(); onBack && onBack(); } });
+  else actions.push({ label: 'Close', cls: 'btn-ghost', onClick: closeModal });
 
   openModal({
     title: '🎯 Campaign',

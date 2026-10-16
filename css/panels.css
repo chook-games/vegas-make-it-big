@@ -168,6 +168,35 @@
 .dock-header > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dock-header > span:last-child { white-space: nowrap; }
 
+.dock-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+.dock-tabs::-webkit-scrollbar { display: none; }
+.dock-tab {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: #aaa;
+  border-radius: 9px;
+  padding: 5px 9px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dock-tab.active { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,212,0.12); }
+.dock-tab-icon { font-size: 15px; }
+.dock-empty { color: #889; font-size: 12px; padding: 18px 10px; }
+
 .build-scroll {
   display: flex;
   gap: 6px;
