@@ -3,6 +3,8 @@ import { Bus, EV } from '../core/events.js';
 import { DAY_LENGTH_MS, SEASONS } from '../core/constants.js';
 import { ambientLight, dirLight, neonPointLight, scene } from '../three/scene.js';
 import { updateSky } from '../three/sky.js';
+import { weatherLight, weatherTint } from './weather.js';
+import { lightningFlash } from '../three/particles.js';
 
 function bandFor(hour) {
   if (hour >= 22 || hour < 6) return { id: 'night', name: 'Night', nightFactor: 1.35, dayFactor: 0.8 };
@@ -45,16 +47,26 @@ function applyLighting() {
   const dayLight = Math.max(0, Math.sin(((h - 6) / 12) * Math.PI));
   const nightAmount = 1 - dayLight;
 
-  dirLight.intensity = 0.5 + dayLight * 0.9;
-  ambientLight.intensity = 0.65 + dayLight * 0.5;
+  const wLight = weatherLight();
+  dirLight.intensity = (0.5 + dayLight * 0.9) * wLight;
+  ambientLight.intensity = (0.65 + dayLight * 0.5) * wLight + lightningFlash() * 1.8;
   neonPointLight.intensity = 0.4 + nightAmount * 0.9;
 
   updateSky(state.clock.hour, nightAmount);
 
   if (state.mode === 'exterior') {
-    const r = Math.round(30 + dayLight * 130);
-    const gch = Math.round(34 + dayLight * 150);
-    const b = Math.round(55 + dayLight * 160);
+    let r = Math.round(30 + dayLight * 130);
+    let gch = Math.round(34 + dayLight * 150);
+    let b = Math.round(55 + dayLight * 160);
+    const tint = weatherTint();
+    if (tint != null) {
+      const tr = (tint >> 16) & 0xff;
+      const tg = (tint >> 8) & 0xff;
+      const tb = tint & 0xff;
+      r = Math.round(r * 0.4 + tr * 0.6);
+      gch = Math.round(gch * 0.4 + tg * 0.6);
+      b = Math.round(b * 0.4 + tb * 0.6);
+    }
     const hex = (r << 16) | (gch << 8) | b;
     if (hex !== lastBg) {
       scene.background.setHex(hex);

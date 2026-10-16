@@ -5,7 +5,7 @@ import { hasSave, load, save, resetToNew } from './core/save.js';
 import { createWorlds } from './three/worlds.js';
 import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
 import { renderFrame, initPostFX, resizePostFX } from './three/postfx.js';
-import { updateParticles, spawnConfetti, spawnMoneyBurst } from './three/particles.js';
+import { updateParticles, spawnConfetti, spawnMoneyBurst, setWeatherParticles, updateWeatherParticles, triggerLightning, tickLightning } from './three/particles.js';
 import { initControls, updateCamera, rotateCameraStep } from './three/controls.js';
 import { initToast, spawnFloatingText } from './ui/toast.js';
 import { initHUD, updateHUD } from './ui/hud.js';
@@ -32,6 +32,7 @@ import { currentTheme } from './game/lots.js';
 import { applyThemeToTiles, applyRadius } from './three/worlds.js';
 import { updateDayNight } from './game/daynight.js';
 import { updateEvents } from './game/randomEvents.js';
+import { updateWeather, weatherId } from './game/weather.js';
 import { doIncomeTick, calculateTotals } from './game/economy.js';
 import { updateGuests, animateGuests } from './game/guests.js';
 import { checkProgress } from './game/quests.js';
@@ -142,6 +143,11 @@ function loop() {
   if (booted) {
     updateDayNight(dt);
     updateEvents(dt);
+    updateWeather(dt);
+    const wid = weatherId();
+    setWeatherParticles(wid);
+    if (wid === 'storm' && Math.random() < 0.006) triggerLightning();
+    tickLightning(dt / 1000);
   }
 
   if (state.pendingPlacement && state.pendingPlacement.mesh) {

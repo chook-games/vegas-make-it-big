@@ -76,3 +76,61 @@ export function clearParticles() {
   active.forEach(p => scene.remove(p.mesh));
   active.length = 0;
 }
+
+let precip = null;
+let precipType = 'clear';
+let precipPos = null;
+let precipSpeed = 8;
+const PRECIP_BOX = 16;
+const PRECIP_TOP = 16;
+
+export function setWeatherParticles(type) {
+  if (type === precipType) return;
+  precipType = type;
+  if (precip) { scene.remove(precip); precip = null; precipPos = null; }
+  if (type !== 'rain' && type !== 'storm' && type !== 'snow') return;
+
+  const count = type === 'snow' ? 300 : 520;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * PRECIP_BOX * 2;
+    pos[i * 3 + 1] = Math.random() * PRECIP_TOP;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * PRECIP_BOX * 2;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const color = type === 'snow' ? 0xffffff : 0x9ec9ff;
+  const mat = new THREE.PointsMaterial({ color, size: type === 'snow' ? 0.16 : 0.09, transparent: true, opacity: 0.85, depthWrite: false });
+  precip = new THREE.Points(geo, mat);
+  scene.add(precip);
+  precipPos = pos;
+  precipSpeed = type === 'snow' ? 3.2 : 10;
+}
+
+export function updateWeatherParticles(dt) {
+  if (!precip || !precipPos) return;
+  const n = precipPos.length;
+  for (let i = 1; i < n; i += 3) {
+    precipPos[i] -= precipSpeed * dt;
+    if (precipPos[i] < 0) {
+      precipPos[i] = PRECIP_TOP;
+      precipPos[i - 1] = (Math.random() - 0.5) * PRECIP_BOX * 2;
+      precipPos[i + 1] = (Math.random() - 0.5) * PRECIP_BOX * 2;
+    }
+  }
+  if (precip.geometry && precip.geometry.attributes && precip.geometry.attributes.position) {
+    precip.geometry.attributes.position.needsUpdate = true;
+  }
+}
+
+let flash = 0;
+export function triggerLightning() {
+  flash = 0.25;
+}
+export function lightningFlash() {
+  return flash;
+}
+export function tickLightning(dt) {
+  if (flash > 0) flash = Math.max(0, flash - dt * 2.5);
+  return flash;
+}

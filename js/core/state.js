@@ -35,6 +35,7 @@ export function freshState() {
     eventsFreq: 1,
     disastersFreq: 1,
     unlockAll: false,
+    weather: null,
     heatmap: false,
     inspectedKey: null,
     pendingPlacement: null,

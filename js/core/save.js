@@ -35,6 +35,7 @@ export function serialize() {
     campaignStars: state.campaignStars,
     scenarioStartDay: state.scenarioStartDay,
     npcs: state.npcs,
+    weather: state.weather,
     prestigeLevel: state.prestigeLevel,
     prestigePoints: state.prestigePoints,
     questIndex: state.questIndex,

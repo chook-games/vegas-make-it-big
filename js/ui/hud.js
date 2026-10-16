@@ -8,6 +8,7 @@ import { activeLot } from '../game/lots.js';
 import { themeById } from '../data/themes.js';
 import { inCampaign, currentScenario, goalStatus } from '../game/campaign.js';
 import { playerRank } from '../game/npc.js';
+import { currentWeather } from '../game/weather.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -36,6 +37,9 @@ export function updateHUD() {
   document.getElementById('ui-clock').textContent = formatClock();
   const s = seasonInfo();
   document.getElementById('ui-season').textContent = `${s.icon} ${s.name}`;
+  const wx = currentWeather();
+  const wxEl = document.getElementById('ui-weather');
+  if (wxEl) wxEl.textContent = `${wx.icon} ${wx.name}`;
 
   document.getElementById('ui-odds-val').textContent = `${state.houseEdge}%`;
 

@@ -5,6 +5,7 @@ import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
 import { utilOf } from '../data/utilities.js';
 import { stationIncomeFactor, isGambling } from '../data/betting.js';
+import { weatherGuestMul, weatherIncomeMul, weatherCasinoMul } from './weather.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
@@ -184,7 +185,7 @@ export function calculateTotals() {
   const condFactor = 0.6 + 0.4 * (Math.max(0, Math.min(100, state.condition)) / 100);
 
   const grossIncome = Math.round(
-    (rawExt * time.dayFactor + rawInt * time.nightFactor) *
+    (rawExt * time.dayFactor + rawInt * time.nightFactor * weatherCasinoMul()) * weatherIncomeMul() *
     repFactor * happyFactor * nuisancePenalty * condFactor *
     season.incomeMul * eventIncome * powerPenalty * prestigeMul * staffIncomeMul
   );
@@ -192,7 +193,7 @@ export function calculateTotals() {
   const wages = totalWages();
   const totalIncome = grossIncome - wages;
 
-  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct) * competitionFactor();
+  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct) * competitionFactor() * weatherGuestMul();
   let guests = Math.round(capacity * Math.min(demandFactor, 3.0));
   if (hasBlackout) guests = Math.round(guests * 0.35);
   if (state.maxPopulation > 0) guests = Math.min(guests, state.maxPopulation);
