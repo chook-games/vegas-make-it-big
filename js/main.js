@@ -23,6 +23,7 @@ import { openRivalsScreen } from './ui/rivalsScreen.js';
 import { openSandboxScreen } from './ui/sandboxScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
+import { checkDailies, onDayPassed } from './game/missions.js';
 import { applyStaticI18n } from './i18n/i18n.js';
 import { setAllEdges } from './data/betting.js';
 import { openSettingsScreen } from './ui/settings.js';
@@ -100,6 +101,8 @@ function initUI() {
     spawnConfetti();
     openLevelUpScreen(data);
   });
+
+  Bus.on(EV.DAY_PASSED, onDayPassed);
 }
 
 function toggleSound() {
@@ -201,6 +204,7 @@ function incomeTick() {
   refreshPrestigeAlert();
   if (state.heatmap) applyHeatmap();
   checkCampaign();
+  checkDailies();
 }
 
 function refreshPrestigeAlert() {

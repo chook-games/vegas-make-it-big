@@ -29,6 +29,8 @@ export function freshState() {
     campaignIndex: 0,
     campaignStars: {},
     scenarioStartDay: 1,
+    dailies: [],
+    dailyDay: 1,
     gameMode: 'freeplay',
     npcs: [],
     maxPopulation: 0,
@@ -66,7 +68,7 @@ export function freshState() {
     event: null,
     tutorial: 0,
     tutorialDone: false,
-    stats: { totalEarned: 0, buildingsBuilt: 0, viewedInterior: false, prestiges: 0, guestsServed: 0, tipsEarned: 0 },
+    stats: { totalEarned: 0, buildingsBuilt: 0, viewedInterior: false, prestiges: 0, guestsServed: 0, tipsEarned: 0, upgrades: 0 },
     seenWelcome: false,
     lastSavedAt: Date.now()
   };

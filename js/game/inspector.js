@@ -118,6 +118,7 @@ function onUpgrade() {
 
   state.cash -= cost;
   cell.level += 1;
+  state.stats.upgrades = (state.stats.upgrades || 0) + 1;
   groupFor(world).remove(cell.mesh);
   const w = cell.w || 1, h = cell.h || 1;
   const cx = cell.cx != null ? cell.cx : cell.gx;

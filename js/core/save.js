@@ -36,6 +36,8 @@ export function serialize() {
     scenarioStartDay: state.scenarioStartDay,
     npcs: state.npcs,
     weather: state.weather,
+    dailies: state.dailies,
+    dailyDay: state.dailyDay,
     prestigeLevel: state.prestigeLevel,
     prestigePoints: state.prestigePoints,
     questIndex: state.questIndex,

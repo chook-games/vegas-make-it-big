@@ -10,8 +10,11 @@ import { rankFor } from '../data/levels.js';
 import { allItems } from '../data/buildings.js';
 import { STAFF } from '../data/staff.js';
 import { t } from '../i18n/i18n.js';
+import { dailiesSnapshot } from '../game/missions.js';
 
-export function openQuestsScreen() {
+let questTab = 'quests';
+
+function questsBody() {
   const rows = QUESTS.map((q, i) => {
     const done = i < state.questIndex;
     const current = i === state.questIndex;
@@ -36,9 +39,44 @@ export function openQuestsScreen() {
       <div class="list-check">${done ? '✅' : current ? '▶️' : '🔒'}</div>
     </div>`;
   }).join('');
-
   const doneCount = Math.min(state.questIndex, QUESTS.length);
-  openModal({ title: `📜 Quests (${doneCount}/${QUESTS.length})`, bodyHTML: rows });
+  return `<div class="center muted">Main Quests: ${doneCount}/${QUESTS.length}</div><div class="spacer"></div>${rows}`;
+}
+
+function dailyBody() {
+  const list = dailiesSnapshot();
+  const rows = list.map(m => {
+    const pct = Math.min(100, Math.round((m.current / m.target) * 100));
+    const reward = `$${(m.cash || 0).toLocaleString()}${m.gold ? ` +${m.gold}💎` : ''}`;
+    return `<div class="list-row ${m.done ? 'done' : ''}">
+      <div class="list-icon">📋</div>
+      <div class="list-main">
+        <div class="list-name">${m.done ? '✅ ' : ''}${m.label}</div>
+        <div class="list-progress"><i style="width:${pct}%"></i></div>
+        <div class="list-reward">${m.current} / ${m.target} · Reward: ${reward}</div>
+      </div>
+      <div class="list-check">${m.done ? '✅' : '⏳'}</div>
+    </div>`;
+  }).join('');
+  return `<div class="center muted">Daily missions refresh every 3 in-game days.</div><div class="spacer"></div>${rows}`;
+}
+
+export function openQuestsScreen() {
+  const tabs = `<div class="tab-bar">
+    <button class="tab-btn ${questTab === 'quests' ? 'active' : ''}" data-tab="quests">Main Quests</button>
+    <button class="tab-btn ${questTab === 'daily' ? 'active' : ''}" data-tab="daily">Daily Missions</button>
+  </div>`;
+  const body = questTab === 'quests' ? questsBody() : dailyBody();
+  openModal({
+    title: '📜 Quests & Missions',
+    bodyHTML: tabs + body,
+    onOpen: (bodyEl) => {
+      bodyEl.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+        questTab = b.dataset.tab;
+        openQuestsScreen();
+      }));
+    }
+  });
 }
 
 export function openAchievementsScreen() {
