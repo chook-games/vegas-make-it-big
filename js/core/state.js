@@ -21,6 +21,7 @@ export function freshState() {
     mode: 'exterior',
     selectedTool: null,
     dockCategory: { exterior: 'casino', interior: 'slots' },
+    dockMajor: { exterior: 'entertainment', interior: 'gambling' },
     gridSize: GRID_SIZE,
     tileSize: TILE_SIZE,
     exteriorGrid: {},

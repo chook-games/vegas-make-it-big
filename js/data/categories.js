@@ -101,6 +101,29 @@ export function categoriesFor(world) {
   return world === 'exterior' ? EXT_CATEGORIES : INT_CATEGORIES;
 }
 
+export const EXT_MAJOR = [
+  { id: 'facilities', name: 'Hotels & Facilities', icon: '🏨', subgroups: ['hotel', 'utility'] },
+  { id: 'entertainment', name: 'Casinos & Entertainment', icon: '🎰', subgroups: ['casino', 'attraction'] },
+  { id: 'services', name: 'Shops & Services', icon: '🛍️', subgroups: ['food', 'transport'] },
+  { id: 'scenery', name: 'Paths & Scenery', icon: '🌳', subgroups: ['paths', 'decor'] }
+];
+
+export const INT_MAJOR = [
+  { id: 'facilities', name: 'Staff & Facilities', icon: '🛠️', subgroups: ['support', 'security'] },
+  { id: 'gambling', name: 'Gambling', icon: '🎰', subgroups: ['slots', 'table'] },
+  { id: 'retail', name: 'Retail & Dining', icon: '🍸', subgroups: ['food'] },
+  { id: 'decor', name: 'Decor', icon: '🌿', subgroups: ['decor'] }
+];
+
+export function majorsFor(world) {
+  return world === 'exterior' ? EXT_MAJOR : INT_MAJOR;
+}
+
+export function majorFor(world, categoryId) {
+  const majors = majorsFor(world);
+  return majors.find(m => m.subgroups.includes(categoryId)) || majors[0];
+}
+
 export function categoryOf(world, id) {
   const map = world === 'exterior' ? EXT_MAP : INT_MAP;
   return map[id] || 'decor';

@@ -1,7 +1,7 @@
 import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { CATALOG, isUnlocked, lockLabel } from '../data/buildings.js';
-import { categoriesFor, categoryOf } from '../data/categories.js';
+import { categoriesFor, categoryOf, majorsFor } from '../data/categories.js';
 import { playSound } from '../audio/audio.js';
 import { cancelPendingPlacement } from '../game/placement.js';
 import { activeLot } from '../game/lots.js';
@@ -10,32 +10,52 @@ import { t } from '../i18n/i18n.js';
 export function renderDock() {
   const grid = document.getElementById('build-grid');
   const tabs = document.getElementById('dock-tabs');
+  const subtabs = document.getElementById('dock-subtabs');
   grid.innerHTML = '';
   tabs.innerHTML = '';
+  if (subtabs) subtabs.innerHTML = '';
 
+  const world = state.mode;
   const theme = activeLot() ? activeLot().theme : 'american';
-  const cats = categoriesFor(state.mode);
-  let cat = state.dockCategory[state.mode];
-  if (!cats.find(c => c.id === cat)) {
-    cat = cats[0].id;
-    state.dockCategory[state.mode] = cat;
+  const majors = majorsFor(world);
+  let major = majors.find(m => m.id === state.dockMajor[world]) || majors[0];
+  state.dockMajor[world] = major.id;
+
+  const minors = categoriesFor(world).filter(c => major.subgroups.includes(c.id));
+  let cat = state.dockCategory[world];
+  if (!minors.find(c => c.id === cat)) {
+    cat = minors.length ? minors[0].id : major.subgroups[0];
+    state.dockCategory[world] = cat;
   }
 
-  cats.forEach(c => {
+  majors.forEach(m => {
     const btn = document.createElement('button');
-    btn.className = 'dock-tab' + (c.id === cat ? ' active' : '');
-    btn.innerHTML = `<span class="dock-tab-icon">${c.icon}</span><span class="dock-tab-name">${t(c.name)}</span>`;
+    btn.className = 'dock-major' + (m.id === major.id ? ' active' : '');
+    btn.innerHTML = `<span class="dock-major-icon">${m.icon}</span><span class="dock-major-name">${t(m.name)}</span>`;
     btn.addEventListener('click', () => {
-      state.dockCategory[state.mode] = c.id;
+      state.dockMajor[world] = m.id;
+      state.dockCategory[world] = m.subgroups[0];
       playSound('preview');
       renderDock();
     });
     tabs.appendChild(btn);
   });
 
+  minors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'dock-tab' + (c.id === cat ? ' active' : '');
+    btn.innerHTML = `<span class="dock-tab-icon">${c.icon}</span><span class="dock-tab-name">${t(c.name)}</span>`;
+    btn.addEventListener('click', () => {
+      state.dockCategory[world] = c.id;
+      playSound('preview');
+      renderDock();
+    });
+    if (subtabs) subtabs.appendChild(btn);
+  });
+
   const statusEl = document.getElementById('dock-status');
   if (state.selectedTool) {
-    const all = CATALOG[state.mode];
+    const all = CATALOG[world];
     const sel = all.find(x => x.id === state.selectedTool);
     statusEl.textContent = sel ? `${t('Selected')}: ${t(sel.name)}` : t('Select a building');
     statusEl.style.color = '#ffd166';
@@ -44,11 +64,11 @@ export function renderDock() {
     statusEl.style.color = '#00f5d4';
   }
 
-  document.getElementById('dock-title').textContent = state.mode === 'exterior'
+  document.getElementById('dock-title').textContent = world === 'exterior'
     ? t('Resort Buildings') : t('Casino Equipment');
 
-  const list = CATALOG[state.mode].filter(item =>
-    (!item.themeOnly || item.themeOnly === theme) && categoryOf(state.mode, item.id) === cat
+  const list = CATALOG[world].filter(item =>
+    (!item.themeOnly || item.themeOnly === theme) && categoryOf(world, item.id) === cat
   );
 
   if (!list.length) {

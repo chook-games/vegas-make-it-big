@@ -350,3 +350,26 @@
   .objectives-panel { display: block; bottom: 8px; right: 8px; width: 300px; }
   .build-scroll { max-height: 92px; }
 }
+
+/* ===== Build menu: major groups + minor tabs ===== */
+.dock-major {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 10px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  color: #c9d6ee; font-weight: 700; font-size: 11.5px;
+  cursor: pointer; white-space: nowrap;
+}
+.dock-major.active {
+  border-color: var(--gold); color: #fff;
+  background: rgba(255,209,102,0.16);
+  box-shadow: 0 0 10px rgba(255,209,102,0.25);
+}
+.dock-major:active { transform: scale(0.97); }
+.dock-major-icon { font-size: 15px; }
+.dock-subtabs {
+  display: flex; gap: 4px; overflow-x: auto;
+  padding: 6px 0 2px; scrollbar-width: none; touch-action: pan-x;
+}
+.dock-subtabs::-webkit-scrollbar { display: none; }
