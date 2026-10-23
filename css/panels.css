@@ -373,3 +373,12 @@
   padding: 6px 0 2px; scrollbar-width: none; touch-action: pan-x;
 }
 .dock-subtabs::-webkit-scrollbar { display: none; }
+/* ===== Inspector tabs ===== */
+.insp-tabs { margin-bottom: 8px; }
+.insp-tabs .tab-btn { padding: 6px 4px; font-size: 11px; }
+.fin-line {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.fin-line > span { color: #9fb3d9; }

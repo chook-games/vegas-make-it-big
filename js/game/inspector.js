@@ -23,6 +23,8 @@ function gridFor(world, layer) {
   return layer ? state.interiorUpperGrid : state.interiorGrid;
 }
 
+let inspTab = 'info';
+
 export function openInspector(world, key, layer = 0) {
   if (state.pendingPlacement) return;
   const grid = gridFor(world, layer);
@@ -42,40 +44,65 @@ export function openInspector(world, key, layer = 0) {
 
   document.getElementById('insp-title').textContent = `${cell.item.icon} ${t(cell.item.name)} (Lv.${cell.level})`;
   const u = utilOf(cell.item.id);
-  let html = `<div>${t(cell.item.desc)}</div>`;
-  html += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / cycle</div>`;
+  const gambling = isGambling(world, cell.item.id);
   const utilParts = [];
   if (u.gp) utilParts.push(`+${u.gp} kW`);
   else if (u.p) utilParts.push(`⚡ ${u.p} kW`);
   if (u.gw) utilParts.push(`+${u.gw} water`);
   else if (u.w) utilParts.push(`💧 ${u.w}`);
-  if (utilParts.length) html += `<div style="margin-top:2px; color:#8fd0ff;">${utilParts.join(' · ')}</div>`;
-  if (stats.notes.length) html += `<div style="margin-top:4px; color:#ffd166;">${stats.notes.join('<br>')}</div>`;
 
-  const gambling = isGambling(world, cell.item.id);
-  if (gambling) {
-    const edge = cell.edge != null ? cell.edge : 12;
-    const bi = cell.betIndex != null ? cell.betIndex : 0;
-    html += `<div class="bet-box">
-      <div class="bet-row"><span>Bet Range</span>
-        <div class="bet-stepper">
-          <button id="insp-bet-dec">−</button>
-          <span id="insp-bet">${betLabel(bi)}</span>
-          <button id="insp-bet-inc">+</button>
+  const tabs = `<div class="tab-bar insp-tabs">
+    <button class="tab-btn ${inspTab === 'info' ? 'active' : ''}" data-itab="info">Info</button>
+    <button class="tab-btn ${inspTab === 'finance' ? 'active' : ''}" data-itab="finance">Finance</button>
+    <button class="tab-btn ${inspTab === 'upgrades' ? 'active' : ''}" data-itab="upgrades">Upgrades</button>
+  </div>`;
+
+  let content = '';
+  if (inspTab === 'finance') {
+    content += `<div class="fin-line"><span>Income / cycle</span><b style="color:#06d6a0">$${stats.income.toLocaleString()}</b></div>`;
+    content += `<div class="fin-line"><span>Power demand</span><b style="color:#9fd6ff">${u.p || 0} kW</b></div>`;
+    content += `<div class="fin-line"><span>Water demand</span><b style="color:#9fd6ff">${u.w || 0}</b></div>`;
+    if (utilParts.length) content += `<div class="fin-line"><span>Supply</span><b style="color:#ffd166">${utilParts.join(' · ')}</b></div>`;
+    if (gambling) {
+      const edge = cell.edge != null ? cell.edge : 12;
+      const bi = cell.betIndex != null ? cell.betIndex : 0;
+      content += `<div class="bet-box">
+        <div class="bet-row"><span>Bet Range</span>
+          <div class="bet-stepper">
+            <button id="insp-bet-dec">−</button>
+            <span id="insp-bet">${betLabel(bi)}</span>
+            <button id="insp-bet-inc">+</button>
+          </div>
         </div>
-      </div>
-      <div class="bet-row"><span>House Edge</span><span id="insp-edge" style="color:var(--neon-cyan)">${edge}% · ${edgeLabel(edge)}</span></div>
-      <input type="range" class="odds-slider" id="insp-edge-slider" min="4" max="28" value="${edge}">
-    </div>`;
+        <div class="bet-row"><span>House Edge</span><span id="insp-edge" style="color:var(--neon-cyan)">${edge}% · ${edgeLabel(edge)}</span></div>
+        <input type="range" class="odds-slider" id="insp-edge-slider" min="4" max="28" value="${edge}">
+      </div>`;
+    }
+  } else if (inspTab === 'upgrades') {
+    content += `<div class="fin-line"><span>Current level</span><b>Lv.${cell.level}</b></div>`;
+    content += `<div class="fin-line"><span>Upgrade cost</span><b style="color:var(--gold)">$${upg.toLocaleString()}</b></div>`;
+    content += `<div class="fin-line"><span>Next income</span><b style="color:#06d6a0">~$${Math.round(stats.income * (cell.level + 1) / cell.level).toLocaleString()}</b></div>`;
+    content += `<div class="muted" style="margin-top:8px;">Use the buttons below to upgrade, move or sell the building.</div>`;
+  } else {
+    content += `<div>${t(cell.item.desc)}</div>`;
+    content += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / cycle</div>`;
+    if (utilParts.length) content += `<div style="margin-top:2px; color:#8fd0ff;">${utilParts.join(' · ')}</div>`;
+    if (stats.notes.length) content += `<div style="margin-top:4px; color:#ffd166;">${stats.notes.join('<br>')}</div>`;
   }
 
-  document.getElementById('insp-body').innerHTML = html;
+  document.getElementById('insp-body').innerHTML = tabs + content;
   document.getElementById('insp-upgrade').textContent = `⬆️ Upgrade ($${upg})`;
   document.getElementById('insp-move').textContent = `🔄 Move ($${MOVE_ROTATE_COST})`;
   document.getElementById('insp-sell').textContent = `🗑️ Sell (+$${refund})`;
   document.getElementById('inspector').style.display = 'block';
 
-  if (gambling) {
+  const bodyEl = document.getElementById('insp-body');
+  bodyEl.querySelectorAll('[data-itab]').forEach(b => b.addEventListener('click', () => {
+    inspTab = b.dataset.itab;
+    openInspector(world, key, layer);
+  }));
+
+  if (gambling && inspTab === 'finance') {
     const dec = document.getElementById('insp-bet-dec');
     const inc = document.getElementById('insp-bet-inc');
     const slider = document.getElementById('insp-edge-slider');

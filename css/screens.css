@@ -325,3 +325,55 @@
 
 
 
+
+/* ===== Original-style lot selection map ===== */
+.lotmap-screen {
+  position: fixed; inset: 0; z-index: 85;
+  background: radial-gradient(circle at 50% 8%, #1a0f2e, #070510 75%);
+  display: flex; align-items: center; justify-content: center;
+  padding: calc(var(--safe-top) + 12px) 12px calc(var(--safe-bottom) + 12px);
+  overflow-y: auto;
+}
+.lotmap-inner { width: min(96vw, 860px); }
+.lotmap-top { text-align: center; margin-bottom: 10px; }
+.lotmap-title { font-size: 20px; font-weight: 800; color: var(--gold); }
+.lotmap-sub { font-size: 12px; color: #9aa; }
+.lotmap-body {
+  display: flex; gap: 10px; border: 1px solid var(--panel-border);
+  border-radius: 14px; overflow: hidden; min-height: 320px;
+  background: linear-gradient(180deg, #12203a, #0a1424);
+}
+.lotmap-road { position: relative; flex: 0 0 120px; background: linear-gradient(90deg, #2a2a36, #1c1c26); overflow: hidden; }
+.lotmap-road .map-lane-line {
+  top: 8%; bottom: 8%; left: 50%; right: auto; height: auto; width: 3px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(180deg, #ffd166 0 22px, transparent 22px 44px);
+}
+.lotmap-road .map-car { left: 14px; top: -30px; animation-name: driveDown; }
+.lotmap-road .map-car.delay1 { left: 44px; }
+.lotmap-road .map-car.delay2 { left: 72px; }
+.lotmap-road .map-car.delay3 { left: 88px; }
+.map-tram { position: absolute; left: 52px; top: -44px; font-size: 26px; animation: driveDown 9s linear infinite; animation-delay: 2s; }
+@keyframes driveDown { from { top: -44px; } to { top: 112%; } }
+.lotmap-plots { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
+.lotplot {
+  position: relative; display: flex; flex-direction: column; gap: 2px;
+  align-items: flex-start; text-align: left; padding: 12px;
+  border-radius: 10px; border: 2px solid rgba(80, 200, 120, 0.6);
+  background: rgba(30, 80, 50, 0.35); color: #fff; cursor: pointer;
+}
+.lotplot.selected { border-color: var(--gold); box-shadow: 0 0 18px rgba(255,209,102,0.6); background: rgba(80, 70, 30, 0.45); }
+.lotplot-ring { position: absolute; right: 10px; bottom: 10px; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--gold); opacity: 0; }
+.lotplot.selected .lotplot-ring { opacity: 1; }
+.lotplot-name { font-weight: 800; font-size: 13px; }
+.lotplot-size { font-size: 11px; color: #bfe6c8; }
+.lotplot-theme { font-size: 11px; color: #cfe0ff; }
+.lotplot-price { font-size: 11px; color: var(--gold); font-weight: 700; }
+.lotmap-footer { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.lotmap-sel { flex: 1 1 220px; font-size: 12px; color: #cbd; }
+.lotmap-footer .btn { width: auto; margin: 0; }
+@media (max-width: 700px) {
+  .lotmap-body { flex-direction: column; }
+  .lotmap-road { flex: 0 0 54px; }
+  .lotmap-plots { grid-template-columns: 1fr; }
+}
