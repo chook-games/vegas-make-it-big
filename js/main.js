@@ -63,6 +63,12 @@ function initUI() {
   document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
   document.getElementById('btn-rivals').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
   document.getElementById('btn-stats').addEventListener('click', () => { closeInspector(); openStatsScreen(); });
+  document.querySelectorAll('.pc-tool[data-speed]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.timeScale = parseInt(btn.dataset.speed, 10);
+      document.querySelectorAll('.pc-tool[data-speed]').forEach(b => b.classList.toggle('active', b === btn));
+    });
+  });
   document.getElementById('btn-layer').addEventListener('click', () => {
     if (state.mode !== 'interior') return;
     state.interiorLayer = state.interiorLayer === 1 ? 0 : 1;
@@ -155,20 +161,29 @@ function switchView() {
 }
 
 let lastGuestUpdate = 0;
+let incomeAcc = 0;
 function loop() {
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta() * 1000, 100);
   const t = clock.getElapsedTime();
+  const scale = state.timeScale == null ? 1 : state.timeScale;
+  const simDt = dt * scale;
 
   updateCamera();
   if (booted) {
-    updateDayNight(dt);
-    updateEvents(dt);
-    updateWeather(dt);
+    updateDayNight(simDt);
+    updateEvents(simDt);
+    updateWeather(simDt);
     const wid = weatherId();
     setWeatherParticles(wid);
     if (wid === 'storm' && Math.random() < 0.006) triggerLightning();
     tickLightning(dt / 1000);
+
+    incomeAcc += simDt;
+    if (incomeAcc >= TICK_MS) {
+      incomeAcc -= TICK_MS;
+      incomeTick();
+    }
   }
 
   if (state.pendingPlacement && state.pendingPlacement.mesh) {
@@ -183,14 +198,14 @@ function loop() {
     if (v.mesh.position.x < -20) v.mesh.position.x = 20;
   });
 
-  lastGuestUpdate += dt;
+  lastGuestUpdate += simDt;
   if (booted && lastGuestUpdate > 500) {
     lastGuestUpdate = 0;
     const totals = calculateTotals();
     state._blackout = totals.hasBlackout;
-    updateGuests(dt, totals);
+    updateGuests(simDt, totals);
   }
-  if (booted) animateGuests(dt);
+  if (booted) animateGuests(simDt);
   updateParticles(dt / 1000);
 
   renderFrame();
@@ -337,7 +352,6 @@ function boot() {
 }
 
 setInterval(() => { if (booted) save(); }, SAVE_INTERVAL_MS);
-setInterval(() => { if (booted) incomeTick(); }, TICK_MS);
 
 boot();
 loop();

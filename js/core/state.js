@@ -36,6 +36,7 @@ export function freshState() {
     dailyDay: 1,
     gameMode: 'freeplay',
     npcs: [],
+    timeScale: 1,
     maxPopulation: 0,
     eventsFreq: 1,
     disastersFreq: 1,

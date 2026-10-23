@@ -286,3 +286,67 @@
   border-radius: 5px;
   padding: 0 3px;
 }
+
+/* ===== Original-style PC UI ===== */
+.pc-toolbar { position: fixed; top: 8px; left: 246px; z-index: 12; display: none; gap: 4px; }
+.pc-tool {
+  width: 34px; height: 30px; border-radius: 7px;
+  background: rgba(20, 24, 40, 0.9); border: 1px solid rgba(140,170,220,0.5);
+  color: #cfe0ff; font-size: 14px; cursor: pointer;
+}
+.pc-tool.active { background: rgba(0,245,212,0.2); border-color: var(--neon-cyan); color: #fff; }
+.pc-tool:active { transform: scale(0.95); }
+
+.finance-strip {
+  display: flex; gap: 6px; align-items: stretch;
+  background: rgba(10, 14, 26, 0.95);
+  border: 1px solid rgba(140,170,220,0.35);
+  border-radius: 10px; padding: 6px 8px; margin-bottom: 6px;
+}
+.fin-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.fin-label { font-size: 9px; letter-spacing: 0.5px; color: #8fa4c8; }
+.fin-val { font-size: 13px; font-weight: 800; color: #ffd166; }
+#fin-profit { color: #06d6a0; }
+#fin-costs { color: #ff6b6b; }
+.fin-util { flex: 0 0 auto; gap: 2px; color: #9fd6ff; font-size: 11px; font-weight: 700; }
+
+.objectives-panel {
+  display: none;
+  position: fixed; z-index: 11;
+  background: rgba(10, 14, 26, 0.95);
+  border: 1px solid rgba(140,170,220,0.35);
+  border-radius: 12px; padding: 10px;
+  max-height: 46vh; overflow-y: auto;
+}
+.obj-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--gold); margin-bottom: 6px; }
+.obj-list { display: flex; flex-direction: column; gap: 6px; }
+.obj-row { font-size: 11.5px; color: #cbd; line-height: 1.35; }
+.obj-row b { color: #fff; }
+.obj-row.done { color: #6fe3b0; text-decoration: line-through; opacity: 0.8; }
+.obj-progress { height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; margin-top: 3px; overflow: hidden; }
+.obj-progress > i { display: block; height: 100%; background: var(--neon-cyan); }
+
+@media (min-width: 900px) {
+  .pc-toolbar { display: flex; left: 8px; top: 58px; }
+  .stats-bar {
+    position: fixed; top: 8px; right: 8px; left: auto;
+    width: 430px; grid-template-columns: repeat(5, 1fr);
+  }
+  .sub-bar {
+    position: fixed; top: 8px; left: 8px; width: auto; max-width: 560px;
+    flex-wrap: nowrap;
+  }
+  .info-strip {
+    position: fixed; top: 96px; right: 8px; left: auto;
+    justify-content: flex-end; max-width: 460px;
+  }
+  .hint-banner {
+    position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+    max-width: 460px; pointer-events: none;
+  }
+  .bottom-dock { left: 8px; right: auto; width: 58vw; max-width: 860px; }
+  .placement-bar { left: 8px; right: auto; width: 58vw; max-width: 860px; }
+  .inspector-card, .odds-modal { left: auto; right: 8px; width: 340px; top: 132px; }
+  .objectives-panel { display: block; bottom: 8px; right: 8px; width: 300px; }
+  .build-scroll { max-height: 92px; }
+}

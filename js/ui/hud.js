@@ -9,6 +9,7 @@ import { themeById } from '../data/themes.js';
 import { inCampaign, currentScenario, goalStatus } from '../game/campaign.js';
 import { playerRank } from '../game/npc.js';
 import { currentWeather } from '../game/weather.js';
+import { activeQuest, questProgress } from '../game/quests.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -74,7 +75,58 @@ export function updateHUD() {
     }
   }
 
+  updateFinance(totals);
+  updateObjectives();
+
   return totals;
+}
+
+function updateFinance(totals) {
+  const profit = document.getElementById('fin-profit');
+  if (!profit) return;
+  const income = totals.grossIncome;
+  const costs = totals.wages;
+  profit.textContent = `${totals.totalIncome >= 0 ? '+' : ''}$${Math.abs(totals.totalIncome).toLocaleString()}`;
+  profit.style.color = totals.totalIncome >= 0 ? '#06d6a0' : '#ff6b6b';
+  document.getElementById('fin-income').textContent = `$${income.toLocaleString()}`;
+  document.getElementById('fin-costs').textContent = `$${costs.toLocaleString()}`;
+  const pow = document.getElementById('fin-power');
+  pow.textContent = `⚡ ${totals.powerUsed}/${totals.powerCap}`;
+  pow.style.color = totals.powerShort ? '#ff6b6b' : '#9fd6ff';
+  const wat = document.getElementById('fin-water');
+  wat.textContent = `💧 ${totals.waterUsed}/${totals.waterCap}`;
+  wat.style.color = totals.waterShort ? '#ff6b6b' : '#9fd6ff';
+}
+
+function updateObjectives() {
+  const list = document.getElementById('objectives-list');
+  if (!list) return;
+  let rows = '';
+  if (inCampaign()) {
+    const sc = currentScenario();
+    if (sc) {
+      goalStatus().forEach(g => {
+        const pct = Math.min(100, g.pct);
+        rows += `<div class="obj-row ${g.done ? 'done' : ''}"><b>${g.done ? '✔ ' : ''}${g.label}</b>
+          <div class="obj-progress"><i style="width:${pct}%"></i></div>
+          <div style="font-size:10px;color:#889">${Math.min(g.current, g.target).toLocaleString()} / ${g.target.toLocaleString()}</div></div>`;
+      });
+    } else {
+      rows = '<div class="obj-row done">Campaign complete!</div>';
+    }
+  } else {
+    const q = activeQuest();
+    if (q) {
+      const p = questProgress(q);
+      const pct = Math.min(100, Math.round((p.current / p.target) * 100));
+      rows = `<div class="obj-row"><b>${q.icon} ${q.title}</b><div style="font-size:10.5px;color:#aab">${q.desc}</div>
+        <div class="obj-progress"><i style="width:${pct}%"></i></div>
+        <div style="font-size:10px;color:#889">${p.current} / ${p.target}</div></div>`;
+    } else {
+      rows = '<div class="obj-row done">All quests complete!</div>';
+    }
+  }
+  list.innerHTML = rows;
 }
 
 export function initHUD() {
