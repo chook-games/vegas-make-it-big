@@ -148,12 +148,13 @@ export function startFreePlayWithTheme(themeId) {
   save();
 }
 
-export function startFreePlayLot({ theme, radius, cash }) {
+export function startFreePlayLot({ theme, radius, cash, name }) {
   resetToNew();
   state.gameMode = 'freeplay';
   const lot = state.lots[0];
   lot.theme = theme || 'american';
   lot.radius = radius || 5;
+  if (name) lot.name = name;
   state.plots = 0;
   if (typeof cash === 'number') state.cash = cash;
   syncActiveGrids();

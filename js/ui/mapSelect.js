@@ -1,4 +1,5 @@
 import { THEMES } from '../data/themes.js';
+import { LOT_NAMES } from '../data/lots.js';
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -21,6 +22,7 @@ const LOT_SIZES = [
 
 export function openMapSelect({ onPick, onBack }) {
   const themes = shuffle(THEMES).slice(0, 3);
+  const names = shuffle(LOT_NAMES).slice(0, 3);
 
   const el = document.createElement('div');
   el.className = 'map-select';
@@ -40,7 +42,8 @@ export function openMapSelect({ onPick, onBack }) {
           ${LOT_SIZES.map((lot, i) => {
             const t = themes[i % themes.length];
             return `<button class="map-lot lot-${lot.id}" data-idx="${i}" style="border-color:${hex(t.accent)}">
-              <span class="map-lot-badge">${lot.label} · ${lot.radius * 2 + 1}×${lot.radius * 2 + 1}</span>
+              <span class="map-lot-badge">${names[i]}</span>
+              <span class="map-lot-size">${lot.label} · ${lot.radius * 2 + 1}×${lot.radius * 2 + 1}</span>
               <span class="map-lot-icon">${t.icon}</span>
               <span class="map-lot-name">${t.name}</span>
               <span class="map-lot-cost">${lot.cost ? '-$' + lot.cost.toLocaleString() : 'Free'} · start $${lot.cash.toLocaleString()}</span>
@@ -55,10 +58,11 @@ export function openMapSelect({ onPick, onBack }) {
 
   const close = () => el.remove();
   el.querySelectorAll('.map-lot').forEach(b => b.addEventListener('click', () => {
-    const lot = LOT_SIZES[parseInt(b.dataset.idx, 10)];
-    const t = themes[parseInt(b.dataset.idx, 10) % themes.length];
+    const idx = parseInt(b.dataset.idx, 10);
+    const lot = LOT_SIZES[idx];
+    const t = themes[idx % themes.length];
     close();
-    onPick && onPick({ theme: t.id, radius: lot.radius, cash: lot.cash });
+    onPick && onPick({ theme: t.id, radius: lot.radius, cash: lot.cash, name: names[idx] });
   }));
   el.querySelector('[data-back]').addEventListener('click', () => {
     close();

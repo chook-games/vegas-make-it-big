@@ -318,6 +318,7 @@
 }
 .map-lot:active { transform: scale(0.97); }
 .map-lot-badge { font-size: 10px; color: #aab; }
+.map-lot-size { font-size: 9px; color: #8fd0ff; }
 .map-lot-icon { font-size: 30px; }
 .map-lot-name { font-size: 11px; font-weight: 700; }
 .map-lot-cost { font-size: 9px; color: var(--gold); text-align: center; line-height: 1.25; }

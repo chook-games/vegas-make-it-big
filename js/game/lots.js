@@ -4,6 +4,7 @@ import { exteriorGroup, interiorGroup, pickableTilesExt, pickableTilesInt } from
 import { createBuildingMesh } from '../three/meshes.js';
 import { applyRadius, applyThemeToTiles, findTile } from '../three/worlds.js';
 import { themeById } from '../data/themes.js';
+import { randomLotName } from '../data/lots.js';
 import { save } from '../core/save.js';
 import { invalidateHeat, computeLotHeatmap } from './noise.js';
 import { invalidatePaths } from './paths.js';
@@ -120,7 +121,7 @@ export function buyLot(themeId) {
   }
   state.cash -= cost;
   const id = state.lots.length;
-  const lot = makeLot(id, themeId || 'american', `Lot ${id + 1}`);
+  const lot = makeLot(id, themeId || 'american', randomLotName(state.lots.map(l => l.name)));
   state.lots.push(lot);
   playSound('levelup');
   vibrate(30);
