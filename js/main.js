@@ -21,6 +21,7 @@ import { openMainMenu } from './ui/mainMenu.js';
 import { openMapSelect } from './ui/mapSelect.js';
 import { openRivalsScreen } from './ui/rivalsScreen.js';
 import { openStatsScreen } from './ui/statsScreen.js';
+import { openPricingScreen } from './ui/pricingScreen.js';
 import { openSandboxScreen } from './ui/sandboxScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
@@ -63,6 +64,7 @@ function initUI() {
   document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
   document.getElementById('btn-rivals').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
   document.getElementById('btn-stats').addEventListener('click', () => { closeInspector(); openStatsScreen(); });
+  document.getElementById('btn-prices').addEventListener('click', () => { closeInspector(); openPricingScreen(); });
   document.querySelectorAll('.pc-tool[data-speed]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.timeScale = parseInt(btn.dataset.speed, 10);

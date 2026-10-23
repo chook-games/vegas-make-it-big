@@ -33,6 +33,16 @@ function hasLandmark(id) {
   return false;
 }
 
+function hasBuilding(id) {
+  const lot = state.lots[state.activeLot];
+  if (!lot) return false;
+  const grids = [lot.exteriorGrid, lot.interiorGrid, lot.interiorUpperGrid || {}];
+  for (const grid of grids) {
+    for (const k in grid) if (grid[k].item.id === id) return true;
+  }
+  return false;
+}
+
 function totalStaffCount() {
   let n = 0;
   for (const id in state.staff) n += state.staff[id];
@@ -50,6 +60,7 @@ function goalCurrent(g) {
     case 'lotBuildings': return lotBuildings();
     case 'guests': return calculateTotals().guests;
     case 'landmark': return hasLandmark(g.target) ? 1 : 0;
+    case 'build': return hasBuilding(g.target) ? 1 : 0;
     default: return 0;
   }
 }

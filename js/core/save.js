@@ -21,6 +21,7 @@ export function serialize() {
     v: 3,
     cash: state.cash,
     houseEdge: state.houseEdge,
+    prices: state.prices,
     reputation: state.reputation,
     happiness: state.happiness,
     condition: state.condition,

@@ -1,6 +1,7 @@
 import {
   GRID_SIZE, TILE_SIZE, START_CASH, START_HOUSE_EDGE, START_REPUTATION
 } from './constants.js';
+import { defaultPrices } from '../data/goods.js';
 
 export function makeLot(id, theme, name) {
   return {
@@ -18,6 +19,7 @@ export function freshState() {
   return {
     cash: START_CASH,
     houseEdge: START_HOUSE_EDGE,
+    prices: defaultPrices(),
     mode: 'exterior',
     selectedTool: null,
     dockCategory: { exterior: 'casino', interior: 'slots' },

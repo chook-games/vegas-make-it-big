@@ -5,6 +5,7 @@ import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
 import { utilOf } from '../data/utilities.js';
 import { stationIncomeFactor, isGambling } from '../data/betting.js';
+import { GOODS, goodForVenue, priceT } from '../data/goods.js';
 import { weatherGuestMul, weatherIncomeMul, weatherCasinoMul } from './weather.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
@@ -72,6 +73,12 @@ export function evaluateTileStats(world, cell, grid, heat, openSet, staffing) {
       inc *= staffing;
       if (staffing < 0.6) notes.push('Not enough croupiers - stations run slow.');
     }
+  }
+  const good = goodForVenue(cell.item.id);
+  if (good) {
+    const price = (state.prices && state.prices[good.id] != null) ? state.prices[good.id] : good.def;
+    inc *= 0.5 + priceT(good, price) * 1.3;
+    if (priceT(good, price) > 0.75) notes.push('Prices are high - guests may complain.');
   }
   return { income: Math.round(inc), notes };
 }
@@ -206,7 +213,14 @@ export function calculateTotals() {
   const wages = totalWages();
   const totalIncome = grossIncome - wages;
 
-  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct) * competitionFactor() * weatherGuestMul();
+  let priceSum = 0;
+  for (const g of GOODS) {
+    const price = (state.prices && state.prices[g.id] != null) ? state.prices[g.id] : g.def;
+    priceSum += priceT(g, price);
+  }
+  const avgPriceT = priceSum / GOODS.length;
+
+  const demandFactor = repFactor * edgeGuestFactor * season.guestMul * time.dayFactor * eventGuest * prestigeMul * (1 + eff.guestPct) * competitionFactor() * weatherGuestMul() * (1 - 0.22 * avgPriceT);
   let guests = Math.round(capacity * Math.min(demandFactor, 3.0));
   if (hasBlackout) guests = Math.round(guests * 0.35);
   if (state.maxPopulation > 0) guests = Math.min(guests, state.maxPopulation);
@@ -223,7 +237,7 @@ export function calculateTotals() {
     edgeGuestFactor, repFactor, happyFactor,
     prestigeMul, eventIncome, eventGuest, staffEff: eff,
     avgNoise, avgSmell, nuisancePenalty, condFactor,
-    staffing, stations, croupiers
+    staffing, stations, croupiers, avgPriceT
   };
 }
 
@@ -233,7 +247,7 @@ export function calculateLotTotals(lot) {
 
 export function updateHappinessAndReputation(totals) {
   let target = 55 + totals.edgeGuestFactor * 30 + (totals.staffEff ? totals.staffEff.happiness : 0);
-  target -= (totals.avgNoise * 20 + totals.avgSmell * 18);
+  target -= (totals.avgNoise * 20 + totals.avgSmell * 18 + (totals.avgPriceT || 0) * 18);
   if (totals.hasBlackout) target = 28;
   const overcrowded = totals.fill > 1.15;
   if (overcrowded) target -= 25;

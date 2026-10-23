@@ -1,10 +1,11 @@
 export const SCENARIOS = [
   {
     id: 's1', title: 'Welcome to The Strip', theme: 'american', startCash: 5000,
-    desc: 'Your first lot. Learn the ropes: buy land, build a motel and attract your first guests.',
+    desc: 'Your first lot. Build a hotel, open a casino and attract your first guests.',
     targetDays: 2, reward: { cash: 3000 },
     goals: [
-      { type: 'lotBuildings', target: 3, label: '3 buildings on the lot' },
+      { type: 'build', target: 'hotel', label: 'Build a Hotel' },
+      { type: 'build', target: 'casino', label: 'Build a Casino' },
       { type: 'guests', target: 30, label: '30 guests' }
     ]
   },
