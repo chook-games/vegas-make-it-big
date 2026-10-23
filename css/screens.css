@@ -382,3 +382,15 @@
 .price-head { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; font-weight: 700; color: #dfe3ff; }
 .price-val { color: var(--gold); }
 .price-meta { display: flex; justify-content: space-between; font-size: 10px; color: #889; }
+/* ===== Staff wages ===== */
+.wage-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 8px; padding: 8px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+}
+.wage-btns { display: flex; gap: 4px; }
+.wage-btn {
+  padding: 6px 9px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05); color: #aaa; font-weight: 700; font-size: 11px; cursor: pointer;
+}
+.wage-btn.active { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,212,0.12); }

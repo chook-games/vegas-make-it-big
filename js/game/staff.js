@@ -1,6 +1,6 @@
 import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
-import { STAFF, findStaff, staffUnlocked, staffMax, staffLockLabel } from '../data/staff.js';
+import { STAFF, WAGE_LEVELS, findStaff, staffUnlocked, staffMax, staffLockLabel } from '../data/staff.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { save } from '../core/save.js';
 
@@ -17,7 +17,8 @@ export function totalStaff() {
 export function totalWages() {
   let w = 0;
   for (const def of STAFF) w += countOf(def.id) * def.wage;
-  return w;
+  const level = WAGE_LEVELS[state.staffWageIndex || 1] || WAGE_LEVELS[1];
+  return Math.round(w * level.mul);
 }
 
 export function hire(id) {
@@ -74,5 +75,7 @@ export function staffEffects() {
   eff.happiness = Math.min(eff.happiness, 40);
   eff.crime = Math.min(eff.crime, 0.9);
   eff.repair = Math.min(eff.repair, 40);
+  const level = WAGE_LEVELS[state.staffWageIndex || 1] || WAGE_LEVELS[1];
+  eff.incomePct *= level.skill;
   return eff;
 }

@@ -62,7 +62,17 @@ function setGuestIcon(guest, icon) {
   if (!sprite) return;
   const tex = iconTexture(icon);
   if (sprite.material) sprite.material.map = tex;
-  sprite.visible = true;
+  sprite.visible = needsVisible;
+}
+
+let needsVisible = true;
+
+export function setNeedsVisible(v) {
+  needsVisible = !!v;
+  for (const g of walkers) {
+    const s = g.mesh.userData.sprite;
+    if (s) s.visible = needsVisible;
+  }
 }
 
 function spawnPos(world) {

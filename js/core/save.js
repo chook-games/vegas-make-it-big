@@ -29,6 +29,7 @@ export function serialize() {
     xp: state.xp,
     gold: state.gold,
     staff: state.staff,
+    staffWageIndex: state.staffWageIndex,
     plots: state.plots,
     activeLot: state.activeLot,
     gameMode: state.gameMode,

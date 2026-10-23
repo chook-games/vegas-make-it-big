@@ -1,6 +1,6 @@
 import { state } from '../core/state.js';
 import { openModal, closeModal } from './modals.js';
-import { STAFF, staffUnlocked, staffMax, staffLockLabel } from '../data/staff.js';
+import { STAFF, WAGE_LEVELS, staffUnlocked, staffMax, staffLockLabel } from '../data/staff.js';
 import { countOf, hire, fire, totalWages, totalStaff } from '../game/staff.js';
 import { isGambling } from '../data/betting.js';
 
@@ -45,8 +45,18 @@ function buildBody() {
     </div>`;
   }).join('');
 
+  const idx = state.staffWageIndex || 1;
+  const wage = WAGE_LEVELS[idx] || WAGE_LEVELS[1];
+  const wageRow = `<div class="wage-row">
+    <div class="settings-label">Wages: <b>${wage.name}</b> · skill ×${wage.skill}</div>
+    <div class="wage-btns">
+      ${WAGE_LEVELS.map((w, i) => `<button class="wage-btn ${i === idx ? 'active' : ''}" data-wage="${i}">${w.name}</button>`).join('')}
+    </div>
+  </div>`;
+
   return `<div class="center muted">Total: <b>${totalStaff()}</b> staff · Wages <b>$${totalWages()}</b> / cycle</div>
-    <div class="center ${cover < 100 ? 'muted' : 'muted'}" style="color:${cover < 100 ? '#ff8080' : '#06d6a0'}">Croupiers: ${croupiers}/${stations} gambling stations covered (${cover}%)</div>
+    <div class="center muted" style="color:${cover < 100 ? '#ff8080' : '#06d6a0'}">Croupiers: ${croupiers}/${stations} gambling stations covered (${cover}%)</div>
+    ${wageRow}
     <div class="spacer"></div>${rows}`;
 }
 
@@ -55,6 +65,10 @@ function render() {
     title: '👔 Staff',
     bodyHTML: buildBody(),
     onOpen: (bodyEl) => {
+      bodyEl.querySelectorAll('[data-wage]').forEach(b => b.addEventListener('click', () => {
+        state.staffWageIndex = parseInt(b.dataset.wage, 10);
+        render();
+      }));
       bodyEl.querySelectorAll('[data-hire]').forEach(b => b.addEventListener('click', () => {
         hire(b.dataset.hire);
         render();

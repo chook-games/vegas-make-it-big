@@ -2,6 +2,7 @@ import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { pickableTilesExt, pickableTilesInt } from '../three/scene.js';
 import { getLotHeat } from '../game/lots.js';
+import { calculateTotals } from '../game/economy.js';
 
 function mix(a, b, t) {
   const ca = new THREE.Color(a);
@@ -39,6 +40,28 @@ export function clearHeatmap() {
       delete t.userData.baseMat;
     }
   });
+}
+
+let utilityOn = false;
+
+export function applyUtilityOverlay() {
+  clearHeatmap();
+  const totals = calculateTotals();
+  const shortage = totals.powerShort || totals.waterShort;
+  const color = shortage ? 0x6a1616 : 0x16603a;
+  const paint = (tiles) => tiles.forEach(t => {
+    if (!t.userData.baseMat) t.userData.baseMat = t.material;
+    t.material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.55 });
+  });
+  paint(pickableTilesExt);
+  paint(pickableTilesInt);
+  utilityOn = true;
+}
+
+export function clearUtilityOverlay() {
+  if (!utilityOn) return;
+  utilityOn = false;
+  clearHeatmap();
 }
 
 export function toggleHeatmap(on) {

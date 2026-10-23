@@ -1,3 +1,9 @@
+export const WAGE_LEVELS = [
+  { name: 'Low', mul: 0.7, skill: 0.85 },
+  { name: 'Normal', mul: 1.0, skill: 1.0 },
+  { name: 'High', mul: 1.4, skill: 1.15 }
+];
+
 export const STAFF = [
   { id: 'cleaner', name: 'Cleaner', icon: '🧹', cost: 400, wage: 22, maxBase: 8,
     effect: { happiness: 1.6, repair: 0.5 }, requires: { level: 2 },
