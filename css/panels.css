@@ -518,3 +518,11 @@
 .sm-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .sm-btn:active { transform: scale(0.94); }
 .sm-lock { font-size: 11px; }
+/* ===== Lot title bar arrows ===== */
+.dock-arrow {
+  width: 24px; height: 22px; border-radius: 6px; padding: 0;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05); color: #cfe0ff;
+  font-size: 10px; cursor: pointer; flex: 0 0 auto;
+}
+.dock-arrow:active { transform: scale(0.94); }

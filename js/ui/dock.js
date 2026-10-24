@@ -4,7 +4,8 @@ import { CATALOG, isUnlocked, lockLabel } from '../data/buildings.js';
 import { categoriesFor, categoryOf, majorsFor } from '../data/categories.js';
 import { playSound } from '../audio/audio.js';
 import { cancelPendingPlacement } from '../game/placement.js';
-import { activeLot } from '../game/lots.js';
+import { activeLot, switchLot } from '../game/lots.js';
+import { themeById } from '../data/themes.js';
 import { t } from '../i18n/i18n.js';
 import { renderPeoplePanel, renderFinancePanel, renderStaffPanel } from './peoplePanel.js';
 
@@ -99,8 +100,11 @@ export function renderDock() {
     statusEl.style.color = '#00f5d4';
   }
 
-  document.getElementById('dock-title').textContent = world === 'exterior'
-    ? t('Resort Buildings') : t('Casino Equipment');
+  const lot = activeLot();
+  const th = lot ? themeById(lot.theme) : null;
+  document.getElementById('dock-title').textContent = th
+    ? `${th.icon} ${lot.name} · 👤 · ${world === 'exterior' ? t('Resort') : t('Casino')}`
+    : (world === 'exterior' ? t('Resort Buildings') : t('Casino Equipment'));
 
   const list = CATALOG[world].filter(item =>
     (!item.themeOnly || item.themeOnly === theme) && categoryOf(world, item.id) === cat
@@ -164,4 +168,18 @@ export function initDock() {
       renderDock();
     });
   });
+
+  const cycleLot = (dir) => {
+    if (state.lots.length < 2) return;
+    if (state.pendingPlacement) cancelPendingPlacement();
+    Bus.emit(EV.INSPECTOR_CLOSE);
+    let idx = state.activeLot + dir;
+    if (idx < 0) idx = state.lots.length - 1;
+    if (idx >= state.lots.length) idx = 0;
+    switchLot(idx);
+  };
+  const prev = document.getElementById('lot-prev');
+  const next = document.getElementById('lot-next');
+  if (prev) prev.addEventListener('click', () => cycleLot(-1));
+  if (next) next.addEventListener('click', () => cycleLot(1));
 }
