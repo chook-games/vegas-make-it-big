@@ -138,7 +138,7 @@ export function initControls(opts) {
     }
     if (Date.now() - lastTouch < 600) return;
     if (!mouseDown) {
-      if (hovering()) onHover(e.clientX, e.clientY);
+      if (hovering() && e.target === dom) onHover(e.clientX, e.clientY);
       return;
     }
     if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) isDragging = true;

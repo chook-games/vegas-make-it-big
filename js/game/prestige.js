@@ -33,6 +33,7 @@ function clearAllBuildings() {
   const theme = state.lots[0] ? state.lots[0].theme : 'american';
   state.lots = [makeLot(0, theme, 'Lot 1')];
   state.activeLot = 0;
+  state.interiorLayer = 0;
   syncActiveGrids();
   clearWalkers();
   state.pendingPlacement = null;
