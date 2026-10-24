@@ -67,6 +67,17 @@ function countUpper() {
   return Object.keys(lot.interiorUpperGrid || {}).length;
 }
 
+function countBuild(id) {
+  const lot = state.lots[state.activeLot];
+  if (!lot) return 0;
+  let n = 0;
+  const grids = [lot.exteriorGrid, lot.interiorGrid, lot.interiorUpperGrid || {}];
+  for (const grid of grids) {
+    for (const k in grid) if (grid[k].item.id === id) n++;
+  }
+  return n;
+}
+
 function totalStaffCount() {
   let n = 0;
   for (const id in state.staff) n += state.staff[id];
@@ -85,6 +96,7 @@ function goalCurrent(g) {
     case 'guests': return calculateTotals().guests;
     case 'landmark': return hasLandmark(g.target) ? 1 : 0;
     case 'build': return hasBuilding(g.target) ? 1 : 0;
+    case 'countBuild': return countBuild(g.target);
     case 'upgradeBuilding': return hasUpgraded(g.target) ? 1 : 0;
     case 'paths': return countPaths();
     case 'cashierVisit': return state.stats.cashierVisits || 0;
@@ -99,7 +111,7 @@ export function goalStatus() {
   const sc = currentScenario();
   if (!sc) return [];
   return sc.goals.map(g => {
-    const target = typeof g.target === 'number' ? g.target : 1;
+    const target = g.amount != null ? g.amount : (typeof g.target === 'number' ? g.target : 1);
     const current = goalCurrent(g);
     return {
       label: g.label,
