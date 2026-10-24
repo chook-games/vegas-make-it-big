@@ -56,6 +56,7 @@ export function openInspector(world, key, layer = 0) {
     <button class="tab-btn ${inspTab === 'info' ? 'active' : ''}" data-itab="info">Info</button>
     <button class="tab-btn ${inspTab === 'finance' ? 'active' : ''}" data-itab="finance">Finance</button>
     <button class="tab-btn ${inspTab === 'upgrades' ? 'active' : ''}" data-itab="upgrades">Upgrades</button>
+    <button class="tab-btn ${inspTab === 'history' ? 'active' : ''}" data-itab="history">History</button>
   </div>`;
 
   let content = '';
@@ -84,6 +85,21 @@ export function openInspector(world, key, layer = 0) {
     content += `<div class="fin-line"><span>Upgrade cost</span><b style="color:var(--gold)">$${upg.toLocaleString()}</b></div>`;
     content += `<div class="fin-line"><span>Next income</span><b style="color:#06d6a0">~$${Math.round(stats.income * (cell.level + 1) / cell.level).toLocaleString()}</b></div>`;
     content += `<div class="muted" style="margin-top:8px;">Use the buttons below to upgrade, move or sell the building.</div>`;
+  } else if (inspTab === 'history') {
+    const hist = Array.isArray(state.history) ? state.history.slice(-32) : [];
+    content += `<div class="muted">Lot income per cycle (last ${hist.length} samples)</div>`;
+    if (!hist.length) {
+      content += `<div class="muted" style="margin-top:10px;">No history yet — let the casino run.</div>`;
+    } else {
+      const max = Math.max(1, ...hist.map(v => Math.abs(v)));
+      content += `<div class="hist-bars">` + hist.map(v => {
+        const h = Math.max(4, Math.round((Math.abs(v) / max) * 70));
+        const color = v >= 0 ? '#06d6a0' : '#ff6b6b';
+        return `<div class="hist-bar" style="height:${h}px;background:${color}" title="$${v}"></div>`;
+      }).join('') + `</div>`;
+      const last = hist[hist.length - 1];
+      content += `<div class="fin-line" style="margin-top:8px;"><span>Latest</span><b style="color:${last >= 0 ? '#06d6a0' : '#ff6b6b'}">$${last.toLocaleString()}</b></div>`;
+    }
   } else {
     content += `<div>${t(cell.item.desc)}</div>`;
     content += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / cycle</div>`;

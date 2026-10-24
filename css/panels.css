@@ -472,3 +472,10 @@
   font-size: 11px; color: #cbd; margin-top: 4px;
 }
 .people-breakdown b { color: #fff; }
+/* ===== History sparkline ===== */
+.hist-bars {
+  display: flex; align-items: flex-end; gap: 2px;
+  height: 78px; margin-top: 8px; padding: 4px;
+  background: rgba(0,0,0,0.25); border-radius: 8px;
+}
+.hist-bar { flex: 1; min-width: 2px; border-radius: 1px 1px 0 0; opacity: 0.9; }

@@ -158,6 +158,9 @@ function leave(guest) {
   const lot = activeLot();
   guest.venue = null;
   setGuestIcon(guest, '💤');
+  if ((guest.mood || 60) < 45) {
+    Bus.emit(EV.FLOATING, { position: guest.mesh.position, text: '👎', color: '#ff4d4d' });
+  }
   if (guest.world === 'exterior') {
     const p = getPaths(lot, 'exterior');
     let front = null, fz = -Infinity;
@@ -311,6 +314,9 @@ export function animateGuests(dtMs) {
       if (g.usingTick >= 1.3 && g.venue) { g.usingTick = 0; spend(g); }
       if (g.timer <= 0) {
         g.mood = Math.min(100, (g.mood || 60) + 6);
+        if (Math.random() < 0.35) {
+          Bus.emit(EV.FLOATING, { position: g.mesh.position, text: '👍', color: '#06d6a0' });
+        }
         g.planIndex++;
         nextActivity(g);
       }

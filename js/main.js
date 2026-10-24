@@ -240,6 +240,9 @@ function loop() {
 
 function incomeTick() {
   const totals = doIncomeTick();
+  if (!Array.isArray(state.history)) state.history = [];
+  state.history.push(totals.totalIncome);
+  if (state.history.length > 48) state.history.shift();
   npcTick();
   updateHUD();
 

@@ -47,6 +47,7 @@ export function freshState() {
     disastersFreq: 1,
     unlockAll: false,
     weather: null,
+    history: [],
     viewFilter: { needs: true, heat: false, utilities: false },
     heatmap: false,
     inspectedKey: null,
