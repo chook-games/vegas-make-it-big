@@ -4,7 +4,7 @@ import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from
 import { hasSave, load, save, resetToNew } from './core/save.js';
 import { createWorlds } from './three/worlds.js';
 import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
-import { renderFrame, initPostFX, resizePostFX } from './three/postfx.js';
+import { renderFrame, initPostFX, resizePostFX, setBloom } from './three/postfx.js';
 import { updateParticles, spawnConfetti, spawnMoneyBurst, setWeatherParticles, updateWeatherParticles, triggerLightning, tickLightning } from './three/particles.js';
 import { initControls, updateCamera, rotateCameraStep, wanderStep } from './three/controls.js';
 import { initToast, spawnFloatingText } from './ui/toast.js';
@@ -188,12 +188,30 @@ function switchView() {
 
 let lastGuestUpdate = 0;
 let incomeAcc = 0;
+let fpsAcc = 0;
+let fpsFrames = 0;
 function loop() {
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta() * 1000, 100);
   const t = clock.getElapsedTime();
   const scale = state.timeScale == null ? 1 : state.timeScale;
   const simDt = dt * scale;
+
+  fpsAcc += dt;
+  fpsFrames++;
+  if (fpsAcc >= 2500) {
+    const fps = (fpsFrames * 1000) / fpsAcc;
+    fpsAcc = 0;
+    fpsFrames = 0;
+    if (state.settings.autoQuality && fps < 28 && !state._autoReduced) {
+      state._autoReduced = true;
+      state.settings.shadows = false;
+      state.settings.bloom = false;
+      applySettings();
+      setBloom(false);
+      Bus.emit(EV.TOAST, { text: '⚙️ Auto-reduced graphics for performance.', kind: 'info' });
+    }
+  }
 
   updateCamera();
   if (state.wander) wanderStep(dt);

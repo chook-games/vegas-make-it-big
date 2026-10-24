@@ -74,6 +74,7 @@ export function freshState() {
       vibration: true,
       shadows: true,
       bloom: true,
+      autoQuality: true,
       quality: 'high'
     },
     clock: { day: 1, hour: 8, season: 'summer', seasonIndex: 1 },

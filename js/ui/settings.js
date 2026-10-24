@@ -39,6 +39,7 @@ export function openSettingsScreen() {
     ${toggleRow('📳 Vibration', 'Haptic feedback (mobile)', 'vibration')}
     ${toggleRow('🌑 Shadows', 'Prettier but heavier', 'shadows')}
     ${bloomAvailable() ? toggleRow('✨ Bloom (Neon Glow)', 'Glow on lights, heavier', 'bloom') : ''}
+    ${toggleRow('🖥️ Auto quality', 'Lowers shadows/bloom if FPS drops', 'autoQuality')}
     <div class="spacer"></div>
     <div class="muted">Tools</div>
     <div class="tool-grid">
