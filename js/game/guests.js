@@ -114,6 +114,10 @@ function spawnGuest(world) {
     usingTick: 0,
     mood: 55 + Math.random() * 20
   };
+  if (Math.random() < 0.35) {
+    const at = Math.floor(Math.random() * guest.plan.length);
+    guest.plan.splice(at, 0, 'money');
+  }
   nextActivity(guest);
   return guest;
 }

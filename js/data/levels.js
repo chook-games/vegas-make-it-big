@@ -1,8 +1,8 @@
 export const MAX_LEVEL = 50;
-export const BASE_XP = 120;
+export const BASE_XP = 80;
 
 export function xpForLevel(level) {
-  return Math.round(BASE_XP * Math.pow(level, 1.5));
+  return Math.round(BASE_XP * Math.pow(level, 1.4));
 }
 
 export function levelReward(level) {
@@ -29,8 +29,8 @@ export function rankFor(level) {
 }
 
 export const XP = {
-  build: 0.02,
-  upgrade: 0.015,
+  build: 0.03,
+  upgrade: 0.02,
   income: 0.00001,
   quest: 60,
   achievement: 40,
