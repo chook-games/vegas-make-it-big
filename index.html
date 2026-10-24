@@ -22,78 +22,61 @@
   <div id="floating-container"></div>
   <div id="toast-container"></div>
 
+  <!-- ORIGINAL-STYLE TOP LEFT TOOLBAR -->
   <div class="pc-toolbar" id="pc-toolbar">
+    <button class="pc-tool" id="btn-options" title="Options">⚙️</button>
+    <button class="pc-tool" id="btn-objectives" title="Objectives">📜</button>
+    <button class="pc-tool" id="btn-players" title="Players">👤</button>
+    <button class="pc-tool" id="btn-shot" title="Screenshot">📷</button>
+    <button class="pc-tool" id="btn-wander" title="Wander mode">✋</button>
+    <span class="pc-sep"></span>
     <button class="pc-tool" data-speed="0" title="Pause">⏸</button>
     <button class="pc-tool active" data-speed="1" title="Normal speed">▶</button>
     <button class="pc-tool" data-speed="2" title="Fast">⏩</button>
     <button class="pc-tool" data-speed="3" title="Fastest">⏭</button>
   </div>
 
-  <div class="top-hud">
-    <div class="stats-bar">
-      <div class="stat-item">
-        <span class="stat-label" data-i18n="Cash">Cash</span>
-        <span class="stat-val" id="ui-cash">$5,000</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label" data-i18n="Income / cycle">Income / cycle</span>
-        <span class="stat-val" id="ui-income" style="color:#06d6a0;">+$0</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label" data-i18n="Power">⚡ Power</span>
-        <span class="stat-val" id="ui-power" style="color:#00f5d4;">0/70</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label" data-i18n="Water">💧 Water</span>
-        <span class="stat-val" id="ui-water" style="color:#4da6ff;">0/90</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label" data-i18n="Guests">Guests</span>
-        <span class="stat-val" id="ui-guests" style="color:#ff9ebb;">12</span>
-      </div>
+  <!-- ORIGINAL-STYLE TOP RIGHT STATUS -->
+  <div class="status-panel" id="status-panel">
+    <div class="status-main">
+      <span id="ui-clock">☀️ Day 1 • 08:00</span>
+      <span id="ui-cash" class="status-cash">$5,000</span>
     </div>
+    <div class="status-sub">
+      <span id="ui-lot">Lot 1</span>
+      <span id="ui-rep">⭐ Rep 10</span>
+      <span id="ui-gold">💎 0</span>
+      <span id="ui-staff">👔 0</span>
+      <span id="ui-level">Lv.1</span>
+      <span id="ui-season">☀️</span>
+      <span id="ui-weather">Clear</span>
+    </div>
+  </div>
 
-    <div class="xp-bar">
-      <div class="xp-fill" id="ui-xp-fill"></div>
-      <span class="xp-label" id="ui-level">Lv.1</span>
-    </div>
+  <!-- LEFT SIDE TABS (original-style vertical strip) -->
+  <div class="side-tabs" id="side-tabs">
+    <button class="side-tab" id="btn-switch-view" title="Casino / Strip">🎰</button>
+    <button class="side-tab" id="btn-campaign" title="Campaign">🎯</button>
+    <button class="side-tab" id="btn-lots" title="Lots">🏙️</button>
+    <button class="side-tab" id="btn-plots" title="Expand Lot">🗺️</button>
+    <span class="side-sep"></span>
+    <button class="side-tab" id="btn-staff" title="Staff">👔</button>
+    <button class="side-tab" id="btn-stats" title="Statistics">📊</button>
+    <button class="side-tab" id="btn-prices" title="Price List">💲</button>
+    <span class="side-sep"></span>
+    <button class="side-tab" id="btn-heat" title="Noise / Smell Heatmap">🌡️</button>
+    <button class="side-tab" id="btn-view" title="View Filters">🔍</button>
+    <button class="side-tab" id="btn-layer" title="Floor (interior)" style="display:none;">⬆️</button>
+    <span class="side-sep"></span>
+    <button class="side-tab" id="btn-ach" title="Achievements">🏆</button>
+    <button class="side-tab" id="btn-prestige" title="Prestige">💎</button>
+    <button class="side-tab" id="btn-odds" title="Casino Odds">🎲</button>
+    <button class="side-tab" id="btn-cam-rotate" title="Rotate Camera">🎥</button>
+    <button class="side-tab" id="btn-sound" title="Sound">🔊</button>
+  </div>
 
-    <div class="sub-bar">
-      <button class="mode-switch-btn" id="btn-switch-view" data-i18n="Casino">Casino</button>
-      <button class="icon-btn" id="btn-campaign" title="Campaign">🎯</button>
-      <button class="icon-btn" id="btn-rivals" title="Rivals / Leaderboard">🏁</button>
-      <button class="icon-btn" id="btn-stats" title="Statistics">📊</button>
-      <button class="icon-btn" id="btn-lots" title="Vegas Strip / Lots">🏙️</button>
-      <button class="icon-btn" id="btn-plots" title="Expand Lot">🗺️</button>
-      <button class="icon-btn" id="btn-heat" title="Noise / Smell Heatmap">🌡️</button>
-      <button class="icon-btn" id="btn-view" title="View Filters">🔍</button>
-      <button class="icon-btn" id="btn-layer" title="Floor (interior)" style="display:none;">⬆️</button>
-      <button class="icon-btn" id="btn-staff" title="Staff">👔</button>
-      <button class="icon-btn" id="btn-quests" title="Quests">📜</button>
-      <button class="icon-btn" id="btn-ach" title="Achievements">🏆</button>
-      <button class="icon-btn" id="btn-prestige" title="Prestige">💎</button>
-      <button class="icon-btn" id="btn-cam-rotate" title="Rotate Camera">🎥</button>
-      <button class="icon-btn" id="btn-sound" title="Sound">🔊</button>
-      <button class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
-      <button class="odds-btn" id="btn-odds">🎲 <span id="ui-odds-val">12%</span></button>
-      <button class="icon-btn" id="btn-prices" title="Price List">💲</button>
-    </div>
-
-    <div class="info-strip">
-      <span class="info-chip" id="ui-goal" style="display:none;">🎯</span>
-      <span class="info-chip" id="ui-rank">🏁 #1/3</span>
-      <span class="info-chip" id="ui-lot">🇺🇸 Lot 1</span>
-      <span class="info-chip" id="ui-rep">⭐ Rep 10</span>
-      <span class="info-chip" id="ui-gold">💎 0</span>
-      <span class="info-chip" id="ui-staff">👔 0 staff</span>
-      <span class="info-chip" id="ui-clock">☀️ Day 1 • 08:00</span>
-      <span class="info-chip" id="ui-season">☀️ Summer</span>
-      <span class="info-chip" id="ui-weather">☀️ Clear</span>
-    </div>
-
-    <div class="hint-banner" id="ui-hint">
-      Pick a building below or tap an existing building on the map for options!
-    </div>
+  <div class="hint-banner" id="ui-hint">
+    Pick a building below or tap an existing building on the map for options!
   </div>
 
   <div class="placement-bar" id="placement-bar">
@@ -127,7 +110,7 @@
       <button class="inspector-close" id="odds-close">✕</button>
     </div>
     <div style="font-size:12px; color:#ccc; margin-bottom:6px;">
-      Set the <b>House Edge</b>. A low edge draws more guests, a high edge earns fast but scares off VIPs.
+      Set the <b>House Edge</b> for all stations. A low edge draws more guests; a high edge earns fast but scares VIPs.
     </div>
     <input type="range" min="4" max="28" value="12" class="odds-slider" id="odds-slider" />
     <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gold); font-weight:700;">
@@ -143,6 +126,7 @@
       <div class="fin-col"><span class="fin-label">INCOME</span><span class="fin-val" id="fin-income">$0</span></div>
       <div class="fin-col"><span class="fin-label">COSTS</span><span class="fin-val" id="fin-costs">$0</span></div>
       <div class="fin-col fin-util"><span id="fin-power">⚡ 0</span><span id="fin-water">💧 0</span></div>
+      <div class="fin-col fin-util"><span id="fin-guests">👥 0</span><span id="fin-odds">🎲 12%</span></div>
     </div>
     <div class="dock-header">
       <span id="dock-title">Resort Buildings</span>

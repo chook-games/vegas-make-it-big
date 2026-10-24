@@ -6,7 +6,7 @@ import { createWorlds } from './three/worlds.js';
 import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
 import { renderFrame, initPostFX, resizePostFX } from './three/postfx.js';
 import { updateParticles, spawnConfetti, spawnMoneyBurst, setWeatherParticles, updateWeatherParticles, triggerLightning, tickLightning } from './three/particles.js';
-import { initControls, updateCamera, rotateCameraStep } from './three/controls.js';
+import { initControls, updateCamera, rotateCameraStep, wanderStep } from './three/controls.js';
 import { initToast, spawnFloatingText } from './ui/toast.js';
 import { initHUD, updateHUD } from './ui/hud.js';
 import { initDock, renderDock } from './ui/dock.js';
@@ -58,12 +58,18 @@ function initUI() {
   document.getElementById('btn-switch-view').addEventListener('click', switchView);
   document.getElementById('btn-cam-rotate').addEventListener('click', () => { rotateCameraStep(); playSound('rotate'); });
   document.getElementById('btn-sound').addEventListener('click', toggleSound);
-  document.getElementById('btn-settings').addEventListener('click', () => { closeInspector(); openSettingsScreen(); });
+  document.getElementById('btn-options').addEventListener('click', () => { closeInspector(); openSettingsScreen(); });
   document.getElementById('btn-staff').addEventListener('click', () => { closeInspector(); openStaffScreen(); });
   document.getElementById('btn-plots').addEventListener('click', () => { closeInspector(); openPlotsScreen(); });
   document.getElementById('btn-lots').addEventListener('click', () => { closeInspector(); openLotScreen(); });
   document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
-  document.getElementById('btn-rivals').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
+  document.getElementById('btn-players').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
+  document.getElementById('btn-objectives').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
+  document.getElementById('btn-shot').addEventListener('click', takeScreenshot);
+  document.getElementById('btn-wander').addEventListener('click', () => {
+    state.wander = !state.wander;
+    document.getElementById('btn-wander').classList.toggle('active', state.wander);
+  });
   document.getElementById('btn-stats').addEventListener('click', () => { closeInspector(); openStatsScreen(); });
   document.getElementById('btn-prices').addEventListener('click', () => { closeInspector(); openPricingScreen(); });
   document.getElementById('btn-view').addEventListener('click', () => { closeInspector(); openViewFilterScreen(); });
@@ -86,7 +92,6 @@ function initUI() {
     renderDock();
   });
   document.getElementById('btn-heat').addEventListener('click', () => toggleHeatmap());
-  document.getElementById('btn-quests').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
   document.getElementById('btn-ach').addEventListener('click', () => { closeInspector(); openAchievementsScreen(); });
   document.getElementById('btn-prestige').addEventListener('click', () => { closeInspector(); openPrestigeScreen(); });
 
@@ -97,7 +102,6 @@ function initUI() {
   document.getElementById('odds-close').addEventListener('click', () => { oddsModal.style.display = 'none'; });
   document.getElementById('odds-slider').addEventListener('input', (e) => {
     state.houseEdge = parseInt(e.target.value, 10);
-    document.getElementById('ui-odds-val').textContent = `${state.houseEdge}%`;
     document.getElementById('odds-modal-label').textContent = `${state.houseEdge}% House Edge`;
     setAllEdges(state.houseEdge);
     Bus.emit('odds:set', state.houseEdge);
@@ -136,6 +140,24 @@ function toggleSound() {
   save();
 }
 
+function takeScreenshot() {
+  try {
+    const canvas = document.querySelector('#canvas-container canvas');
+    if (!canvas || !canvas.toBlob) return;
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vegas-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    });
+  } catch (e) {}
+}
+
 function switchView() {
   if (state.pendingPlacement) cancelPendingPlacement();
   closeInspector();
@@ -146,7 +168,7 @@ function switchView() {
     exteriorGroup.visible = false;
     interiorGroup.visible = true;
     state.stats.viewedInterior = true;
-    document.getElementById('btn-switch-view').textContent = '🌴 Exit to Strip';
+    document.getElementById('btn-switch-view').title = 'Exit to Strip';
     document.getElementById('btn-layer').style.display = '';
     document.getElementById('btn-layer').textContent = state.interiorLayer === 1 ? '⬇️' : '⬆️';
     document.getElementById('ui-hint').innerHTML = '🃏 <b>Casino:</b> Pick a table below or tap one to Rotate/Upgrade!';
@@ -155,7 +177,7 @@ function switchView() {
     interiorGroup.visible = false;
     exteriorGroup.visible = true;
     state.interiorLayer = 0;
-    document.getElementById('btn-switch-view').textContent = '🎰 Enter Casino';
+    document.getElementById('btn-switch-view').title = 'Enter Casino';
     document.getElementById('btn-layer').style.display = 'none';
     document.getElementById('ui-hint').innerHTML = '🌴 <b>Strip:</b> Tap a building to Upgrade/Move or build a new one!';
   }
@@ -174,6 +196,7 @@ function loop() {
   const simDt = dt * scale;
 
   updateCamera();
+  if (state.wander) wanderStep(dt);
   if (booted) {
     updateDayNight(simDt);
     updateEvents(simDt);

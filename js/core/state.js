@@ -40,6 +40,7 @@ export function freshState() {
     gameMode: 'freeplay',
     npcs: [],
     timeScale: 1,
+    wander: false,
     maxPopulation: 0,
     eventsFreq: 1,
     disastersFreq: 1,

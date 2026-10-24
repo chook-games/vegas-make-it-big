@@ -22,6 +22,10 @@ export function rotateCameraStep() {
   camTargetAngle += Math.PI / 2;
 }
 
+export function wanderStep(dt) {
+  camTargetAngle += dt * 0.00025;
+}
+
 export function updateCamera() {
   if (Math.abs(camTargetAngle - camAngle) > 0.005) {
     camAngle += (camTargetAngle - camAngle) * 0.12;
