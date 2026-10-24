@@ -1,11 +1,12 @@
 const NOISE_SRC = {
   slots: 0.55, craps: 0.8, sicbo: 0.7, nightclub: 0.9, boxing: 1.0,
-  generator: 0.65, powerplant: 0.85, rollercoaster: 0.9, stadium: 0.8, helipad: 0.7
+  generator: 0.65, powerplant: 0.85, rollercoaster: 0.9, stadium: 0.8, helipad: 0.7,
+  circus: 0.7, theatre: 0.5, carjackpot: 0.7, progressiveslots: 0.6
 };
 
 const SMELL_SRC = {
   buffet: 0.7, foodcourt: 0.8, generator: 0.5, powerplant: 0.6,
-  restaurant: 0.4, restroom: 1.0, stadium: 0.3
+  restaurant: 0.4, restroom: 1.0, stadium: 0.3, kitchen: 0.6
 };
 
 const CLEANERS = {

@@ -40,9 +40,42 @@ function makeTransparent(group) {
   });
 }
 
+function resolveBuilder(item) {
+  if (EXTERIOR[item.id]) return EXTERIOR[item.id];
+  if (INTERIOR[item.id]) return INTERIOR[item.id];
+  const id = item.id;
+  if (id.includes('hotel')) return EXTERIOR.hotel;
+  if (id.includes('casino')) return EXTERIOR.casino;
+  if (id.includes('pool') || id === 'waterride') return EXTERIOR.pool;
+  if (id === 'circus' || id === 'tennisclub' || id === 'arcade') return EXTERIOR.ferris;
+  if (id === 'sign') return EXTERIOR.restaurant;
+  if (id.includes('slot') || id === 'videopoker' || id === 'carjackpot') return INTERIOR.slots;
+  if (id === 'blackjack' || id === 'texasholdem' || id === 'paigow' || id === 'caribbeanstud' || id === 'wheeloffortune') return INTERIOR.poker;
+  if (id === 'firstaid') return INTERIOR.restroom;
+  if (id === 'atm') return INTERIOR.cashier;
+  if (id === 'kitchen') return INTERIOR.buffet;
+  if (id === 'jewelrystore') return INTERIOR.giftshop;
+  if (id === 'theatre' || id === 'museum') return INTERIOR.nightclub;
+  return null;
+}
+
+function genericMesh(item, level) {
+  const g = new THREE.Group();
+  const tier = item.tier || 1;
+  const h = 0.6 + tier * 0.3;
+  const mat = new THREE.MeshStandardMaterial({ color: 0x4b5563 + (tier * 0x111111), roughness: 0.6 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.5, h * (1 + (level - 1) * 0.2), 1.3), mat);
+  body.position.y = (h * (1 + (level - 1) * 0.2)) / 2;
+  g.add(body);
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.06), new THREE.MeshBasicMaterial({ color: 0xffd166 }));
+  sign.position.set(0, 0.4, 0.68);
+  g.add(sign);
+  return g;
+}
+
 export function createBuildingMesh(item, level = 1, isGhost = false, ctx = {}) {
-  const builder = EXTERIOR[item.id] || INTERIOR[item.id];
-  const group = builder ? builder(item, level, ctx) : new THREE.Group();
+  const builder = resolveBuilder(item);
+  const group = builder ? builder(item, level, ctx) : genericMesh(item, level);
 
   const fp = ctx.footprint;
   if (fp) {

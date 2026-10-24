@@ -65,7 +65,15 @@ const U = {
   restroom: { p: 6, w: 15 },
   plants: { p: 0, w: 1 },
   path_concrete: { p: 0, w: 0 },
-  path_pavement: { p: 0, w: 0 }
+  path_pavement: { p: 0, w: 0 },
+  mediumhotel: { p: 22, w: 30 }, largehotel: { p: 40, w: 55 },
+  mediumcasino: { p: 28, w: 20 }, largecasino: { p: 55, w: 40 },
+  circus: { p: 25, w: 10 }, wavepool: { p: 20, w: 50 }, waterride: { p: 22, w: 45 },
+  tennisclub: { p: 12, w: 8 }, arcade: { p: 18, w: 4 }, sign: { p: 0, w: 0 },
+  videopoker: { p: 4, w: 1 }, blackjack: { p: 4, w: 1 }, wheeloffortune: { p: 6, w: 2 },
+  carjackpot: { p: 8, w: 1 }, progressiveslots: { p: 6, w: 1 }, texasholdem: { p: 5, w: 1 },
+  paigow: { p: 5, w: 1 }, caribbeanstud: { p: 5, w: 1 }, firstaid: { p: 4, w: 6 },
+  atm: { p: 3, w: 1 }, kitchen: { p: 14, w: 10 }, jewelrystore: { p: 8, w: 3 }, theatre: { p: 18, w: 6 }
 };
 
 export function utilOf(id) {

@@ -14,12 +14,12 @@ export const DESIRES = {
 const VENUE_LIST = {
   gambling: ['slots', 'roulette', 'craps', 'sicbo', 'keno', 'baccarat', 'poker', 'sportsbook', 'vip_bj', 'highlimit', 'casino'],
   drink: ['bar', 'lounge', 'nightclub'],
-  entertainment: ['cinema', 'stadium', 'boxing', 'nightclub'],
+  entertainment: ['cinema', 'stadium', 'boxing', 'nightclub', 'theatre', 'circus'],
   toilet: ['restroom'],
   rest: ['lounge', 'gardens', 'pool'],
   food: ['restaurant', 'buffet', 'foodcourt'],
   activity: ['pool', 'golf', 'ferris', 'rollercoaster', 'aquarium', 'gardens', 'marina', 'cinema'],
-  shopping: ['mall', 'giftshop'],
+  shopping: ['mall', 'giftshop', 'jewelrystore'],
   sleep: ['hotel'],
   money: ['cashier', 'cage']
 };

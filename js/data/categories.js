@@ -69,7 +69,10 @@ const EXT_MAP = {
   decor_cactus: 'decor',
   decor_palm: 'decor',
   decor_banner: 'decor',
-  decor_pillar: 'decor'
+  decor_pillar: 'decor',
+  mediumhotel: 'hotel', largehotel: 'hotel', mediumcasino: 'casino', largecasino: 'casino',
+  circus: 'attraction', wavepool: 'attraction', waterride: 'attraction', tennisclub: 'attraction',
+  arcade: 'attraction', sign: 'decor'
 };
 
 const INT_MAP = {
@@ -98,7 +101,10 @@ const INT_MAP = {
   security: 'security',
   wall: 'decor',
   stairs: 'support',
-  plants: 'decor'
+  plants: 'decor',
+  videopoker: 'slots', progressiveslots: 'slots', carjackpot: 'slots',
+  blackjack: 'table', wheeloffortune: 'table', texasholdem: 'table', paigow: 'table', caribbeanstud: 'table',
+  firstaid: 'support', atm: 'support', kitchen: 'support', jewelrystore: 'food', theatre: 'food'
 };
 
 export function categoriesFor(world) {

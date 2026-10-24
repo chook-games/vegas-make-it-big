@@ -11,7 +11,12 @@ export const SIZES = {
   keno: [2, 2], bar: [2, 2], poker: [2, 2], sicbo: [2, 2], craps: [2, 2], baccarat: [2, 2],
   giftshop: [2, 2], lounge: [3, 3], cage: [2, 2], sportsbook: [3, 2], buffet: [3, 2], foodcourt: [3, 3],
   spa: [3, 2], nightclub: [3, 3], highlimit: [3, 3], boxing: [4, 3], vault: [2, 2], restroom: [2, 2],
-  plants: [1, 1], path_concrete: [1, 1], path_pavement: [1, 1]
+  plants: [1, 1], path_concrete: [1, 1], path_pavement: [1, 1],
+  mediumhotel: [3, 3], largehotel: [4, 4], mediumcasino: [3, 3], largecasino: [4, 4],
+  circus: [3, 3], wavepool: [3, 3], waterride: [3, 3], tennisclub: [3, 2], arcade: [2, 2], sign: [1, 1],
+  videopoker: [2, 1], blackjack: [2, 2], wheeloffortune: [3, 3], carjackpot: [3, 1], progressiveslots: [3, 1],
+  texasholdem: [2, 2], paigow: [2, 2], caribbeanstud: [2, 2], firstaid: [2, 2], atm: [1, 1],
+  kitchen: [3, 2], jewelrystore: [2, 2], theatre: [3, 3],
 };
 
 export function sizeOf(id) {
