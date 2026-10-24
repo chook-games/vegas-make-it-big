@@ -2,7 +2,8 @@ import { state, activeLot } from './core/state.js';
 import { Bus, EV } from './core/events.js';
 import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
 import { hasSave, load, save, resetToNew } from './core/save.js';
-import { createWorlds } from './three/worlds.js';
+import { createWorlds, animateCityPeds } from './three/worlds.js';
+import { rebuildCity } from './three/city.js';
 import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
 import { renderFrame, initPostFX, resizePostFX, setBloom } from './three/postfx.js';
 import { updateParticles, spawnConfetti, spawnMoneyBurst, setWeatherParticles, updateWeatherParticles, triggerLightning, tickLightning } from './three/particles.js';
@@ -189,6 +190,7 @@ function switchView() {
 
 let lastGuestUpdate = 0;
 let incomeAcc = 0;
+let cityAcc = 0;
 let fpsAcc = 0;
 let fpsFrames = 0;
 function loop() {
@@ -230,6 +232,8 @@ function loop() {
       incomeAcc -= TICK_MS;
       incomeTick();
     }
+    cityAcc += dt;
+    if (cityAcc > 8000) { cityAcc = 0; rebuildCity(); }
   }
 
   if (state.pendingPlacement && state.pendingPlacement.mesh) {
@@ -238,10 +242,11 @@ function loop() {
 
   animatedObjects.forEach(obj => { if (obj.type === 'spin') obj.mesh.rotation.y += 0.035; });
 
+  animateCityPeds(dt);
   vehicles.forEach(v => {
     v.mesh.position.x += v.speed;
-    if (v.mesh.position.x > 20) v.mesh.position.x = -20;
-    if (v.mesh.position.x < -20) v.mesh.position.x = 20;
+    if (v.mesh.position.x > 112) v.mesh.position.x = -112;
+    if (v.mesh.position.x < -112) v.mesh.position.x = 112;
   });
 
   lastGuestUpdate += simDt;
@@ -372,6 +377,7 @@ function boot() {
     renderDock();
     refreshPrestigeAlert();
     initHeatmap();
+    rebuildCity();
   };
 
   document.getElementById('loading').classList.add('hide');

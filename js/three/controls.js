@@ -2,7 +2,7 @@ import { camera, renderer } from './scene.js';
 import { state } from '../core/state.js';
 
 function lim() {
-  return Math.floor(state.gridSize / 2) * state.tileSize + 2;
+  return Math.max(46, Math.floor(state.gridSize / 2) * state.tileSize + 2);
 }
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
@@ -98,7 +98,7 @@ export function initControls(opts) {
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-      camRadius = Math.max(12, Math.min(48, camRadius + (pinchDist - newDist) * 0.045));
+      camRadius = Math.max(12, Math.min(80, camRadius + (pinchDist - newDist) * 0.045));
       pinchDist = newDist;
       updateCameraPosition();
     }
@@ -166,7 +166,7 @@ export function initControls(opts) {
   dom.addEventListener('contextmenu', (e) => e.preventDefault());
 
   dom.addEventListener('wheel', (e) => {
-    camRadius = Math.max(12, Math.min(48, camRadius + e.deltaY * 0.015));
+    camRadius = Math.max(12, Math.min(80, camRadius + e.deltaY * 0.015));
     updateCameraPosition();
   }, { passive: true });
 

@@ -9,6 +9,7 @@ const MAX_HALF = 11;
 let stripGroup = null;
 let interiorWalls = null;
 const allExt = [];
+export const cityPeds = [];
 const allInt = [];
 let groundMesh = null;
 let floorMesh = null;
@@ -86,7 +87,7 @@ export function createWorlds() {
   }
 
   groundMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(70, 70),
+    new THREE.PlaneGeometry(320, 120),
     new THREE.MeshStandardMaterial({ color: 0x120e24, roughness: 0.9 })
   );
   groundMesh.rotation.x = -Math.PI / 2;
@@ -95,20 +96,20 @@ export function createWorlds() {
 
   stripGroup = new THREE.Group();
   const road = new THREE.Mesh(
-    new THREE.BoxGeometry(44, 0.12, 4.2),
+    new THREE.BoxGeometry(240, 0.12, 4.2),
     new THREE.MeshStandardMaterial({ color: 0x2b2b36, roughness: 0.85 })
   );
   road.position.y = -0.02;
   stripGroup.add(road);
 
   const sidewalkMat = new THREE.MeshStandardMaterial({ color: 0xc2c2c2, roughness: 0.95 });
-  const curbNeg = new THREE.Mesh(new THREE.BoxGeometry(46, 0.18, 1.7), sidewalkMat);
+  const curbNeg = new THREE.Mesh(new THREE.BoxGeometry(242, 0.18, 1.7), sidewalkMat);
   curbNeg.position.set(0, 0.03, -2.95);
-  const curbPos = new THREE.Mesh(new THREE.BoxGeometry(46, 0.18, 1.7), sidewalkMat);
+  const curbPos = new THREE.Mesh(new THREE.BoxGeometry(242, 0.18, 1.7), sidewalkMat);
   curbPos.position.set(0, 0.03, 2.95);
   stripGroup.add(curbNeg, curbPos);
 
-  for (let i = -20; i <= 20; i += 2.5) {
+  for (let i = -116; i <= 116; i += 2.5) {
     const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.14, 0.15), new THREE.MeshBasicMaterial({ color: 0xffd166 }));
     stripe.position.set(i, -0.01, 0);
     stripGroup.add(stripe);
@@ -116,12 +117,12 @@ export function createWorlds() {
 
   const railMat = new THREE.MeshStandardMaterial({ color: 0x6a6f7a, metalness: 0.6, roughness: 0.4 });
   for (const rz of [-0.9, -0.5]) {
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(44, 0.1, 0.09), railMat);
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(240, 0.1, 0.09), railMat);
     rail.position.set(0, 0.0, rz);
     stripGroup.add(rail);
   }
 
-  for (const cx of [-9, -3, 3, 9]) {
+  for (const cx of [-60, -30, 0, 30, 60]) {
     for (let cz = -1.7; cz <= 1.7; cz += 0.55) {
       const bar = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.15, 0.28), new THREE.MeshBasicMaterial({ color: 0xf2f2f2 }));
       bar.position.set(cx, -0.005, cz);
@@ -140,9 +141,38 @@ export function createWorlds() {
   const tramWin = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.34, 0.66), new THREE.MeshBasicMaterial({ color: 0x9ad0ff }));
   tramWin.position.y = 0.62;
   tram.add(tramBody, tramRoof, tramWin);
-  tram.position.set(-14, 0.06, -0.7);
+  tram.position.set(-80, 0.06, -0.7);
   stripGroup.add(tram);
-  vehicles.push({ mesh: tram, speed: 0.03 });
+  vehicles.push({ mesh: tram, speed: 0.04 });
+
+  for (let i = 0; i < 26; i++) {
+    const ped = new THREE.Group();
+    const body = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.15, 0.46, 6),
+      new THREE.MeshStandardMaterial({ color: [0x00bbf9, 0xff9ebb, 0xffd166, 0x9b5de5, 0x06d6a0][i % 5] })
+    );
+    body.position.y = 0.3;
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.11, 6, 6), new THREE.MeshStandardMaterial({ color: 0xffcba4 }));
+    head.position.y = 0.65;
+    ped.add(body, head);
+    const side = i % 2 === 0 ? 1 : -1;
+    ped.position.set((Math.random() - 0.5) * 220, 0.06, side * 3.6);
+    stripGroup.add(ped);
+    cityPeds.push({ mesh: ped, speed: (i % 3 === 0 ? -1 : 1) * (0.02 + Math.random() * 0.03) });
+  }
+
+  const skyline = new THREE.Group();
+  for (let i = 0; i < 34; i++) {
+    const h = 6 + Math.random() * 26;
+    const w = 6 + Math.random() * 8;
+    const b = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, 8 + Math.random() * 6),
+      new THREE.MeshStandardMaterial({ color: [0x1b2436, 0x22304a, 0x2a3550][i % 3], roughness: 0.9 })
+    );
+    b.position.set(-160 + i * 10 + Math.random() * 4, h / 2, -38 - Math.random() * 10);
+    skyline.add(b);
+  }
+  exteriorGroup.add(skyline);
 
   exteriorGroup.add(stripGroup);
 
@@ -175,7 +205,7 @@ export function createWorlds() {
     cabin.position.y = 0.65;
     car.add(body, cabin);
     const dir = i % 2 === 0 ? 1 : -1;
-    car.position.set((Math.random() - 0.5) * 26, 0.06, dir * 0.95);
+    car.position.set((Math.random() - 0.5) * 220, 0.06, dir * 0.95);
     car.userData.dir = dir;
     stripGroup.add(car);
     vehicles.push({ mesh: car, speed: (0.06 + Math.random() * 0.05) * dir });
@@ -193,4 +223,14 @@ export function expandWorld() {
 
 export function worldRadius() {
   return Math.floor(state.gridSize / 2);
+}
+
+export function animateCityPeds(dtMs) {
+  const dt = dtMs / 1000;
+  for (const p of cityPeds) {
+    p.mesh.position.x += p.speed * dt * 60;
+    if (p.mesh.position.x > 112) p.mesh.position.x = -112;
+    if (p.mesh.position.x < -112) p.mesh.position.x = 112;
+    p.mesh.position.y = 0.06 + Math.abs(Math.sin(performance.now() * 0.006 + p.mesh.position.x)) * 0.04;
+  }
 }

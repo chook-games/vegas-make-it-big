@@ -5,6 +5,7 @@ import { createBuildingMesh } from '../three/meshes.js';
 import { applyRadius, applyThemeToTiles, findTile } from '../three/worlds.js';
 import { themeById } from '../data/themes.js';
 import { randomLotName } from '../data/lots.js';
+import { rebuildCity } from '../three/city.js';
 import { save } from '../core/save.js';
 import { invalidateHeat, computeLotHeatmap } from './noise.js';
 import { invalidatePaths } from './paths.js';
@@ -96,6 +97,7 @@ export function switchLot(index, force = false) {
   applyRadius(lot.radius || 7);
   applyThemeToTiles(themeById(lot.theme));
   buildMeshes(lot);
+  rebuildCity();
 
   state.pendingPlacement = null;
   state.selectedTool = null;
@@ -134,6 +136,7 @@ export function buyLot(themeId) {
 export function rebuildActiveLot() {
   const lot = state.lots[state.activeLot];
   buildMeshes(lot);
+  rebuildCity();
 }
 
 export function registerNewBuilding(cell, world) {

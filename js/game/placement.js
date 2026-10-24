@@ -10,9 +10,11 @@ import { spawnFloatingText } from '../ui/toast.js';
 import { playSound, vibrate } from '../audio/audio.js';
 import { addXP } from './leveling.js';
 import { XP, xpForCost } from '../data/levels.js';
-import { markLotDirty, currentTheme } from './lots.js';
+import { markLotDirty, currentTheme, buyLot, canBuyLot, switchLot } from './lots.js';
 import { getOccupancy, getUpperOccupancy, upperSupport } from './paths.js';
 import { isGambling, defaultBetIndex } from '../data/betting.js';
+import { randomTheme } from '../data/themes.js';
+import { cityInteractives } from '../three/city.js';
 import { t } from '../i18n/i18n.js';
 
 export const FLOOR_H = 1.15;
@@ -343,11 +345,34 @@ function resolveCell(world, layer, tileKey) {
   return occ.get(tileKey) || null;
 }
 
+function handleCityTap(ray) {
+  if (!cityInteractives.length) return false;
+  const hits = ray.intersectObjects(cityInteractives, false);
+  if (!hits.length) return false;
+  const data = hits[0].object.userData;
+  if (data.kind === 'buyPlot') {
+    if (!canBuyLot()) {
+      Bus.emit(EV.TOAST, { text: 'Max lots reached.', kind: 'info' });
+      return true;
+    }
+    buyLot(randomTheme());
+    return true;
+  }
+  if (data.kind === 'lot') {
+    switchLot(data.index);
+    return true;
+  }
+  return false;
+}
+
 export function handleTileTap(clientX, clientY) {
   const ray = screenRay(clientX, clientY);
   const targets = state.mode === 'exterior' ? pickableTilesExt : pickableTilesInt;
   const hits = ray.intersectObjects(targets, false);
-  if (hits.length === 0) return;
+  if (hits.length === 0) {
+    handleCityTap(ray);
+    return;
+  }
 
   const tile = hits[0].object;
   const { key, world } = tile.userData;

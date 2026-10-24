@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v39';
+const CACHE = 'vegas-mib-v40';
 const CORE = [
   './',
   './index.html',
@@ -41,6 +41,7 @@ const CORE = [
   './js/three/sky.js',
   './js/three/particles.js',
   './js/three/postfx.js',
+  './js/three/city.js',
   './js/three/icons.js',
   './js/game/economy.js',
   './js/game/daynight.js',
