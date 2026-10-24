@@ -6,37 +6,46 @@ import { playSound } from '../audio/audio.js';
 import { cancelPendingPlacement } from '../game/placement.js';
 import { activeLot } from '../game/lots.js';
 import { t } from '../i18n/i18n.js';
-import { renderPeoplePanel } from './peoplePanel.js';
+import { renderPeoplePanel, renderFinancePanel, renderStaffPanel } from './peoplePanel.js';
 
 export function renderDock() {
   const grid = document.getElementById('build-grid');
   const tabs = document.getElementById('dock-tabs');
   const subtabs = document.getElementById('dock-subtabs');
-  const peopleEl = document.getElementById('people-panel');
+  const panels = {
+    people: document.getElementById('people-panel'),
+    finance: document.getElementById('finance-panel'),
+    staff: document.getElementById('staff-panel')
+  };
   const mode = state.dockMode || 'lot';
 
   document.querySelectorAll('[data-dmode]').forEach(b => {
     b.classList.toggle('active', b.dataset.dmode === mode);
   });
 
-  if (mode === 'people') {
+  const PANEL_TITLES = { people: 'People', finance: 'Finance', staff: 'Staff' };
+
+  if (panels[mode]) {
     tabs.innerHTML = '';
     if (subtabs) subtabs.innerHTML = '';
     grid.innerHTML = '';
     grid.style.display = 'none';
     if (subtabs) subtabs.style.display = 'none';
-    if (peopleEl) {
-      peopleEl.style.display = 'block';
-      renderPeoplePanel(peopleEl);
-    }
-    document.getElementById('dock-title').textContent = 'People';
+    Object.keys(panels).forEach(k => {
+      if (!panels[k]) return;
+      panels[k].style.display = k === mode ? 'block' : 'none';
+    });
+    if (mode === 'people') renderPeoplePanel(panels.people);
+    else if (mode === 'finance') renderFinancePanel(panels.finance);
+    else if (mode === 'staff') renderStaffPanel(panels.staff);
+    document.getElementById('dock-title').textContent = PANEL_TITLES[mode] || '';
     document.getElementById('dock-status').textContent = '';
     return;
   }
 
   grid.style.display = '';
   if (subtabs) subtabs.style.display = '';
-  if (peopleEl) peopleEl.style.display = 'none';
+  Object.keys(panels).forEach(k => { if (panels[k]) panels[k].style.display = 'none'; });
   grid.innerHTML = '';
   tabs.innerHTML = '';
   if (subtabs) subtabs.innerHTML = '';

@@ -498,3 +498,23 @@
   }
   .bottom-dock { left: 52px; right: 8px; }
 }
+/* ===== Bottom panel tabs: finance/staff ===== */
+.people-panel { max-height: 152px; overflow-y: auto; }
+.staff-mini { max-height: 132px; overflow-y: auto; margin-top: 4px; }
+.staff-mini-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 2px; font-size: 11.5px; color: #cbd;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sm-icon { font-size: 14px; }
+.sm-name { flex: 1; }
+.sm-count { min-width: 30px; text-align: center; color: var(--gold); font-weight: 700; font-size: 11px; }
+.sm-btn {
+  width: 24px; height: 24px; border-radius: 6px; border: none;
+  background: rgba(0,245,212,0.16); color: var(--neon-cyan);
+  font-weight: 800; cursor: pointer; line-height: 1;
+}
+.sm-btn[data-dock-fire] { background: rgba(255,77,77,0.18); color: #ff9999; }
+.sm-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.sm-btn:active { transform: scale(0.94); }
+.sm-lock { font-size: 11px; }
