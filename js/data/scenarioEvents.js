@@ -17,6 +17,7 @@ export const SCENARIO_EVENTS = {
   ],
   s6: [
     { day: 1, kind: 'highrollers', icon: '🎩', name: 'Whales in Town', desc: 'High rollers are looking for VIP tables.' },
+    { day: 2, kind: 'whale', icon: '💎', name: 'Whale Sighted', desc: 'A billionaire whale checks in.' },
     { day: 2, kind: 'lightning', icon: '⚡', name: 'Lightning Strike', desc: 'Lightning damages the resort!' }
   ],
   s7: [
@@ -29,10 +30,12 @@ export const SCENARIO_EVENTS = {
   ],
   s9: [
     { day: 1, kind: 'highrollers', icon: '🎩', name: 'Big Fight Night', desc: 'Fight fans and whales arrive.' },
+    { day: 2, kind: 'whale', icon: '💎', name: 'Whale Sighted', desc: 'A billionaire whale checks in.' },
     { day: 2, kind: 'guests', icon: '👥', name: 'Nightlife Crowd', desc: 'The clubs are packed.' }
   ],
   s10: [
-    { day: 1, kind: 'highrollers', icon: '🎩', name: 'Celebrity Night', desc: 'Celebrities and whales arrive.' },
+    { day: 1, kind: 'celeb', icon: '⭐', name: 'Celebrity Night', desc: 'Celebrities and whales arrive.' },
+    { day: 2, kind: 'whale', icon: '💎', name: 'Whale Sighted', desc: 'A billionaire whale checks in.' },
     { day: 2, kind: 'guests', icon: '👥', name: 'Viva Las Vegas', desc: 'The whole city shows up.' },
     { day: 3, kind: 'lightning', icon: '⚡', name: 'Lightning Strike', desc: 'Lightning damages the resort!' }
   ]

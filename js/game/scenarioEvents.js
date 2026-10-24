@@ -5,6 +5,7 @@ import { SCENARIO_EVENTS } from '../data/scenarioEvents.js';
 import { forceWeather } from './weather.js';
 import { startEvent } from './randomEvents.js';
 import { triggerLightning } from '../three/particles.js';
+import { spawnSpecialGuest } from './guests.js';
 
 export function checkScenarioEvents() {
   if (state.gameMode !== 'campaign') return;
@@ -36,5 +37,12 @@ function fire(ev) {
     Bus.emit(EV.TOAST, { text: `${ev.icon} ${ev.name}: ${ev.desc}`, kind: 'bad' });
   } else if (ev.kind === 'guests') {
     startEvent({ id: 'ev_convention', name: ev.name, icon: ev.icon, desc: ev.desc, effects: { guestMul: 1.4 }, durationMs: 24000 });
+  } else if (ev.kind === 'whale') {
+    for (let i = 0; i < 2; i++) spawnSpecialGuest('whale', 'interior');
+    Bus.emit(EV.TOAST, { text: `${ev.icon} ${ev.name}: ${ev.desc}`, kind: 'good' });
+  } else if (ev.kind === 'celeb') {
+    spawnSpecialGuest('celebrity', 'interior');
+    spawnSpecialGuest('business', 'interior');
+    Bus.emit(EV.TOAST, { text: `${ev.icon} ${ev.name}: ${ev.desc}`, kind: 'good' });
   }
 }

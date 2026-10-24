@@ -3,7 +3,7 @@ import { Bus, EV } from '../core/events.js';
 import { exteriorGroup, interiorGroup, walkers } from '../three/scene.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
-import { pickArchetype } from './archetypes.js';
+import { pickArchetype, findArchetype } from './archetypes.js';
 import { heatAt } from './noise.js';
 import { activeLot } from './lots.js';
 import { getPaths, entranceKey, bfsPath, keyAt, nearestWalkable } from './paths.js';
@@ -118,6 +118,33 @@ function spawnGuest(world) {
   return guest;
 }
 
+export function spawnSpecialGuest(archId, world = 'interior') {
+  const arch = findArchetype(archId);
+  if (!arch) return false;
+  const pos = spawnPos(world);
+  if (!pos) return false;
+  const mesh = makeMesh(arch);
+  mesh.position.set(pos.x, 0.08, pos.z);
+  groupFor(world).add(mesh);
+  const guest = {
+    mesh, world, arch, special: true,
+    plan: arch.activities.slice(),
+    planIndex: 0,
+    stateId: 'idle',
+    venue: null,
+    path: null,
+    pi: 0,
+    target: { x: pos.x, z: pos.z },
+    speed: 1.2 + Math.random() * 0.6,
+    timer: 0,
+    usingTick: 0,
+    mood: 80 + Math.random() * 20
+  };
+  walkers.push(guest);
+  nextActivity(guest);
+  return true;
+}
+
 function nextActivity(guest) {
   const lot = activeLot();
   while (guest.planIndex < guest.plan.length) {
@@ -126,7 +153,7 @@ function nextActivity(guest) {
     if (cells.length) {
       const cell = cells[Math.floor(Math.random() * cells.length)];
       guest.venue = cell;
-      setGuestIcon(guest, desireIcon(desire));
+      setGuestIcon(guest, guest.arch.isSpecial ? guest.arch.icon : desireIcon(desire));
       if (guest.world === 'exterior') {
         const ek = entranceKey(cell);
         const startKey = keyAt(guest.mesh.position.x, guest.mesh.position.z);
@@ -253,8 +280,8 @@ export function updateGuests(dtMs, totals) {
   const extDesired = Math.round(desired * 0.55);
   const intDesired = desired - extDesired;
 
-  let extCount = walkers.filter(w => w.world === 'exterior').length;
-  let intCount = walkers.filter(w => w.world === 'interior').length;
+  let extCount = walkers.filter(w => w.world === 'exterior' && !w.special).length;
+  let intCount = walkers.filter(w => w.world === 'interior' && !w.special).length;
 
   while (extCount < extDesired && walkers.length < MAX_GUESTS) {
     const g = spawnGuest('exterior');
@@ -271,6 +298,7 @@ export function updateGuests(dtMs, totals) {
 
   for (let i = walkers.length - 1; i >= 0; i--) {
     const w = walkers[i];
+    if (w.special) continue;
     const over = w.world === 'exterior' ? extCount > extDesired : intCount > intDesired;
     if (over) { removeGuest(i); if (w.world === 'exterior') extCount--; else intCount--; }
   }

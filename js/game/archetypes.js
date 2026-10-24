@@ -26,6 +26,28 @@ export const CATEGORY = {
   fun: new Set(['pool', 'cinema', 'aquarium', 'ferris', 'rollercoaster', 'gardens', 'stadium', 'mall', 'spa', 'volcano', 'pagoda', 'robot', 'pyramid', 'castle', 'saloon', 'trex', 'rocket', 'titanic', 'statue'])
 };
 
+export const SPECIALS = [
+  {
+    id: 'celebrity', name: 'Celebrity', icon: '⭐', color: 0xffd166,
+    visits: 6, tipMul: 8, isSpecial: true,
+    activities: ['gambling', 'drink', 'food', 'shopping']
+  },
+  {
+    id: 'whale', name: 'Whale', icon: '💎', color: 0x9b5de5,
+    visits: 7, tipMul: 12, isSpecial: true,
+    activities: ['gambling', 'drink', 'gambling', 'food']
+  },
+  {
+    id: 'business', name: 'Business Exec', icon: '💼', color: 0x00bbf9,
+    visits: 5, tipMul: 2.5, isSpecial: true,
+    activities: ['gambling', 'food', 'drink']
+  }
+];
+
+export function findArchetype(id) {
+  return ARCHETYPES.find(a => a.id === id) || SPECIALS.find(a => a.id === id) || null;
+}
+
 export function archetypeWeights(state) {
   const rep = state.reputation / 100;
   const edge = state.houseEdge;
