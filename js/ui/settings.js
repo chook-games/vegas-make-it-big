@@ -4,7 +4,7 @@ import { openModal, closeModal } from './modals.js';
 import { refreshMusic, playSound } from '../audio/audio.js';
 import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
-import { resetToNew, save } from '../core/save.js';
+import { resetToNew, save, exportSave, importSave } from '../core/save.js';
 import { LANGS, getLang, setLang, applyStaticI18n } from '../i18n/i18n.js';
 import { openStatsScreen } from './statsScreen.js';
 import { openPricingScreen } from './pricingScreen.js';
@@ -51,6 +51,17 @@ export function openSettingsScreen() {
       <button class="tool-btn" data-tool="prestige">💎 Prestige</button>
       <button class="tool-btn" data-tool="lots">🏙️ Lots</button>
     </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">💾 Save Data</div>
+        <div class="settings-sub">Backup or move to another device</div>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-ghost" id="set-export" style="width:auto;margin:0;padding:8px 12px;">Export</button>
+        <button class="btn btn-ghost" id="set-import" style="width:auto;margin:0;padding:8px 12px;">Import</button>
+      </div>
+    </div>
+    <input type="file" id="set-import-file" accept="application/json,.json" style="display:none;">
     <div class="settings-row">
       <div>
         <div class="settings-label">🖥️ Fullscreen</div>
@@ -101,6 +112,38 @@ export function openSettingsScreen() {
       const fn = tools[b.dataset.tool];
       if (fn) fn();
     }));
+
+    const exp = bodyEl.querySelector('#set-export');
+    if (exp) exp.addEventListener('click', () => {
+      try {
+        const blob = new Blob([exportSave()], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vegas-save-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        playSound('confirm');
+      } catch (e) {}
+    });
+    const imp = bodyEl.querySelector('#set-import');
+    const fileIn = bodyEl.querySelector('#set-import-file');
+    if (imp && fileIn) {
+      imp.addEventListener('click', () => fileIn.click());
+      fileIn.addEventListener('change', () => {
+        const f = fileIn.files && fileIn.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const ok = importSave(String(reader.result));
+          if (ok) location.reload();
+          else Bus.emit(EV.TOAST, { text: 'Invalid save file.', kind: 'bad' });
+        };
+        reader.readAsText(f);
+      });
+    }
 
     const fs = bodyEl.querySelector('#set-fullscreen');
     if (fs) fs.addEventListener('click', () => {

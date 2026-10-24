@@ -114,9 +114,7 @@ function hydrateGrid(raw, world) {
   return grid;
 }
 
-export function load() {
-  const raw = loadRaw();
-  if (!raw) return null;
+export function applySaveRaw(raw) {
   const data = Object.assign({}, raw);
 
   if (raw.lots && raw.lots.length) {
@@ -142,6 +140,29 @@ export function load() {
 
   applyLoadedState(data);
   return raw;
+}
+
+export function load() {
+  const raw = loadRaw();
+  if (!raw) return null;
+  applySaveRaw(raw);
+  return raw;
+}
+
+export function exportSave() {
+  return JSON.stringify(serialize());
+}
+
+export function importSave(text) {
+  try {
+    const raw = JSON.parse(text);
+    if (!raw || typeof raw !== 'object') return false;
+    applySaveRaw(raw);
+    save();
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 export function resetToNew() {
