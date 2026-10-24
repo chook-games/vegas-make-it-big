@@ -3,11 +3,12 @@ import { Bus, EV } from '../core/events.js';
 import { exteriorGroup, interiorGroup, walkers } from '../three/scene.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
-import { pickArchetype, CATEGORY } from './archetypes.js';
+import { pickArchetype } from './archetypes.js';
 import { heatAt } from './noise.js';
 import { activeLot } from './lots.js';
 import { getPaths, entranceKey, bfsPath, keyAt, nearestWalkable } from './paths.js';
-import { iconTexture, CATEGORY_ICON } from '../three/icons.js';
+import { iconTexture } from '../three/icons.js';
+import { venueSet, desireIcon } from '../data/desires.js';
 
 const MAX_GUESTS = 40;
 
@@ -18,10 +19,9 @@ function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
 }
 
-function venueCells(world, category) {
+function venueCells(world, desire) {
   const grid = gridFor(world);
-  const set = CATEGORY[category];
-  if (!set) return [];
+  const set = venueSet(desire);
   const lot = activeLot();
   const open = world === 'exterior' ? getPaths(lot, 'exterior').open : null;
   const out = [];
@@ -111,7 +111,8 @@ function spawnGuest(world) {
     target: { x: pos.x, z: pos.z },
     speed: 1.1 + Math.random() * 0.7,
     timer: 0,
-    usingTick: 0
+    usingTick: 0,
+    mood: 55 + Math.random() * 20
   };
   nextActivity(guest);
   return guest;
@@ -120,12 +121,12 @@ function spawnGuest(world) {
 function nextActivity(guest) {
   const lot = activeLot();
   while (guest.planIndex < guest.plan.length) {
-    const category = guest.plan[guest.planIndex];
-    const cells = venueCells(guest.world, category);
+    const desire = guest.plan[guest.planIndex];
+    const cells = venueCells(guest.world, desire);
     if (cells.length) {
       const cell = cells[Math.floor(Math.random() * cells.length)];
       guest.venue = cell;
-      setGuestIcon(guest, CATEGORY_ICON[category] || '🎲');
+      setGuestIcon(guest, desireIcon(desire));
       if (guest.world === 'exterior') {
         const ek = entranceKey(cell);
         const startKey = keyAt(guest.mesh.position.x, guest.mesh.position.z);
@@ -156,7 +157,7 @@ function nextActivity(guest) {
 function leave(guest) {
   const lot = activeLot();
   guest.venue = null;
-  setGuestIcon(guest, CATEGORY_ICON.leaving);
+  setGuestIcon(guest, '💤');
   if (guest.world === 'exterior') {
     const p = getPaths(lot, 'exterior');
     let front = null, fz = -Infinity;
@@ -187,7 +188,7 @@ function spend(guest) {
   const inc = cell.item.income * cell.level;
   const edge = state.houseEdge;
   const edgeMul = edge <= 15 ? 1 : Math.max(0.4, 1 - (edge - 15) * 0.05);
-  let amount = Math.max(1, Math.round(inc * 0.04 * guest.arch.tipMul * edgeMul));
+  let amount = Math.max(1, Math.round(inc * 0.04 * guest.arch.tipMul * edgeMul * (0.6 + (guest.mood || 60) / 150)));
 
   if (guest.arch.noiseSensitive) {
     const h = heatAt(lot, guest.world, cell.gx, cell.gz);
@@ -305,7 +306,11 @@ export function animateGuests(dtMs) {
       g.timer -= dt;
       g.usingTick += dt;
       if (g.usingTick >= 1.3 && g.venue) { g.usingTick = 0; spend(g); }
-      if (g.timer <= 0) { g.planIndex++; nextActivity(g); }
+      if (g.timer <= 0) {
+        g.mood = Math.min(100, (g.mood || 60) + 6);
+        g.planIndex++;
+        nextActivity(g);
+      }
     }
   }
 }

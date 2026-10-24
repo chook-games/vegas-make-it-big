@@ -1,19 +1,19 @@
 export const ARCHETYPES = [
   {
     id: 'tourist', name: 'Tourist', icon: '🧳', color: 0x00bbf9,
-    visits: 5, tipMul: 1, activities: ['gamble', 'food', 'drink', 'fun', 'restroom']
+    visits: 5, tipMul: 1, activities: ['gambling', 'food', 'drink', 'activity', 'toilet']
   },
   {
     id: 'family', name: 'Family', icon: '👪', color: 0xff9ebb,
-    visits: 4, tipMul: 0.8, activities: ['fun', 'food', 'restroom', 'fun']
+    visits: 4, tipMul: 0.8, activities: ['activity', 'food', 'toilet', 'shopping']
   },
   {
     id: 'highroller', name: 'High Roller', icon: '🎩', color: 0xffd166,
-    visits: 6, tipMul: 5, noiseSensitive: true, activities: ['gamble', 'drink', 'gamble', 'food', 'fun']
+    visits: 6, tipMul: 5, noiseSensitive: true, activities: ['gambling', 'drink', 'gambling', 'food', 'activity']
   },
   {
     id: 'cheater', name: 'Cheater', icon: '🕵️', color: 0x8d99ae,
-    visits: 3, tipMul: 0.5, cheater: true, activities: ['gamble', 'gamble', 'drink']
+    visits: 3, tipMul: 0.5, cheater: true, activities: ['gambling', 'gambling', 'drink']
   }
 ];
 
