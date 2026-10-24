@@ -78,7 +78,7 @@ export function freshState() {
     event: null,
     tutorial: 0,
     tutorialDone: false,
-    stats: { totalEarned: 0, buildingsBuilt: 0, viewedInterior: false, prestiges: 0, guestsServed: 0, tipsEarned: 0, upgrades: 0 },
+    stats: { totalEarned: 0, buildingsBuilt: 0, viewedInterior: false, prestiges: 0, guestsServed: 0, tipsEarned: 0, upgrades: 0, cashierVisits: 0, pokerAdjusted: 0 },
     seenWelcome: false,
     lastSavedAt: Date.now()
   };

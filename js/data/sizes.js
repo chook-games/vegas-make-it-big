@@ -1,6 +1,6 @@
 export const SIZES = {
   casino: [3, 3], hotel: [2, 2], chapel: [2, 2], fountain: [2, 2], generator: [2, 2],
-  tramstop: [2, 1],
+  tramstop: [2, 1], motel: [2, 2], headoffice: [2, 2], mechhut: [2, 2], elechut: [2, 2],
   waterpump: [2, 2], waterplant: [3, 3],
   parking: [3, 3], restaurant: [2, 2], solar: [2, 2], pool: [4, 3], gardens: [3, 3],
   cinema: [2, 3], mall: [3, 3], aquarium: [3, 3], powerplant: [3, 3], marina: [3, 4],

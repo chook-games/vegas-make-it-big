@@ -441,6 +441,40 @@ export const EXTERIOR = {
     g.add(lamp);
     return g;
   },
+  motel(item, level) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.7, 0.8 * s, 1.0, std(0xe9c46a)), 0, 0.4 * s, -0.1));
+    g.add(at(box(1.8, 0.12, 1.1, std(0xc0392b)), 0, 0.86 * s, -0.1));
+    g.add(at(box(0.5, 0.3, 0.06, bas(0xff2a85)), 0, 0.6 * s, 0.42));
+    for (let i = -0.5; i <= 0.5; i += 0.5) g.add(at(box(0.22, 0.24, 0.05, bas(0x9ad0ff)), i, 0.42 * s, 0.42));
+    return g;
+  },
+  headoffice(item, level) {
+    const g = new THREE.Group();
+    const s = scaleFor(level);
+    g.add(at(box(1.0, 1.8 * s, 0.9, std(0x2f3e56)), 0, 0.9 * s, -0.1));
+    for (let i = 0; i < 4; i++) g.add(at(box(0.7, 0.12, 0.05, bas(0x9ad0ff)), 0, 0.4 + i * 0.35 * s, 0.37));
+    g.add(at(box(0.6, 0.18, 0.06, bas(0xffd166)), 0, 1.82 * s, -0.1));
+    return g;
+  },
+  mechhut(item, level) {
+    const g = new THREE.Group();
+    g.add(at(box(1.3, 0.7, 1.0, std(0x6c757d)), 0, 0.35, -0.1));
+    g.add(at(box(1.4, 0.12, 1.1, std(0x495057)), 0, 0.75, -0.1));
+    g.add(at(box(0.5, 0.5, 0.06, bas(0xffd166)), 0, 0.4, 0.42));
+    g.add(at(box(0.2, 0.3, 0.06, bas(0x111111)), 0.45, 0.45, 0.42));
+    return g;
+  },
+  elechut(item, level) {
+    const g = new THREE.Group();
+    g.add(at(box(1.2, 0.8, 0.9, std(0x495057)), 0, 0.4, -0.1));
+    g.add(at(box(1.3, 0.12, 1.0, std(0x343a40)), 0, 0.86, -0.1));
+    g.add(at(box(0.4, 0.3, 0.06, bas(0xffd166)), 0, 0.5, 0.37));
+    const bolt = at(cone(0.16, 0.5, 4, glow(0x00f5d4, 0.9)), 0, 1.15, -0.1);
+    spin(bolt); g.add(bolt);
+    return g;
+  },
   waterpump(item, level) {
     const g = new THREE.Group();
     const s = scaleFor(level);

@@ -43,6 +43,30 @@ function hasBuilding(id) {
   return false;
 }
 
+function hasUpgraded(id) {
+  const lot = state.lots[state.activeLot];
+  if (!lot) return false;
+  const grids = [lot.exteriorGrid, lot.interiorGrid, lot.interiorUpperGrid || {}];
+  for (const grid of grids) {
+    for (const k in grid) if (grid[k].item.id === id && grid[k].level >= 2) return true;
+  }
+  return false;
+}
+
+function countPaths() {
+  const lot = state.lots[state.activeLot];
+  if (!lot) return 0;
+  let n = 0;
+  for (const k in lot.exteriorGrid) if (lot.exteriorGrid[k].item.isPath) n++;
+  return n;
+}
+
+function countUpper() {
+  const lot = state.lots[state.activeLot];
+  if (!lot) return 0;
+  return Object.keys(lot.interiorUpperGrid || {}).length;
+}
+
 function totalStaffCount() {
   let n = 0;
   for (const id in state.staff) n += state.staff[id];
@@ -61,6 +85,12 @@ function goalCurrent(g) {
     case 'guests': return calculateTotals().guests;
     case 'landmark': return hasLandmark(g.target) ? 1 : 0;
     case 'build': return hasBuilding(g.target) ? 1 : 0;
+    case 'upgradeBuilding': return hasUpgraded(g.target) ? 1 : 0;
+    case 'paths': return countPaths();
+    case 'cashierVisit': return state.stats.cashierVisits || 0;
+    case 'pokerAdjusted': return state.stats.pokerAdjusted || 0;
+    case 'stairs': return hasBuilding('stairs') ? 1 : 0;
+    case 'upperBuilt': return countUpper();
     default: return 0;
   }
 }

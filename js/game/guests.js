@@ -185,6 +185,9 @@ function spend(guest) {
   const lot = activeLot();
   const cell = guest.venue;
   if (!cell) return;
+  if (cell.item.id === 'cashier' || cell.item.id === 'cage') {
+    state.stats.cashierVisits = (state.stats.cashierVisits || 0) + 1;
+  }
   const inc = cell.item.income * cell.level;
   const edge = state.houseEdge;
   const edgeMul = edge <= 15 ? 1 : Math.max(0.4, 1 - (edge - 15) * 0.05);

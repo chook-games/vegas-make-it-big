@@ -1,12 +1,24 @@
 export const SCENARIOS = [
   {
-    id: 's1', title: 'Welcome to The Strip', theme: 'american', startCash: 5000,
-    desc: 'Your first lot. Build a hotel, open a casino and attract your first guests.',
+    id: 's1', title: 'Welcome to The Strip', theme: 'american', startCash: 12000,
+    desc: 'The tutorial scenario: build a motel, lay paths, set up maintenance, then open the casino and its first games.',
     targetDays: 2, reward: { cash: 3000 },
     goals: [
-      { type: 'build', target: 'hotel', label: 'Build a Hotel' },
+      { type: 'build', target: 'motel', label: 'Build a Motel' },
+      { type: 'paths', target: 5, label: 'Lay 5 path tiles' },
+      { type: 'build', target: 'headoffice', label: 'Build the Head Office' },
+      { type: 'upgradeBuilding', target: 'headoffice', label: 'Upgrade the Head Office' },
+      { type: 'build', target: 'mechhut', label: 'Build a Mechanic Hut' },
+      { type: 'build', target: 'elechut', label: 'Build an Electrical Hut' },
       { type: 'build', target: 'casino', label: 'Build a Casino' },
-      { type: 'guests', target: 30, label: '30 guests' }
+      { type: 'build', target: 'slots', label: 'Build a Slot Machine' },
+      { type: 'build', target: 'cashier', label: 'Build a Cash Desk' },
+      { type: 'cashierVisit', target: 1, label: 'A guest uses the cashier' },
+      { type: 'build', target: 'poker', label: 'Build a Poker Table' },
+      { type: 'pokerAdjusted', target: 1, label: 'Adjust the Poker table odds' },
+      { type: 'build', target: 'security', label: 'Build Security' },
+      { type: 'stairs', target: 1, label: 'Place Stairs' },
+      { type: 'upperBuilt', target: 1, label: 'Build on the Upper floor' }
     ]
   },
   {

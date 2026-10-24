@@ -270,11 +270,16 @@ export function doIncomeTick() {
   updateHappinessAndReputation(totals);
 
   let buildings = 0;
+  let maintenance = 0;
   for (const lot of state.lots) {
     buildings += Object.keys(lot.exteriorGrid).length + Object.keys(lot.interiorGrid).length;
+    const grids = [lot.exteriorGrid, lot.interiorGrid, lot.interiorUpperGrid || {}];
+    for (const grid of grids) {
+      for (const k in grid) if (grid[k].item.isMaintenance) maintenance++;
+    }
   }
   const decay = buildings * 0.06;
-  const repair = totals.staffEff ? totals.staffEff.repair : 0;
+  const repair = (totals.staffEff ? totals.staffEff.repair : 0) + maintenance * 0.6;
   state.condition = Math.max(0, Math.min(100, state.condition + (repair - decay) * 0.12));
 
   if (totals.totalIncome > 0) addXP(Math.max(0.5, totals.totalIncome * XP.income));
