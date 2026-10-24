@@ -6,6 +6,12 @@ import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
 import { resetToNew, save } from '../core/save.js';
 import { LANGS, getLang, setLang, applyStaticI18n } from '../i18n/i18n.js';
+import { openStatsScreen } from './statsScreen.js';
+import { openPricingScreen } from './pricingScreen.js';
+import { openViewFilterScreen } from './viewFilterScreen.js';
+import { openStaffScreen } from './staffScreen.js';
+import { openAchievementsScreen, openPrestigeScreen } from './screens.js';
+import { openLotScreen } from './lotScreen.js';
 
 function toggleRow(label, sub, key) {
   return `<div class="settings-row">
@@ -33,6 +39,17 @@ export function openSettingsScreen() {
     ${toggleRow('📳 Vibration', 'Haptic feedback (mobile)', 'vibration')}
     ${toggleRow('🌑 Shadows', 'Prettier but heavier', 'shadows')}
     ${bloomAvailable() ? toggleRow('✨ Bloom (Neon Glow)', 'Glow on lights, heavier', 'bloom') : ''}
+    <div class="spacer"></div>
+    <div class="muted">Tools</div>
+    <div class="tool-grid">
+      <button class="tool-btn" data-tool="staff">👔 Staff</button>
+      <button class="tool-btn" data-tool="stats">📊 Statistics</button>
+      <button class="tool-btn" data-tool="prices">💲 Prices</button>
+      <button class="tool-btn" data-tool="filters">🔍 View Filters</button>
+      <button class="tool-btn" data-tool="ach">🏆 Achievements</button>
+      <button class="tool-btn" data-tool="prestige">💎 Prestige</button>
+      <button class="tool-btn" data-tool="lots">🏙️ Lots</button>
+    </div>
     <div class="settings-row">
       <div>
         <div class="settings-label">🖥️ Fullscreen</div>
@@ -69,6 +86,21 @@ export function openSettingsScreen() {
       Bus.emit(EV.UI_REFRESH);
       save();
     });
+    const tools = {
+      staff: openStaffScreen,
+      stats: openStatsScreen,
+      prices: openPricingScreen,
+      filters: openViewFilterScreen,
+      ach: openAchievementsScreen,
+      prestige: openPrestigeScreen,
+      lots: openLotScreen
+    };
+    bodyEl.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => {
+      closeModal();
+      const fn = tools[b.dataset.tool];
+      if (fn) fn();
+    }));
+
     const fs = bodyEl.querySelector('#set-fullscreen');
     if (fs) fs.addEventListener('click', () => {
       try {

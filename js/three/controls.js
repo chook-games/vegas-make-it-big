@@ -7,7 +7,7 @@ function lim() {
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
 let camRadius = 24;
-let camElevation = 0.85;
+let camElevation = 0.92;
 let camAngle = Math.PI / 4;
 let camTargetAngle = Math.PI / 4;
 
@@ -54,12 +54,14 @@ export function initControls(opts) {
   const onTap = o.onTap || (() => {});
   const onHover = o.onHover || (() => {});
   const onDesktopClick = o.onDesktopClick || onTap;
+  const onRightClick = o.onRightClick || (() => {});
   const dom = renderer.domElement;
 
   let isDragging = false;
   let startX = 0, startY = 0, lastX = 0, lastY = 0;
   let pinchDist = 0;
   let lastTouch = 0;
+  let rightDown = false, rightDragged = false, rightLastX = 0;
 
   const hovering = () => state.selectedTool || state.pendingPlacement;
 
@@ -112,6 +114,13 @@ export function initControls(opts) {
   let mouseDown = false;
   dom.addEventListener('mousedown', (e) => {
     if (Date.now() - lastTouch < 600) return;
+    if (e.button === 2) {
+      rightDown = true;
+      rightDragged = false;
+      rightLastX = e.clientX;
+      e.preventDefault();
+      return;
+    }
     if (e.button !== 0) return;
     mouseDown = true;
     isDragging = false;
@@ -120,6 +129,13 @@ export function initControls(opts) {
   });
 
   window.addEventListener('mousemove', (e) => {
+    if (rightDown) {
+      const dx = e.clientX - rightLastX;
+      if (Math.abs(dx) > 2) rightDragged = true;
+      camTargetAngle += dx * 0.008;
+      rightLastX = e.clientX;
+      return;
+    }
     if (Date.now() - lastTouch < 600) return;
     if (!mouseDown) {
       if (hovering()) onHover(e.clientX, e.clientY);
@@ -135,6 +151,11 @@ export function initControls(opts) {
   });
 
   window.addEventListener('mouseup', (e) => {
+    if (e.button === 2) {
+      if (rightDown && !rightDragged) onRightClick();
+      rightDown = false;
+      return;
+    }
     if (Date.now() - lastTouch < 600) return;
     if (mouseDown && !isDragging && e.target === dom) {
       onDesktopClick(e.clientX, e.clientY);

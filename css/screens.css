@@ -394,3 +394,10 @@
   background: rgba(255,255,255,0.05); color: #aaa; font-weight: 700; font-size: 11px; cursor: pointer;
 }
 .wage-btn.active { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,212,0.12); }
+/* ===== Options tool hub ===== */
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+.tool-btn {
+  padding: 9px 8px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05); color: #dfe3ff; font-weight: 700; font-size: 12px; cursor: pointer;
+}
+.tool-btn:active { transform: scale(0.97); }

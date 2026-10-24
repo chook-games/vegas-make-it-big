@@ -327,6 +327,10 @@ function boot() {
     onDesktopClick: (x, y) => {
       if (state.pendingPlacement) confirmPendingPlacement();
       else handleTileTap(x, y);
+    },
+    onRightClick: () => {
+      if (state.pendingPlacement) cancelPendingPlacement();
+      else closeInspector();
     }
   });
   applySettings();
