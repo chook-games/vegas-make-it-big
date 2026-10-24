@@ -89,3 +89,17 @@ export function initHUD() {
   Bus.on(EV.UI_REFRESH, updateHUD);
   Bus.on(EV.CASH_CHANGED, updateHUD);
 }
+
+export function showBuildingFinance(income) {
+  const p = document.getElementById('fin-profit');
+  if (!p) return;
+  const v = Math.round(income || 0);
+  p.textContent = `${v >= 0 ? '+' : '-'}$${Math.abs(v).toLocaleString()}`;
+  p.style.color = v >= 0 ? '#06d6a0' : '#ff6b6b';
+  document.getElementById('fin-income').textContent = `$${Math.abs(v).toLocaleString()}`;
+  document.getElementById('fin-costs').textContent = '—';
+}
+
+export function restoreFinance() {
+  updateHUD();
+}

@@ -6,11 +6,37 @@ import { playSound } from '../audio/audio.js';
 import { cancelPendingPlacement } from '../game/placement.js';
 import { activeLot } from '../game/lots.js';
 import { t } from '../i18n/i18n.js';
+import { renderPeoplePanel } from './peoplePanel.js';
 
 export function renderDock() {
   const grid = document.getElementById('build-grid');
   const tabs = document.getElementById('dock-tabs');
   const subtabs = document.getElementById('dock-subtabs');
+  const peopleEl = document.getElementById('people-panel');
+  const mode = state.dockMode || 'lot';
+
+  document.querySelectorAll('[data-dmode]').forEach(b => {
+    b.classList.toggle('active', b.dataset.dmode === mode);
+  });
+
+  if (mode === 'people') {
+    tabs.innerHTML = '';
+    if (subtabs) subtabs.innerHTML = '';
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    if (subtabs) subtabs.style.display = 'none';
+    if (peopleEl) {
+      peopleEl.style.display = 'block';
+      renderPeoplePanel(peopleEl);
+    }
+    document.getElementById('dock-title').textContent = 'People';
+    document.getElementById('dock-status').textContent = '';
+    return;
+  }
+
+  grid.style.display = '';
+  if (subtabs) subtabs.style.display = '';
+  if (peopleEl) peopleEl.style.display = 'none';
   grid.innerHTML = '';
   tabs.innerHTML = '';
   if (subtabs) subtabs.innerHTML = '';
@@ -122,4 +148,11 @@ function selectTool(item, unlocked) {
 export function initDock() {
   Bus.on(EV.UI_REFRESH, renderDock);
   Bus.on('tool:select', renderDock);
+  document.querySelectorAll('[data-dmode]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.dockMode = b.dataset.dmode;
+      playSound('preview');
+      renderDock();
+    });
+  });
 }

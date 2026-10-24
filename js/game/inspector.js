@@ -14,6 +14,7 @@ import { getPaths } from './paths.js';
 import { utilOf } from '../data/utilities.js';
 import { isGambling, BET_STEPS, betLabel, edgeLabel } from '../data/betting.js';
 import { t } from '../i18n/i18n.js';
+import { showBuildingFinance, restoreFinance } from '../ui/hud.js';
 
 function groupFor(world) {
   return world === 'exterior' ? exteriorGroup : interiorGroup;
@@ -95,6 +96,7 @@ export function openInspector(world, key, layer = 0) {
   document.getElementById('insp-move').textContent = `🔄 Move ($${MOVE_ROTATE_COST})`;
   document.getElementById('insp-sell').textContent = `🗑️ Sell (+$${refund})`;
   document.getElementById('inspector').style.display = 'block';
+  showBuildingFinance(stats.income);
 
   const bodyEl = document.getElementById('insp-body');
   bodyEl.querySelectorAll('[data-itab]').forEach(b => b.addEventListener('click', () => {
@@ -128,9 +130,12 @@ export function openInspector(world, key, layer = 0) {
 }
 
 export function closeInspector() {
-  document.getElementById('inspector').style.display = 'none';
+  const el = document.getElementById('inspector');
+  const wasOpen = el.style.display === 'block';
+  el.style.display = 'none';
   inspectRing.visible = false;
   state.inspectedKey = null;
+  if (wasOpen) restoreFinance();
 }
 
 function onUpgrade() {
