@@ -6,7 +6,8 @@ export const WEATHER = {
   rain: { name: 'Rain', icon: '🌧️', guestMul: 0.8, incomeMul: 1.0, casinoMul: 1.2, light: 0.82 },
   storm: { name: 'Storm', icon: '⛈️', guestMul: 0.65, incomeMul: 0.92, casinoMul: 1.3, light: 0.66 },
   heatwave: { name: 'Heatwave', icon: '🔥', guestMul: 0.9, incomeMul: 1.15, casinoMul: 1.05, light: 1.12 },
-  snow: { name: 'Snow', icon: '❄️', guestMul: 0.78, incomeMul: 1.0, casinoMul: 1.15, light: 0.9 }
+  snow: { name: 'Snow', icon: '❄️', guestMul: 0.78, incomeMul: 1.0, casinoMul: 1.15, light: 0.9 },
+  duststorm: { name: 'Dust Storm', icon: '🌪️', guestMul: 0.72, incomeMul: 0.9, casinoMul: 1.2, light: 0.8 }
 };
 
 function pickType() {
@@ -56,5 +57,11 @@ export function weatherTint() {
   if (id === 'storm') return 0x59637a;
   if (id === 'snow') return 0xd8e2f0;
   if (id === 'heatwave') return 0xffb060;
+  if (id === 'duststorm') return 0xb08a5a;
   return null;
+}
+
+export function forceWeather(id, ms) {
+  ensureWeather();
+  state.weather = { id, remaining: ms || 20000 };
 }

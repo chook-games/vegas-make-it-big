@@ -27,6 +27,7 @@ import { openSandboxScreen } from './ui/sandboxScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
 import { checkDailies, onDayPassed } from './game/missions.js';
+import { checkScenarioEvents } from './game/scenarioEvents.js';
 import { applyStaticI18n } from './i18n/i18n.js';
 import { setAllEdges } from './data/betting.js';
 import { openSettingsScreen } from './ui/settings.js';
@@ -286,6 +287,7 @@ function incomeTick() {
   if (state.heatmap) applyHeatmap();
   checkCampaign();
   checkDailies();
+  checkScenarioEvents();
 }
 
 function refreshPrestigeAlert() {

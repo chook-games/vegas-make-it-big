@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v30';
+const CACHE = 'vegas-mib-v31';
 const CORE = [
   './',
   './index.html',
@@ -20,6 +20,7 @@ const CORE = [
   './js/data/lots.js',
   './js/data/goods.js',
   './js/data/desires.js',
+  './js/data/scenarioEvents.js',
   './js/data/utilities.js',
   './js/data/betting.js',
   './js/data/quests.js',
@@ -61,6 +62,7 @@ const CORE = [
   './js/game/npc.js',
   './js/game/weather.js',
   './js/game/missions.js',
+  './js/game/scenarioEvents.js',
   './js/ui/toast.js',
   './js/ui/hud.js',
   './js/ui/dock.js',

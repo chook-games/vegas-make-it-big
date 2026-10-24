@@ -30,10 +30,14 @@ export function archetypeWeights(state) {
   const rep = state.reputation / 100;
   const edge = state.houseEdge;
   const cashPressure = Math.min(1, state.cash / 200000);
+  let highrollerW = 0.15 + rep * 0.9 + cashPressure * 0.4;
+  if (state.highrollerBoostDay && state.clock && state.clock.day <= state.highrollerBoostDay) {
+    highrollerW += 1.5;
+  }
   return [
     { def: ARCHETYPES[0], w: 1.0 },
     { def: ARCHETYPES[1], w: 0.6 + rep * 0.3 },
-    { def: ARCHETYPES[2], w: 0.15 + rep * 0.9 + cashPressure * 0.4 },
+    { def: ARCHETYPES[2], w: highrollerW },
     { def: ARCHETYPES[3], w: 0.2 + (edge > 15 ? 0.4 : 0.15) }
   ];
 }

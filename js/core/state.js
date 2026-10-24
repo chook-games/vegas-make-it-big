@@ -48,6 +48,8 @@ export function freshState() {
     unlockAll: false,
     weather: null,
     history: [],
+    scenarioEventsDone: {},
+    highrollerBoostDay: 0,
     viewFilter: { needs: true, heat: false, utilities: false },
     heatmap: false,
     inspectedKey: null,
