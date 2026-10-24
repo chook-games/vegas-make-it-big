@@ -488,3 +488,13 @@
     max-height: 40vh; overflow-y: auto;
   }
 }
+/* ===== Mobile layout fixes ===== */
+@media (max-width: 700px) {
+  .status-panel { top: calc(var(--safe-top) + 104px); }
+  .side-tabs { top: calc(var(--safe-top) + 162px); }
+  .inspector-card, .odds-modal {
+    top: calc(var(--safe-top) + 150px);
+    max-height: 46vh; overflow-y: auto;
+  }
+  .bottom-dock { left: 52px; right: 8px; }
+}

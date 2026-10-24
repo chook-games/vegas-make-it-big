@@ -17,6 +17,8 @@ export const SIZES = {
   videopoker: [2, 1], blackjack: [2, 2], wheeloffortune: [3, 3], carjackpot: [3, 1], progressiveslots: [3, 1],
   texasholdem: [2, 2], paigow: [2, 2], caribbeanstud: [2, 2], firstaid: [2, 2], atm: [1, 1],
   kitchen: [3, 2], jewelrystore: [2, 2], theatre: [3, 3],
+  decor_flag: [1, 1], decor_wave: [1, 1], decor_ufo: [1, 1], decor_fern: [1, 1], decor_lantern: [1, 1],
+  decor_obelisk: [1, 1], decor_cactus: [1, 1], decor_palm: [1, 1], decor_banner: [1, 1], decor_pillar: [1, 1],
 };
 
 export function sizeOf(id) {

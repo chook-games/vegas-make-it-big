@@ -12,16 +12,19 @@ export const DESIRES = {
 };
 
 const VENUE_LIST = {
-  gambling: ['slots', 'roulette', 'craps', 'sicbo', 'keno', 'baccarat', 'poker', 'sportsbook', 'vip_bj', 'highlimit', 'casino'],
+  gambling: ['slots', 'roulette', 'craps', 'sicbo', 'keno', 'baccarat', 'poker', 'sportsbook', 'vip_bj', 'highlimit', 'casino',
+    'videopoker', 'blackjack', 'wheeloffortune', 'carjackpot', 'progressiveslots', 'texasholdem', 'paigow', 'caribbeanstud',
+    'mediumcasino', 'largecasino'],
   drink: ['bar', 'lounge', 'nightclub'],
   entertainment: ['cinema', 'stadium', 'boxing', 'nightclub', 'theatre', 'circus'],
   toilet: ['restroom'],
-  rest: ['lounge', 'gardens', 'pool'],
+  rest: ['lounge', 'gardens', 'pool', 'wavepool'],
   food: ['restaurant', 'buffet', 'foodcourt'],
-  activity: ['pool', 'golf', 'ferris', 'rollercoaster', 'aquarium', 'gardens', 'marina', 'cinema'],
+  activity: ['pool', 'golf', 'ferris', 'rollercoaster', 'aquarium', 'gardens', 'marina', 'cinema',
+    'wavepool', 'waterride', 'tennisclub', 'arcade', 'circus'],
   shopping: ['mall', 'giftshop', 'jewelrystore'],
-  sleep: ['hotel'],
-  money: ['cashier', 'cage']
+  sleep: ['hotel', 'mediumhotel', 'largehotel'],
+  money: ['cashier', 'cage', 'atm']
 };
 
 const SETS = {};
