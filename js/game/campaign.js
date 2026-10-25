@@ -110,7 +110,7 @@ function goalCurrent(g) {
 export function goalStatus() {
   const sc = currentScenario();
   if (!sc) return [];
-  return sc.goals.map(g => {
+  const all = sc.goals.map(g => {
     const target = g.amount != null ? g.amount : (typeof g.target === 'number' ? g.target : 1);
     const current = goalCurrent(g);
     return {
@@ -121,6 +121,8 @@ export function goalStatus() {
       pct: Math.min(100, (current / target) * 100)
     };
   });
+  const firstOpen = all.findIndex(g => !g.done);
+  return firstOpen < 0 ? all : all.slice(0, firstOpen + 1);
 }
 
 export function allGoalsDone() {
