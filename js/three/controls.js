@@ -2,14 +2,15 @@ import { camera, renderer } from './scene.js';
 import { state } from '../core/state.js';
 
 function lim() {
-  return Math.max(46, Math.floor(state.gridSize / 2) * state.tileSize + 2);
+  return Math.max(100, Math.floor(state.gridSize / 2) * state.tileSize + 2);
 }
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
-let camRadius = 24;
+let camRadius = 58;
 let camElevation = 0.92;
 let camAngle = Math.PI / 4;
 let camTargetAngle = Math.PI / 4;
+const keys = new Set();
 
 export function updateCameraPosition() {
   camera.position.x = camTarget.x + camRadius * Math.sin(camAngle) * Math.cos(camElevation);
@@ -26,16 +27,44 @@ export function wanderStep(dt) {
   camTargetAngle += dt * 0.00025;
 }
 
-export function updateCamera() {
+function panBy(dxPix, dyPix, factor) {
+  const cs = Math.cos(camAngle);
+  const sn = Math.sin(camAngle);
+  camTarget.x -= (dxPix * cs - dyPix * sn) * factor;
+  camTarget.z += (dxPix * sn + dyPix * cs) * factor;
+  const l = lim();
+  camTarget.x = Math.max(-l, Math.min(l, camTarget.x));
+  camTarget.z = Math.max(-l, Math.min(l, camTarget.z));
+  updateCameraPosition();
+}
+
+export function updateCamera(dtMs) {
   if (Math.abs(camTargetAngle - camAngle) > 0.005) {
     camAngle += (camTargetAngle - camAngle) * 0.12;
     updateCameraPosition();
+  }
+
+  if (keys.size && dtMs) {
+    const speed = 0.035 * dtMs;
+    const fx = -Math.sin(camAngle), fz = -Math.cos(camAngle);
+    const rx = Math.cos(camAngle), rz = -Math.sin(camAngle);
+    let mx = 0, mz = 0;
+    if (keys.has('ArrowUp')) { mx += fx; mz += fz; }
+    if (keys.has('ArrowDown')) { mx -= fx; mz -= fz; }
+    if (keys.has('ArrowRight')) { mx += rx; mz += rz; }
+    if (keys.has('ArrowLeft')) { mx -= rx; mz -= rz; }
+    if (mx || mz) {
+      const l = lim();
+      camTarget.x = Math.max(-l, Math.min(l, camTarget.x + mx * speed));
+      camTarget.z = Math.max(-l, Math.min(l, camTarget.z + mz * speed));
+      updateCameraPosition();
+    }
   }
 }
 
 export function focusOn(worldX, worldZ) {
   camTarget.x = Math.max(-lim(), Math.min(lim(), worldX));
-  camTarget.z = Math.max(-lim(), Math.min(lim() + 1, worldZ));
+  camTarget.z = Math.max(-lim(), Math.min(lim(), worldZ));
   updateCameraPosition();
 }
 
@@ -61,7 +90,7 @@ export function initControls(opts) {
   let startX = 0, startY = 0, lastX = 0, lastY = 0;
   let pinchDist = 0;
   let lastTouch = 0;
-  let rightDown = false, rightDragged = false, rightLastX = 0;
+  let rightDown = false, rightDragged = false, rightLastX = 0, rightLastY = 0;
 
   const hovering = () => state.selectedTool || state.pendingPlacement;
 
@@ -87,18 +116,14 @@ export function initControls(opts) {
       const cx = e.touches[0].clientX;
       const cy = e.touches[0].clientY;
       if (Math.hypot(cx - startX, cy - startY) > 10) isDragging = true;
-      if (isDragging) {
-        camTarget.x = Math.max(-lim(), Math.min(lim(), camTarget.x - (cx - lastX) * 0.032));
-        camTarget.z = Math.max(-lim(), Math.min(lim() + 1, camTarget.z - (cy - lastY) * 0.032));
-        updateCameraPosition();
-      }
+      if (isDragging) panBy(cx - lastX, cy - lastY, 0.045);
       lastX = cx; lastY = cy;
     } else if (e.touches.length === 2) {
       const newDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-      camRadius = Math.max(12, Math.min(80, camRadius + (pinchDist - newDist) * 0.045));
+      camRadius = Math.max(12, Math.min(150, camRadius + (pinchDist - newDist) * 0.06));
       pinchDist = newDist;
       updateCameraPosition();
     }
@@ -118,6 +143,7 @@ export function initControls(opts) {
       rightDown = true;
       rightDragged = false;
       rightLastX = e.clientX;
+      rightLastY = e.clientY;
       e.preventDefault();
       return;
     }
@@ -131,9 +157,14 @@ export function initControls(opts) {
   window.addEventListener('mousemove', (e) => {
     if (rightDown) {
       const dx = e.clientX - rightLastX;
-      if (Math.abs(dx) > 2) rightDragged = true;
-      camTargetAngle += dx * 0.008;
+      const dy = e.clientY - rightLastY;
+      if (Math.abs(dx) + Math.abs(dy) > 2) rightDragged = true;
+      camAngle += dx * 0.008;
+      camTargetAngle = camAngle;
+      camElevation = Math.max(0.32, Math.min(1.35, camElevation - dy * 0.004));
+      updateCameraPosition();
       rightLastX = e.clientX;
+      rightLastY = e.clientY;
       return;
     }
     if (Date.now() - lastTouch < 600) return;
@@ -142,11 +173,7 @@ export function initControls(opts) {
       return;
     }
     if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) isDragging = true;
-    if (isDragging) {
-      camTarget.x = Math.max(-lim(), Math.min(lim(), camTarget.x - (e.clientX - lastX) * 0.03));
-      camTarget.z = Math.max(-lim(), Math.min(lim() + 1, camTarget.z - (e.clientY - lastY) * 0.03));
-      updateCameraPosition();
-    }
+    if (isDragging) panBy(e.clientX - lastX, e.clientY - lastY, 0.045);
     lastX = e.clientX; lastY = e.clientY;
   });
 
@@ -166,9 +193,16 @@ export function initControls(opts) {
   dom.addEventListener('contextmenu', (e) => e.preventDefault());
 
   dom.addEventListener('wheel', (e) => {
-    camRadius = Math.max(12, Math.min(80, camRadius + e.deltaY * 0.015));
+    camRadius = Math.max(12, Math.min(150, camRadius + e.deltaY * 0.02));
     updateCameraPosition();
   }, { passive: true });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key.startsWith('Arrow')) { keys.add(e.key); e.preventDefault(); }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.key.startsWith('Arrow')) keys.delete(e.key);
+  });
 
   updateCameraPosition();
 }

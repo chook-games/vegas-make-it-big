@@ -17,7 +17,6 @@ function hex(n) {
 const LOT_SIZES = [
   { id: 'small', label: 'Small', radius: 4, cost: 0, cash: 8000 },
   { id: 'medium', label: 'Medium', radius: 5, cost: 4000, cash: 4000 },
-  { id: 'large', label: 'Large', radius: 6, cost: 7000, cash: 1000 },
   { id: 'large', label: 'Large', radius: 6, cost: 7000, cash: 1000 }
 ];
 

@@ -37,14 +37,14 @@ const skyMat = new THREE.ShaderMaterial({
   `
 });
 
-const dome = new THREE.Mesh(new THREE.SphereGeometry(120, 32, 16), skyMat);
+const dome = new THREE.Mesh(new THREE.SphereGeometry(480, 32, 16), skyMat);
 group.add(dome);
 
 const starGeo = new THREE.BufferGeometry();
 const starCount = 600;
 const positions = new Float32Array(starCount * 3);
 for (let i = 0; i < starCount; i++) {
-  const r = 100;
+  const r = 400;
   const theta = Math.random() * Math.PI * 2;
   const phi = Math.acos(Math.random() * 0.9 + 0.05);
   positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
@@ -90,9 +90,9 @@ export function updateSky(hour, nightAmount) {
   starMat.opacity = Math.max(0, nightAmount - 0.25) * 1.2;
 
   const sunAngle = ((hour - 6) / 12) * Math.PI;
-  sun.position.set(Math.cos(sunAngle) * 70, Math.sin(sunAngle) * 60 + 5, -40);
+  sun.position.set(Math.cos(sunAngle) * 300, Math.sin(sunAngle) * 260 + 5, -160);
   sun.visible = Math.sin(sunAngle) > -0.2;
-  moon.position.set(-Math.cos(sunAngle) * 70, -Math.sin(sunAngle) * 55 + 8, 40);
+  moon.position.set(-Math.cos(sunAngle) * 300, -Math.sin(sunAngle) * 240 + 8, 160);
   moon.visible = Math.sin(sunAngle) <= 0.2;
 }
 

@@ -1,4 +1,4 @@
-import { state, activeLot } from './core/state.js';
+import { state, activeLot, syncActiveGrids } from './core/state.js';
 import { Bus, EV } from './core/events.js';
 import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
 import { hasSave, load, save, resetToNew } from './core/save.js';
@@ -25,6 +25,7 @@ import { openStatsScreen } from './ui/statsScreen.js';
 import { openPricingScreen } from './ui/pricingScreen.js';
 import { openViewFilterScreen } from './ui/viewFilterScreen.js';
 import { openSandboxScreen } from './ui/sandboxScreen.js';
+import { openLotPurchase } from './ui/lotPurchase.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
 import { checkDailies, onDayPassed } from './game/missions.js';
@@ -34,7 +35,7 @@ import { setAllEdges } from './data/betting.js';
 import { openSettingsScreen } from './ui/settings.js';
 import { openPlotsScreen } from './ui/plotsScreen.js';
 import { toggleHeatmap, initHeatmap, applyHeatmap } from './ui/heatmap.js';
-import { currentTheme } from './game/lots.js';
+import { currentTheme, switchLot } from './game/lots.js';
 import { applyThemeToTiles, applyRadius } from './three/worlds.js';
 import { updateDayNight } from './game/daynight.js';
 import { updateEvents } from './game/randomEvents.js';
@@ -114,7 +115,7 @@ function initUI() {
 
   window.addEventListener('resize', () => { onResize(); resizePostFX(); });
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'r' || e.key === 'R') {
+    if (e.key === ' ' || e.key === 'r' || e.key === 'R') {
       if (state.pendingPlacement) { rotatePendingPlacement(); e.preventDefault(); }
     } else if (e.key === 'Escape') {
       if (state.pendingPlacement) { cancelPendingPlacement(); e.preventDefault(); }
@@ -216,7 +217,7 @@ function loop() {
     }
   }
 
-  updateCamera();
+  updateCamera(dt);
   if (state.wander) wanderStep(dt);
   if (booted) {
     updateDayNight(simDt);
@@ -245,8 +246,8 @@ function loop() {
   animateCityPeds(dt);
   vehicles.forEach(v => {
     v.mesh.position.x += v.speed;
-    if (v.mesh.position.x > 112) v.mesh.position.x = -112;
-    if (v.mesh.position.x < -112) v.mesh.position.x = 112;
+    if (v.mesh.position.x > 160) v.mesh.position.x = -160;
+    if (v.mesh.position.x < -160) v.mesh.position.x = 160;
   });
 
   lastGuestUpdate += simDt;
@@ -387,7 +388,22 @@ function boot() {
     onContinue: () => { const r = load() || raw || {}; startContinue(r); launch(); },
     onCampaign: () => openCampaignScreen({
       fromMenu: true,
-      onStarted: () => { beginTutorial(); launch(); },
+      onStarted: () => {
+        openLotPurchase({
+          onPick: ({ radius, cost }) => {
+            const lot = activeLot();
+            lot.radius = radius;
+            state.cash = Math.max(0, state.cash - cost);
+            syncActiveGrids();
+            applyRadius(radius);
+            applyThemeToTiles(currentTheme());
+            switchLot(0, true);
+            save();
+            beginTutorial();
+            launch();
+          }
+        });
+      },
       onBack: () => menu()
     }),
     onFreePlay: () => openMapSelect({

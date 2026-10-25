@@ -3,11 +3,15 @@ import { exteriorGroup } from './scene.js';
 import { themeById } from '../data/themes.js';
 import { textSprite } from './icons.js';
 
-const SPACING = 30;
+const SPACING = 34;
 const cityGroup = new THREE.Group();
 exteriorGroup.add(cityGroup);
 
 export const cityInteractives = [];
+
+const OWNED_CELLS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+const RIVAL_CELLS = [[2, 0], [-2, 0]];
+const SALE_CELLS = [[0, 2], [0, -2], [2, 1], [-2, 1]];
 
 const matCache = {};
 function mat(color, opts) {
@@ -33,14 +37,13 @@ function themeColors(theme) {
   return themeColorCache[theme.id];
 }
 
-function lotSlab(size, theme, borderColor) {
+function lotSlab(size, theme) {
   const g = new THREE.Group();
   const slab = box(size, 0.12, size, theme ? theme.ground : 0x2b3b4a);
   slab.position.y = -0.02;
   g.add(slab);
-  const t = 0.35;
-  const half = size / 2;
   const edge = theme ? theme.accent : 0x22c55e;
+  const half = size / 2;
   const b1 = box(size, 0.16, 0.28, edge); b1.position.set(0, 0.08, half); g.add(b1);
   const b2 = box(size, 0.16, 0.28, edge); b2.position.set(0, 0.08, -half); g.add(b2);
   const b3 = box(0.28, 0.16, size, edge); b3.position.set(half, 0.08, 0); g.add(b3);
@@ -52,12 +55,12 @@ function simpleBuilding(item, level, theme) {
   const tier = item.tier || 1;
   const h = 0.8 + tier * 0.55 + (level - 1) * 0.28;
   const color = (tier % 2 === 0) ? theme.shell : theme.accent;
-  const m = box(1.7, h, 1.5, color);
-  m.position.y = h / 2;
+  const g = new THREE.Group();
+  const body = box(1.7, h, 1.5, color);
+  body.position.y = h / 2;
   const roof = box(1.85, 0.14, 1.65, theme.roof);
   roof.position.y = h + 0.05;
-  const g = new THREE.Group();
-  g.add(m, roof);
+  g.add(body, roof);
   return g;
 }
 
@@ -77,10 +80,10 @@ function addLotBuildings(group, lot, ts) {
   }
 }
 
-function addRivalLot(group, npc, r, slot, size) {
+function addRivalLot(npc, slot, size) {
   const color = parseColor(npc.color, 0x99aabb);
   const g = new THREE.Group();
-  g.position.x = slot * SPACING;
+  g.position.set(slot[0] * SPACING, 0, slot[1] * SPACING);
   const slab = box(size, 0.12, size, 0x263238);
   slab.position.y = -0.02;
   g.add(slab);
@@ -120,12 +123,18 @@ export function rebuildCity() {
   const size = state.gridSize * ts * 0.95;
   const active = state.activeLot;
   const lots = state.lots || [];
+  const npcs = state.npcs || [];
 
+  let ownedIdx = 0;
   lots.forEach((lot, i) => {
     if (i === active) return;
+    const cell = OWNED_CELLS[ownedIdx % OWNED_CELLS.length];
+    ownedIdx++;
+    const x = cell[0] * SPACING;
+    const z = cell[1] * SPACING;
     const th = themeColors(themeById(lot.theme));
     const g = lotSlab(size, th);
-    g.position.x = (i - active) * SPACING;
+    g.position.set(x, 0, z);
     addLotBuildings(g, lot, ts);
     const label = textSprite(lot.name, '#ffd166', 10);
     label.position.set(0, 6.2, size / 2 + 1.6);
@@ -133,38 +142,37 @@ export function rebuildCity() {
     cityGroup.add(g);
 
     const hit = box(size, 8, size, th.accent, { transparent: true, opacity: 0.001 });
-    hit.position.set((i - active) * SPACING, 4, 0);
+    hit.position.set(x, 4, z);
     hit.userData = { kind: 'lot', index: i };
     cityGroup.add(hit);
     cityInteractives.push(hit);
   });
 
-  const npcs = state.npcs || [];
   npcs.forEach((npc, r) => {
-    const slot = -1 - r;
-    addRivalLot(cityGroup, npc, r, slot - active, size);
+    addRivalLot(npc, RIVAL_CELLS[r % RIVAL_CELLS.length], size);
   });
 
-  const nextSlot = lots.length;
   for (let k = 0; k < 2; k++) {
-    const slot = nextSlot + k;
-    const x = (slot - active) * SPACING;
-    const g = lotSlab(size, null, 0x22c55e);
-    g.position.x = x;
+    const cell = SALE_CELLS[k % SALE_CELLS.length];
+    const x = cell[0] * SPACING;
+    const z = cell[1] * SPACING;
+    const g = lotSlab(size, null);
+    g.position.set(x, 0, z);
     const sign = box(6, 2.2, 0.35, 0x22c55e);
-    sign.position.set(x, 1.2, size / 2 + 1.2);
-    cityGroup.add(g, sign);
+    sign.position.set(0, 1.2, size / 2 + 1.2);
+    g.add(sign);
     const panel = box(1.6, 0.5, 0.1, 0xffd166);
-    panel.position.set(x, 2.4, size / 2 + 1.2);
-    cityGroup.add(panel);
+    panel.position.set(0, 2.4, size / 2 + 1.2);
+    g.add(panel);
     const lbl = textSprite('FOR SALE', '#22c55e', 8);
-    lbl.position.set(x, 4.6, size / 2 + 2.0);
-    cityGroup.add(lbl);
+    lbl.position.set(0, 4.6, size / 2 + 2.0);
+    g.add(lbl);
+    cityGroup.add(g);
+
     const hit = box(size, 8, size, 0x22c55e, { transparent: true, opacity: 0.001 });
-    hit.position.set(x, 4, 0);
+    hit.position.set(x, 4, z);
     hit.userData = { kind: 'buyPlot' };
     cityGroup.add(hit);
     cityInteractives.push(hit);
   }
-
 }

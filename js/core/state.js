@@ -75,7 +75,7 @@ export function freshState() {
       music: true,
       vibration: true,
       shadows: true,
-      bloom: true,
+      bloom: false,
       autoQuality: true,
       quality: 'high'
     },
