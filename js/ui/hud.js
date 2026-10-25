@@ -40,8 +40,25 @@ export function updateHUD() {
 
   updateFinance(totals);
   updateObjectives();
+  updateWorldInfo(totals);
 
   return totals;
+}
+
+function updateWorldInfo(totals) {
+  const label = document.getElementById('wi-label');
+  if (!label) return;
+  const pop = document.getElementById('wi-pop');
+  const extra = document.getElementById('wi-extra');
+  const lot = activeLot();
+  if (state.inspectedKey) {
+    label.textContent = lot ? lot.name : 'Lot';
+    if (extra) extra.textContent = state.inspectedKey.world === 'exterior' ? 'Lot selected' : 'Building selected';
+  } else {
+    label.textContent = 'World Info';
+    if (extra) extra.textContent = lot ? `${themeById(lot.theme).name} · ${state.mode}` : '';
+  }
+  if (pop) pop.textContent = `Population: ${totals.guests}`;
 }
 
 function updateFinance(totals) {

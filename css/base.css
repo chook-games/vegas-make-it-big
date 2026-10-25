@@ -175,3 +175,14 @@ html, body {
 button, .build-card, .toggle, input[type="range"] {
   touch-action: manipulation;
 }
+
+/* ===== Loading progress ===== */
+.load-bar {
+  width: min(60vw, 320px); height: 10px; border-radius: 6px;
+  background: rgba(255,255,255,0.12); overflow: hidden;
+}
+.load-bar > i {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, #06d6a0, #00f5d4);
+  transition: width 0.25s ease;
+}

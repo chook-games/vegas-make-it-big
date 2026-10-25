@@ -134,6 +134,11 @@
   </div>
 
   <div class="bottom-dock">
+    <div class="world-info" id="world-info">
+      <span class="wi-label" id="wi-label">World Info</span>
+      <span class="wi-val" id="wi-pop">Population: 0</span>
+      <span class="wi-extra" id="wi-extra"></span>
+    </div>
     <div class="finance-strip" id="finance-strip">
       <div class="fin-col"><span class="fin-label">PROFIT</span><span class="fin-val" id="fin-profit">+$0</span></div>
       <div class="fin-col"><span class="fin-label">INCOME</span><span class="fin-val" id="fin-income">$0</span></div>
@@ -178,7 +183,8 @@
 
   <div id="loading">
     <div class="spinner"></div>
-    <p id="loading-text">Loading Resort...</p>
+    <p id="loading-text">Preparing World...</p>
+    <div class="load-bar"><i id="load-fill"></i></div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

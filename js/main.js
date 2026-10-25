@@ -26,7 +26,9 @@ import { openPricingScreen } from './ui/pricingScreen.js';
 import { openViewFilterScreen } from './ui/viewFilterScreen.js';
 import { openSandboxScreen } from './ui/sandboxScreen.js';
 import { openLotPurchase } from './ui/lotPurchase.js';
-import { startFreePlayLot, startFreePlayWithTheme, checkCampaign } from './game/campaign.js';
+import { openThemeSelect } from './ui/themeSelect.js';
+import { openObjectivesScreen } from './ui/objectivesScreen.js';
+import { startFreePlayLot, startFreePlayWithTheme, checkCampaign, currentScenario } from './game/campaign.js';
 import { npcTick } from './game/npc.js';
 import { checkDailies, onDayPassed } from './game/missions.js';
 import { checkScenarioEvents } from './game/scenarioEvents.js';
@@ -67,7 +69,7 @@ function initUI() {
   document.getElementById('btn-lots').addEventListener('click', () => { closeInspector(); openLotScreen(); });
   document.getElementById('btn-campaign').addEventListener('click', () => { closeInspector(); openCampaignScreen(); });
   document.getElementById('btn-players').addEventListener('click', () => { closeInspector(); openRivalsScreen(); });
-  document.getElementById('btn-objectives').addEventListener('click', () => { closeInspector(); openQuestsScreen(); });
+  document.getElementById('btn-objectives').addEventListener('click', () => { closeInspector(); openObjectivesScreen(); });
   document.getElementById('btn-shot').addEventListener('click', takeScreenshot);
   document.getElementById('btn-wander').addEventListener('click', () => {
     state.wander = !state.wander;
@@ -347,9 +349,29 @@ function applyLightingRefresh() {
   updateDayNight(0);
 }
 
-function boot() {
+async function boot() {
+  const setLoad = (p, text) => {
+    const f = document.getElementById('load-fill');
+    if (f) f.style.width = p + '%';
+    const t = document.getElementById('loading-text');
+    if (t && text) t.textContent = text;
+  };
+  const nextFrame = () => new Promise(r => {
+    let done = false;
+    const fin = () => { if (!done) { done = true; r(); } };
+    try { requestAnimationFrame(fin); } catch (e) {}
+    setTimeout(fin, 60);
+  });
+
+  setLoad(8, 'Loading engine...');
+  await nextFrame();
   initUI();
+  applyStaticI18n();
+  setLoad(24, 'Preparing World...');
+  await nextFrame();
   createWorlds();
+  setLoad(46, 'Building the city...');
+  await nextFrame();
   initControls({
     onTap: handleTileTap,
     onHover: hoverPlacement,
@@ -364,11 +386,16 @@ function boot() {
   });
   applySettings();
   initPostFX();
-  applyStaticI18n();
+  setLoad(64, 'Loading save...');
+  await nextFrame();
 
   const existing = hasSave();
   let raw = null;
   if (existing) raw = load();
+
+  rebuildCity();
+  setLoad(88, 'Placing lots...');
+  await nextFrame();
 
   const launch = () => {
     booted = true;
@@ -381,6 +408,8 @@ function boot() {
     rebuildCity();
   };
 
+  setLoad(100, 'Ready');
+  await nextFrame();
   document.getElementById('loading').classList.add('hide');
 
   const menu = () => openMainMenu({
@@ -391,16 +420,22 @@ function boot() {
       onStarted: () => {
         openLotPurchase({
           onPick: ({ radius, cost }) => {
-            const lot = activeLot();
-            lot.radius = radius;
-            state.cash = Math.max(0, state.cash - cost);
-            syncActiveGrids();
-            applyRadius(radius);
-            applyThemeToTiles(currentTheme());
-            switchLot(0, true);
-            save();
-            beginTutorial();
-            launch();
+            openThemeSelect({
+              defaultId: currentScenario() ? currentScenario().theme : 'american',
+              onPick: (theme) => {
+                const lot = activeLot();
+                lot.radius = radius;
+                lot.theme = theme;
+                state.cash = Math.max(0, state.cash - cost);
+                syncActiveGrids();
+                applyRadius(radius);
+                applyThemeToTiles(currentTheme());
+                switchLot(0, true);
+                save();
+                beginTutorial();
+                launch();
+              }
+            });
           }
         });
       },
@@ -410,12 +445,17 @@ function boot() {
       onPick: (lot) => openSandboxScreen({
         defaultCash: lot.cash,
         onStart: (cfg) => {
-          startFreePlayLot({ theme: lot.theme, radius: lot.radius, cash: cfg.cash });
-          applySandbox(cfg);
-          seedStarterResort();
-          beginTutorial();
-          Bus.emit(EV.UI_REFRESH);
-          launch();
+          openThemeSelect({
+            defaultId: lot.theme,
+            onPick: (theme) => {
+              startFreePlayLot({ theme, radius: lot.radius, cash: cfg.cash });
+              applySandbox(cfg);
+              seedStarterResort();
+              beginTutorial();
+              Bus.emit(EV.UI_REFRESH);
+              launch();
+            }
+          });
         },
         onBack: () => menu()
       }),
@@ -429,7 +469,7 @@ function boot() {
 
 setInterval(() => { if (booted) save(); }, SAVE_INTERVAL_MS);
 
-boot();
+boot().catch(e => console.error('Boot failed', e));
 loop();
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
