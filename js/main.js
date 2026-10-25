@@ -50,6 +50,7 @@ import { canPrestige } from './game/prestige.js';
 import { playSound, vibrate, unlockAudio, suspendAudio, resumeAudio } from './audio/audio.js';
 import { playMenuMusic, playGameMusic, playSting } from './audio/music.js';
 import { startAmbience, stopAmbience } from './audio/ambience.js';
+import { startVenues, stopVenues } from './audio/venue.js';
 
 const clock = new THREE.Clock();
 let booted = false;
@@ -136,13 +137,19 @@ function initUI() {
 
   Bus.on('level:up', (data) => {
     playSound('achievement');
+    playSound('firework_launch');
+    setTimeout(() => playSound('firework_explode'), 750);
     vibrate(30);
     spawnConfetti();
     openLevelUpScreen(data);
   });
 
   Bus.on(EV.DAY_PASSED, onDayPassed);
-  Bus.on('campaign:complete', () => playSting('win'));
+  Bus.on('campaign:complete', () => {
+    playSting('win');
+    playSound('firework_launch');
+    setTimeout(() => playSound('firework_explode'), 800);
+  });
 }
 
 function toggleSound() {
@@ -411,6 +418,7 @@ async function boot() {
     booted = true;
     playGameMusic(currentTheme());
     startAmbience();
+    startVenues();
     updateHUD();
     renderDock();
     refreshPrestigeAlert();
@@ -425,6 +433,7 @@ async function boot() {
   const menu = () => {
   playMenuMusic();
   stopAmbience();
+  stopVenues();
   openMainMenu({
     hasSave: hasSave(),
     onContinue: () => { const r = load() || raw || {}; startContinue(r); launch(); },

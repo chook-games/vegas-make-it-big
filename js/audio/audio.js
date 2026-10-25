@@ -6,7 +6,16 @@ import {
 
 const SAMPLES = {
   click: 'assets/audio/ui/click.ogg',
-  cash: 'assets/audio/ui/cash.ogg'
+  cash: 'assets/audio/ui/cash.ogg',
+  firework_launch_1: 'assets/audio/sfx/firework_launch_1.ogg',
+  firework_launch_2: 'assets/audio/sfx/firework_launch_2.ogg',
+  firework_launch_3: 'assets/audio/sfx/firework_launch_3.ogg',
+  firework_explode_1: 'assets/audio/sfx/firework_explode_1.ogg',
+  firework_explode_2: 'assets/audio/sfx/firework_explode_2.ogg',
+  firework_explode_3: 'assets/audio/sfx/firework_explode_3.ogg',
+  firework_explode_4: 'assets/audio/sfx/firework_explode_4.ogg',
+  firework_explode_5: 'assets/audio/sfx/firework_explode_5.ogg',
+  firework_explode_6: 'assets/audio/sfx/firework_explode_6.ogg'
 };
 
 const SAMPLE_SFX = {
@@ -15,7 +24,9 @@ const SAMPLE_SFX = {
   confirm: { name: 'click', vol: 0.7, rate: 1.2 },
   cancel: { name: 'click', vol: 0.45, rate: 0.75 },
   error: { name: 'click', vol: 0.5, rate: 0.55 },
-  coin: { name: 'cash', vol: 0.45, rate: 1.0 }
+  coin: { name: 'cash', vol: 0.45, rate: 1.0 },
+  firework_launch: { list: ['firework_launch_1', 'firework_launch_2', 'firework_launch_3'], vol: 0.55, rate: 1.0 },
+  firework_explode: { list: ['firework_explode_1', 'firework_explode_2', 'firework_explode_3', 'firework_explode_4', 'firework_explode_5', 'firework_explode_6'], vol: 0.5, rate: 1.0 }
 };
 
 export function unlockAudio() {
@@ -46,8 +57,9 @@ export function playSound(type) {
   if (s) {
     const c = initAudio();
     if (!c) return;
-    loadBuffer(s.name, SAMPLES[s.name]).then(() => {
-      playBuffer(s.name, { vol: s.vol, rate: s.rate });
+    const name = s.list ? s.list[Math.floor(Math.random() * s.list.length)] : s.name;
+    loadBuffer(name, SAMPLES[name]).then(() => {
+      playBuffer(name, { vol: s.vol, rate: s.rate });
     });
     return;
   }
