@@ -18,7 +18,7 @@ export function defaultBetIndex(tier) {
 }
 
 export function isGambling(world, id) {
-  if (id === 'casino') return true;
+  if (id === 'casino' || id === 'mediumcasino' || id === 'largecasino') return true;
   const cat = categoryOf(world, id);
   return cat === 'table' || cat === 'slots';
 }

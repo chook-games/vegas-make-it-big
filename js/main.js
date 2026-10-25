@@ -1,6 +1,7 @@
 import { state, activeLot, syncActiveGrids } from './core/state.js';
 import { Bus, EV } from './core/events.js';
-import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
+import { TICK_MS, DAY_LENGTH_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
+import { dailyBuildingRevenue } from './game/revenue.js';
 import { hasSave, load, save, resetToNew } from './core/save.js';
 import { createWorlds, animateCityPeds } from './three/worlds.js';
 import { rebuildCity, updateCityHover } from './three/city.js';

@@ -51,19 +51,22 @@ export function renderFinancePanel(el) {
   if (!el) return;
   const t = calculateTotals();
   const st = stations();
-  const profit = `${t.totalIncome >= 0 ? '+' : '-'}$${Math.abs(t.totalIncome).toLocaleString()}`;
+  const profitVal = t.profitPerDay != null ? t.profitPerDay : t.totalIncome;
+  const profit = `${profitVal >= 0 ? '+' : '-'}$${Math.abs(profitVal).toLocaleString()}`;
   el.innerHTML = `
     <div class="people-grid">
-      <div class="people-stat"><span>Profit</span><b style="color:${t.totalIncome >= 0 ? '#06d6a0' : '#ff6b6b'}">${profit}</b></div>
-      <div class="people-stat"><span>Income</span><b>$${t.grossIncome.toLocaleString()}</b></div>
-      <div class="people-stat"><span>Wages</span><b style="color:#ffb4a2">$${t.wages.toLocaleString()}</b></div>
+      <div class="people-stat"><span>Profit / day</span><b style="color:${profitVal >= 0 ? '#06d6a0' : '#ff6b6b'}">${profit}</b></div>
+      <div class="people-stat"><span>Income / day</span><b>$${(t.grossPerDay != null ? t.grossPerDay : t.grossIncome).toLocaleString()}</b></div>
+      <div class="people-stat"><span>Costs / day</span><b style="color:#ffb4a2">$${(t.costsPerDay != null ? t.costsPerDay : t.costs).toLocaleString()}</b></div>
       <div class="people-stat"><span>Guests</span><b>${t.guests}</b></div>
     </div>
     <div class="people-breakdown">
-      <div>⚡ Power <b>${t.powerUsed}/${t.powerCap}</b></div>
-      <div>💧 Water <b>${t.waterUsed}/${t.waterCap}</b></div>
-      <div>🤵 Croupiers <b>${countOf('dealer')}/${st}</b></div>
-      <div>🛠️ Condition <b>${Math.round(state.condition)}%</b></div>
+      <div>Wages <b>$${(t.wagesPerDay != null ? t.wagesPerDay : t.wages).toLocaleString()}</b></div>
+      <div>Running <b>$${(t.runningPerDay != null ? t.runningPerDay : t.running).toLocaleString()}</b></div>
+      <div>Power <b>${t.powerUsed}/${t.powerCap}</b></div>
+      <div>Water <b>${t.waterUsed}/${t.waterCap}</b></div>
+      <div>Croupiers <b>${countOf('dealer')}/${st}</b></div>
+      <div>Condition <b>${Math.round(state.condition)}%</b></div>
     </div>
   `;
 }

@@ -64,10 +64,11 @@ function updateWorldInfo(totals) {
 function updateFinance(totals) {
   const profit = document.getElementById('fin-profit');
   if (!profit) return;
-  profit.textContent = `${totals.totalIncome >= 0 ? '+' : '-'}$${Math.abs(totals.totalIncome).toLocaleString()}`;
-  profit.style.color = totals.totalIncome >= 0 ? '#06d6a0' : '#ff6b6b';
-  document.getElementById('fin-income').textContent = `$${totals.grossIncome.toLocaleString()}`;
-  document.getElementById('fin-costs').textContent = `$${totals.wages.toLocaleString()}`;
+  const dailyProfit = totals.profitPerDay != null ? totals.profitPerDay : totals.totalIncome;
+  profit.textContent = `${dailyProfit >= 0 ? '+' : '-'}$${Math.abs(dailyProfit).toLocaleString()}`;
+  profit.style.color = dailyProfit >= 0 ? '#06d6a0' : '#ff6b6b';
+  document.getElementById('fin-income').textContent = `$${(totals.grossPerDay != null ? totals.grossPerDay : totals.grossIncome).toLocaleString()}`;
+  document.getElementById('fin-costs').textContent = `$${(totals.costsPerDay != null ? totals.costsPerDay : totals.costs).toLocaleString()}`;
   const pow = document.getElementById('fin-power');
   pow.textContent = `⚡ ${totals.powerUsed}/${totals.powerCap}`;
   pow.style.color = totals.powerShort ? '#ff6b6b' : '#9fd6ff';

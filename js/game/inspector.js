@@ -61,7 +61,7 @@ export function openInspector(world, key, layer = 0) {
 
   let content = '';
   if (inspTab === 'finance') {
-    content += `<div class="fin-line"><span>Income / cycle</span><b style="color:#06d6a0">$${stats.income.toLocaleString()}</b></div>`;
+    content += `<div class="fin-line"><span>Income / day</span><b style="color:#06d6a0">$${stats.income.toLocaleString()}</b></div>`;
     if (cell.item.running) content += `<div class="fin-line"><span>Running cost / day</span><b style="color:#ff9a8b">$${cell.item.running.toLocaleString()}</b></div>`;
     content += `<div class="fin-line"><span>Power demand</span><b style="color:#9fd6ff">${u.p || 0} kW</b></div>`;
     content += `<div class="fin-line"><span>Water demand</span><b style="color:#9fd6ff">${u.w || 0}</b></div>`;
@@ -84,7 +84,7 @@ export function openInspector(world, key, layer = 0) {
   } else if (inspTab === 'upgrades') {
     content += `<div class="fin-line"><span>Current level</span><b>Lv.${cell.level}</b></div>`;
     content += `<div class="fin-line"><span>Upgrade cost</span><b style="color:var(--gold)">$${upg.toLocaleString()}</b></div>`;
-    content += `<div class="fin-line"><span>Next income</span><b style="color:#06d6a0">~$${Math.round(stats.income * (cell.level + 1) / cell.level).toLocaleString()}</b></div>`;
+    content += `<div class="fin-line"><span>Next income / day</span><b style="color:#06d6a0">~$${Math.round(stats.income * (cell.level + 1) / cell.level).toLocaleString()}</b></div>`;
     content += `<div class="muted" style="margin-top:8px;">Use the buttons below to upgrade, move or sell the building.</div>`;
   } else if (inspTab === 'history') {
     const hist = Array.isArray(state.history) ? state.history.slice(-32) : [];
@@ -103,7 +103,7 @@ export function openInspector(world, key, layer = 0) {
     }
   } else {
     content += `<div>${t(cell.item.desc)}</div>`;
-    content += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / cycle</div>`;
+    content += `<div style="margin-top:6px; color:#06d6a0; font-weight:700;">Income: $${stats.income} / day</div>`;
     if (utilParts.length) content += `<div style="margin-top:2px; color:#8fd0ff;">${utilParts.join(' · ')}</div>`;
     if (stats.notes.length) content += `<div style="margin-top:4px; color:#ffd166;">${stats.notes.join('<br>')}</div>`;
   }

@@ -280,7 +280,6 @@ export function placeBuildingAt(world, itemId, ox, oz, rotation = 0, layer = 0) 
 export function seedStarterResort() {
   placeBuildingAt('exterior', 'casino', -1, 0, 0);
   placeBuildingAt('exterior', 'fountain', -4, 2, 0);
-  placeBuildingAt('exterior', 'generator', 3, -3, 0);
   placeBuildingAt('interior', 'slots', -3, 0, 0);
   placeBuildingAt('interior', 'wall', 0, 0, 1);
   placeBuildingAt('interior', 'vip_bj', 2, 2, 0);
@@ -296,6 +295,7 @@ export function seedStarterResort() {
   for (let gz = 4; gz <= half; gz++) {
     placeBuildingAt('exterior', 'path_concrete', -3, gz, 0);
   }
+  placeBuildingAt('exterior', 'path_concrete', -1, 2, 0);
   placeBuildingAt('exterior', 'path_concrete', -2, 3, 0);
   placeBuildingAt('exterior', 'path_concrete', -1, 3, 0);
   placeBuildingAt('exterior', 'path_concrete', 0, 3, 0);

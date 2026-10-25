@@ -4,11 +4,11 @@ export const GOODS = [
   { id: 'food', name: 'Food', icon: '🍽️', cost: 20, min: 10, max: 40, step: 2, def: 20,
     venues: ['restaurant', 'buffet', 'foodcourt'] },
   { id: 'rooms', name: 'Rooms', icon: '🛏️', cost: 50, min: 20, max: 90, step: 5, def: 45,
-    venues: ['hotel'] },
+    venues: ['hotel', 'motel', 'mediumhotel', 'largehotel'] },
   { id: 'shows', name: 'Shows', icon: '🎬', cost: 30, min: 10, max: 60, step: 5, def: 25,
-    venues: ['cinema', 'stadium', 'boxing'] },
+    venues: ['cinema', 'stadium', 'boxing', 'theatre', 'circus'] },
   { id: 'shops', name: 'Souvenirs', icon: '🎁', cost: 15, min: 5, max: 30, step: 1, def: 12,
-    venues: ['mall', 'giftshop'] }
+    venues: ['mall', 'giftshop', 'jewelrystore'] }
 ];
 
 export function goodForVenue(id) {

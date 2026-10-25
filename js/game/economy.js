@@ -4,13 +4,14 @@ import { getTimeFactors, seasonInfo } from './daynight.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
 import { utilOf } from '../data/utilities.js';
-import { stationIncomeFactor, isGambling } from '../data/betting.js';
+import { isGambling } from '../data/betting.js';
 import { GOODS, goodForVenue, priceT } from '../data/goods.js';
 import { weatherGuestMul, weatherIncomeMul, weatherCasinoMul } from './weather.js';
 import { staffEffects, totalWages } from './staff.js';
 import { getLotHeat } from './lots.js';
 import { getPaths } from './paths.js';
 import { competitionFactor } from './npc.js';
+import { dailyBuildingRevenue } from './revenue.js';
 
 function getNeighbors(grid, gx, gz) {
   const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -24,7 +25,7 @@ function getNeighbors(grid, gx, gz) {
 
 export function evaluateTileStats(world, cell, grid, heat, openSet, staffing) {
   const item = cell.item;
-  let inc = item.income * cell.level;
+  let inc = dailyBuildingRevenue(world, cell);
   const notes = [];
   const key = cell.key;
 
@@ -67,8 +68,7 @@ export function evaluateTileStats(world, cell, grid, heat, openSet, staffing) {
     }
   }
 
-  if (isGambling(world, cell.item.id)) {
-    inc *= stationIncomeFactor(world, cell);
+  if (world === 'interior' && isGambling(world, cell.item.id)) {
     if (staffing != null && staffing < 0.999) {
       inc *= staffing;
       if (staffing < 0.6) notes.push('Not enough croupiers - stations run slow.');
@@ -77,7 +77,6 @@ export function evaluateTileStats(world, cell, grid, heat, openSet, staffing) {
   const good = goodForVenue(cell.item.id);
   if (good) {
     const price = (state.prices && state.prices[good.id] != null) ? state.prices[good.id] : good.def;
-    inc *= 0.5 + priceT(good, price) * 1.3;
     if (priceT(good, price) > 0.75) notes.push('Prices are high - guests may complain.');
   }
   return { income: Math.round(inc), notes };
@@ -161,7 +160,6 @@ export function calculateTotals() {
   let stations = 0;
   for (const lot of state.lots) {
     for (const k in lot.interiorGrid) if (isGambling('interior', lot.interiorGrid[k].item.id)) stations++;
-    for (const k in lot.exteriorGrid) if (isGambling('exterior', lot.exteriorGrid[k].item.id)) stations++;
   }
   const croupiers = (state.staff && state.staff.dealer) || 0;
   const staffed = Math.min(croupiers, stations);
@@ -210,17 +208,6 @@ export function calculateTotals() {
   const nuisancePenalty = 1 - Math.min(0.25, (avgNoise * 0.15 + avgSmell * 0.12));
   const condFactor = 0.6 + 0.4 * (Math.max(0, Math.min(100, state.condition)) / 100);
 
-  const grossIncome = Math.round(
-    (rawExt * time.dayFactor + rawInt * time.nightFactor * weatherCasinoMul()) * weatherIncomeMul() *
-    repFactor * happyFactor * nuisancePenalty * condFactor *
-    season.incomeMul * eventIncome * powerPenalty * prestigeMul * staffIncomeMul
-  );
-
-  const wages = totalWages();
-  const running = Math.round(runningPerDay * (TICK_MS / DAY_LENGTH_MS));
-  const costs = wages + running;
-  const totalIncome = grossIncome - costs;
-
   let priceSum = 0;
   for (const g of GOODS) {
     const price = (state.prices && state.prices[g.id] != null) ? state.prices[g.id] : g.def;
@@ -235,12 +222,31 @@ export function calculateTotals() {
   guests = Math.max(0, guests);
 
   const fill = capacity > 0 ? guests / capacity : 0;
+  // Guest-driven revenue: a venue only earns from the guests actually inside it.
+  const fillFactor = Math.max(0, Math.min(1.15, fill));
+
+  const grossPerDay = Math.round(
+    (rawExt * time.dayFactor + rawInt * time.nightFactor * weatherCasinoMul()) * weatherIncomeMul() *
+    repFactor * happyFactor * nuisancePenalty * condFactor *
+    season.incomeMul * eventIncome * powerPenalty * prestigeMul * staffIncomeMul * fillFactor
+  );
+
+  const wagesPerDay = totalWages();
+  const costsPerDay = wagesPerDay + runningPerDay;
+  const profitPerDay = grossPerDay - costsPerDay;
+  const share = TICK_MS / DAY_LENGTH_MS;
+  const grossIncome = Math.round(grossPerDay * share);
+  const wages = Math.round(wagesPerDay * share);
+  const running = Math.round(runningPerDay * share);
+  const costs = Math.round(costsPerDay * share);
+  const totalIncome = grossIncome - costs;
 
   return {
     powerUsed: powerDemand, powerCap: powerGen,
     waterUsed: waterDemand, waterCap: waterGen,
     powerShort, waterShort,
-    capacity, guests, fill,
+    capacity, guests, fill, fillFactor,
+    grossPerDay, costsPerDay, profitPerDay, wagesPerDay, runningPerDay,
     rawExt, rawInt, totalIncome, grossIncome, wages, running, costs, hasBlackout,
     edgeGuestFactor, repFactor, happyFactor,
     prestigeMul, eventIncome, eventGuest, staffEff: eff,
