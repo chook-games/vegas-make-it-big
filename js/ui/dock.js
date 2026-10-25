@@ -7,13 +7,14 @@ import { cancelPendingPlacement } from '../game/placement.js';
 import { activeLot, switchLot } from '../game/lots.js';
 import { themeById } from '../data/themes.js';
 import { t } from '../i18n/i18n.js';
-import { renderPeoplePanel, renderFinancePanel, renderStaffPanel } from './peoplePanel.js';
+import { renderPeoplePanel, renderFinancePanel, renderStaffPanel, renderWorldPanel } from './peoplePanel.js';
 
 export function renderDock() {
   const grid = document.getElementById('build-grid');
   const tabs = document.getElementById('dock-tabs');
   const subtabs = document.getElementById('dock-subtabs');
   const panels = {
+    world: document.getElementById('world-panel'),
     people: document.getElementById('people-panel'),
     finance: document.getElementById('finance-panel'),
     staff: document.getElementById('staff-panel')
@@ -23,8 +24,12 @@ export function renderDock() {
   document.querySelectorAll('[data-dmode]').forEach(b => {
     b.classList.toggle('active', b.dataset.dmode === mode);
   });
+  const wbtn = document.getElementById('btn-world');
+  const lbtn = document.getElementById('btn-lot');
+  if (wbtn) wbtn.classList.toggle('active', mode === 'world');
+  if (lbtn) lbtn.classList.toggle('active', mode === 'lot');
 
-  const PANEL_TITLES = { people: 'People', finance: 'Finance', staff: 'Staff' };
+  const PANEL_TITLES = { world: 'World Info', people: 'People', finance: 'Finance', staff: 'Staff' };
 
   if (panels[mode]) {
     tabs.innerHTML = '';
@@ -36,7 +41,8 @@ export function renderDock() {
       if (!panels[k]) return;
       panels[k].style.display = k === mode ? 'block' : 'none';
     });
-    if (mode === 'people') renderPeoplePanel(panels.people);
+    if (mode === 'world') renderWorldPanel(panels.world);
+    else if (mode === 'people') renderPeoplePanel(panels.people);
     else if (mode === 'finance') renderFinancePanel(panels.finance);
     else if (mode === 'staff') renderStaffPanel(panels.staff);
     document.getElementById('dock-title').textContent = PANEL_TITLES[mode] || '';
@@ -168,6 +174,11 @@ export function initDock() {
       renderDock();
     });
   });
+
+  const worldBtn = document.getElementById('btn-world');
+  const lotBtn = document.getElementById('btn-lot');
+  if (worldBtn) worldBtn.addEventListener('click', () => { state.dockMode = 'world'; renderDock(); });
+  if (lotBtn) lotBtn.addEventListener('click', () => { state.dockMode = 'lot'; renderDock(); });
 
   const cycleLot = (dir) => {
     if (state.lots.length < 2) return;

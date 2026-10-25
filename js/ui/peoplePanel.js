@@ -4,6 +4,7 @@ import { calculateTotals } from '../game/economy.js';
 import { totalStaff, countOf, hire, fire, totalWages } from '../game/staff.js';
 import { STAFF, staffUnlocked, staffMax } from '../data/staff.js';
 import { isGambling } from '../data/betting.js';
+import { playerValue, playerRank } from '../game/npc.js';
 
 function stations() {
   let n = 0;
@@ -93,4 +94,30 @@ export function renderStaffPanel(el) {
   el.querySelectorAll('[data-dock-fire]').forEach(b => {
     b.addEventListener('click', () => { fire(b.dataset.dockFire); renderStaffPanel(el); });
   });
+}
+
+export function renderWorldPanel(el) {
+  if (!el) return;
+  const t = calculateTotals();
+  const rank = playerRank();
+  let buildings = 0;
+  for (const lot of state.lots) {
+    buildings += Object.keys(lot.exteriorGrid).length
+      + Object.keys(lot.interiorGrid).length
+      + Object.keys(lot.interiorUpperGrid || {}).length;
+  }
+  el.innerHTML = `
+    <div class="people-grid">
+      <div class="people-stat"><span>Population</span><b>${t.guests}</b></div>
+      <div class="people-stat"><span>Lots</span><b>${state.lots.length}</b></div>
+      <div class="people-stat"><span>Buildings</span><b>${buildings}</b></div>
+      <div class="people-stat"><span>Rank</span><b>#${rank.rank}/${rank.total}</b></div>
+    </div>
+    <div class="people-breakdown">
+      <div>💰 Cash <b>$${Math.floor(state.cash).toLocaleString()}</b></div>
+      <div>⭐ Reputation <b>${Math.round(state.reputation)}</b></div>
+      <div>🛠️ Condition <b>${Math.round(state.condition)}%</b></div>
+      <div>🏁 Resort value <b>$${playerValue().toLocaleString()}</b></div>
+    </div>
+  `;
 }

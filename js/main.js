@@ -3,11 +3,11 @@ import { Bus, EV } from './core/events.js';
 import { TICK_MS, SAVE_INTERVAL_MS, OFFLINE_CAP_HOURS, OFFLINE_EFFICIENCY } from './core/constants.js';
 import { hasSave, load, save, resetToNew } from './core/save.js';
 import { createWorlds, animateCityPeds } from './three/worlds.js';
-import { rebuildCity } from './three/city.js';
+import { rebuildCity, updateCityHover } from './three/city.js';
 import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
 import { renderFrame, initPostFX, resizePostFX, setBloom } from './three/postfx.js';
 import { updateParticles, spawnConfetti, spawnMoneyBurst, setWeatherParticles, updateWeatherParticles, triggerLightning, tickLightning } from './three/particles.js';
-import { initControls, updateCamera, rotateCameraStep, wanderStep } from './three/controls.js';
+import { initControls, updateCamera, rotateCameraStep, wanderStep, screenRay } from './three/controls.js';
 import { initToast, spawnFloatingText } from './ui/toast.js';
 import { initHUD, updateHUD } from './ui/hud.js';
 import { initDock, renderDock } from './ui/dock.js';
@@ -374,7 +374,10 @@ async function boot() {
   await nextFrame();
   initControls({
     onTap: handleTileTap,
-    onHover: hoverPlacement,
+    onHover: (x, y) => {
+      updateCityHover(screenRay(x, y));
+      if (state.selectedTool || state.pendingPlacement) hoverPlacement(x, y);
+    },
     onDesktopClick: (x, y) => {
       if (state.pendingPlacement) confirmPendingPlacement();
       else handleTileTap(x, y);

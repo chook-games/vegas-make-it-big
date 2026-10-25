@@ -7,14 +7,14 @@ export function closeModal() {
   }
 }
 
-export function openModal({ title, bodyHTML, bodyEl, actions, closable = true, onOpen }) {
+export function openModal({ title, bodyHTML, bodyEl, actions, closable = true, className, onOpen }) {
   closeModal();
 
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
 
   const card = document.createElement('div');
-  card.className = 'modal-card';
+  card.className = 'modal-card' + (className ? ' ' + className : '');
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close';

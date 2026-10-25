@@ -47,6 +47,7 @@ export function openObjectivesScreen() {
 
   openModal({
     title: 'Objectives',
+    className: 'green-modal objectives-window',
     bodyHTML: body,
     actions: [
       { label: 'Quests & Missions', cls: 'btn-ghost', onClick: () => { closeModal(); openQuestsScreen(); } },
@@ -59,6 +60,7 @@ export function openObjectivesScreen() {
           if (!o) return;
           openModal({
             title: 'Objective',
+            className: 'green-modal',
             bodyHTML: `<div class="modal-text"><b>${o.name}</b><br><br>Progress: ${Math.min(o.current, o.target)} / ${o.target}<br>Status: ${o.done ? 'Completed ✔' : 'In progress'}</div>`,
             actions: [{ label: 'Back', cls: 'btn-ghost', onClick: () => { closeModal(); openObjectivesScreen(); } }]
           });

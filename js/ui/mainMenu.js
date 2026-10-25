@@ -7,7 +7,18 @@ function button(act, icon, label, disabled) {
 export function openMainMenu({ hasSave, onContinue, onCampaign, onFreePlay, onSettings }) {
   const el = document.createElement('div');
   el.className = 'main-menu';
+  const buildings = Array.from({ length: 16 }).map((_, i) => {
+    const h = 16 + ((i * 37) % 54);
+    const w = 6 + ((i * 13) % 5);
+    const hue = 260 + (i % 5) * 12;
+    return `<span class="mm-bld" style="left:${i * 6.6}%;width:${w}%;height:${h}%;--hue:${hue};--lit:${i % 3 === 0}"></span>`;
+  }).join('');
   el.innerHTML = `
+    <div class="mm-scene">
+      <div class="mm-sun"></div>
+      <div class="mm-skyline">${buildings}</div>
+      <div class="mm-neon">VEGAS</div>
+    </div>
     <div class="mm-panel">
       <div class="mm-title">Main Menu</div>
       <div class="mm-buttons">

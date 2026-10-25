@@ -9,6 +9,15 @@ exteriorGroup.add(cityGroup);
 
 export const cityInteractives = [];
 
+const hoverRing = new THREE.Mesh(
+  new THREE.RingGeometry(0.92, 1.0, 40),
+  new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide, transparent: true, opacity: 0.9, depthWrite: false })
+);
+hoverRing.rotation.x = -Math.PI / 2;
+hoverRing.position.y = 0.25;
+hoverRing.visible = false;
+exteriorGroup.add(hoverRing);
+
 const OWNED_CELLS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
 const RIVAL_CELLS = [[2, 0], [-2, 0]];
 const SALE_CELLS = [[0, 2], [0, -2], [2, 1], [-2, 1]];
@@ -115,6 +124,18 @@ function parseColor(hex, fallback) {
   return fallback;
 }
 
+export function updateCityHover(ray) {
+  if (!ray || !cityInteractives.length) { hoverRing.visible = false; return false; }
+  const hits = ray.intersectObjects(cityInteractives, false);
+  if (!hits.length) { hoverRing.visible = false; return false; }
+  const d = hits[0].object.userData;
+  hoverRing.position.set(d.x, 0.25, d.z);
+  hoverRing.scale.setScalar((d.size || 20) / 2);
+  hoverRing.material.color.setHex(d.kind === 'buyPlot' ? 0x22c55e : 0xffd166);
+  hoverRing.visible = true;
+  return true;
+}
+
 export function rebuildCity() {
   while (cityGroup.children.length) cityGroup.remove(cityGroup.children[0]);
   cityInteractives.length = 0;
@@ -143,7 +164,7 @@ export function rebuildCity() {
 
     const hit = box(size, 8, size, th.accent, { transparent: true, opacity: 0.001 });
     hit.position.set(x, 4, z);
-    hit.userData = { kind: 'lot', index: i };
+    hit.userData = { kind: 'lot', index: i, x, z, size };
     cityGroup.add(hit);
     cityInteractives.push(hit);
   });
@@ -171,7 +192,7 @@ export function rebuildCity() {
 
     const hit = box(size, 8, size, 0x22c55e, { transparent: true, opacity: 0.001 });
     hit.position.set(x, 4, z);
-    hit.userData = { kind: 'buyPlot' };
+    hit.userData = { kind: 'buyPlot', x, z, size };
     cityGroup.add(hit);
     cityInteractives.push(hit);
   }

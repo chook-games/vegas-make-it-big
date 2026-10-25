@@ -24,6 +24,7 @@ export function openLotPurchase({ onPick, themeName }) {
   openModal({
     title: 'Buy a Lot',
     closable: false,
+    className: 'green-modal',
     bodyHTML: `<div class="center muted">Choose your starting lot${themeName ? ' for the ' + themeName + ' theme' : ''}. Bigger fits more buildings but costs more.</div><div class="spacer"></div>${content}`,
     onOpen: (bodyEl) => {
       bodyEl.querySelectorAll('[data-size]').forEach(btn => {

@@ -490,3 +490,71 @@
   color: var(--neon-cyan); border-radius: 6px; width: 24px; height: 24px;
   font-size: 12px; font-weight: 800; cursor: pointer;
 }
+/* ===== Main menu: own Vegas scene (not the game world) ===== */
+.main-menu {
+  position: fixed; inset: 0; z-index: 85; overflow: hidden;
+  display: flex; justify-content: flex-end; align-items: center;
+  padding: calc(var(--safe-top) + 12px) 6% calc(var(--safe-bottom) + 12px) 12px;
+  background: linear-gradient(180deg, #241033 0%, #5a1e3a 34%, #b2432f 60%, #ff8c42 76%, #140a1e 100%);
+}
+.mm-scene { position: absolute; inset: 0; pointer-events: none; }
+.mm-scene::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(10,5,15,0.5), rgba(10,5,15,0.1) 55%, rgba(10,5,15,0.6));
+}
+.mm-sun {
+  position: absolute; left: 30%; top: 46%; width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,244,190,0.95), rgba(255,150,70,0.55) 45%, transparent 70%);
+  filter: blur(2px);
+}
+.mm-skyline { position: absolute; left: 0; right: 0; bottom: 0; height: 52%; }
+.mm-bld {
+  position: absolute; bottom: 0; border-radius: 2px 2px 0 0;
+  background:
+    repeating-linear-gradient(180deg, rgba(255,220,140,0.20) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(90deg, rgba(255,220,140,0.14) 0 2px, transparent 2px 10px),
+    linear-gradient(180deg, hsl(var(--hue) 30% 20%), hsl(var(--hue) 35% 8%));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 0 18px rgba(0,0,0,0.55);
+}
+.mm-neon {
+  position: absolute; left: 5%; top: 20%;
+  font-size: clamp(46px, 9vw, 128px); font-weight: 900; letter-spacing: 0.08em;
+  color: #ffd166;
+  text-shadow: 0 0 18px rgba(255,209,102,0.9), 0 0 40px rgba(255,42,133,0.8), 0 0 90px rgba(255,42,133,0.5);
+  -webkit-text-stroke: 2px rgba(120, 20, 60, 0.6);
+}
+.mm-panel { position: relative; z-index: 2; }
+@media (max-width: 700px) {
+  .main-menu { justify-content: center; padding: 12px; }
+  .mm-neon { left: 50%; transform: translateX(-50%); top: 8%; font-size: clamp(40px, 16vw, 80px); }
+}
+
+/* ===== Authentic green windows ===== */
+.modal-card.green-modal {
+  background: rgba(32, 82, 48, 0.97);
+  border-color: #7fbf8a;
+  color: #eaffea;
+}
+.green-modal .modal-title {
+  background: rgba(18, 52, 30, 0.98);
+  border: 1px solid rgba(140, 200, 150, 0.5);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #eaffea;
+}
+.green-modal .muted { color: #a9c9ad; }
+.green-modal .modal-text { color: #e3f3e3; }
+.green-modal .btn-ghost { background: rgba(255,255,255,0.08); color: #dff0df; border-color: rgba(180,220,190,0.35); }
+.green-modal .modal-close { background: rgba(0,0,0,0.25); color: #eaffea; }
+.modal-card.objectives-window { max-width: 600px; }
+.modal-card.green-modal .list-row { background: rgba(255,255,255,0.05); border-color: rgba(180,220,190,0.2); }
+/* ===== Theme thumbnails ===== */
+.theme-grid.thumbs { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.tc-thumb {
+  width: 100%; aspect-ratio: 16 / 10; object-fit: cover;
+  border-radius: 6px; display: block;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
+}
+@media (max-width: 700px) {
+  .theme-grid.thumbs { grid-template-columns: repeat(3, 1fr); }
+}
