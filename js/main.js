@@ -51,9 +51,12 @@ import { playSound, vibrate, unlockAudio, suspendAudio, resumeAudio } from './au
 import { playMenuMusic, playGameMusic, playSting } from './audio/music.js';
 import { startAmbience, stopAmbience } from './audio/ambience.js';
 import { startVenues, stopVenues } from './audio/venue.js';
+import './audio/voices.js';
 
 const clock = new THREE.Clock();
 let booted = false;
+let inGame = false;
+let musicTheme = null;
 
 function initUI() {
   initToast();
@@ -145,6 +148,11 @@ function initUI() {
   });
 
   Bus.on(EV.DAY_PASSED, onDayPassed);
+  Bus.on(EV.UI_REFRESH, () => {
+    if (!inGame) return;
+    const t = currentTheme();
+    if (t !== musicTheme) { musicTheme = t; playGameMusic(t); }
+  });
   Bus.on('campaign:complete', () => {
     playSting('win');
     playSound('firework_launch');
@@ -417,6 +425,8 @@ async function boot() {
   const launch = () => {
     booted = true;
     playGameMusic(currentTheme());
+    inGame = true;
+    musicTheme = currentTheme();
     startAmbience();
     startVenues();
     updateHUD();
@@ -432,6 +442,7 @@ async function boot() {
 
   const menu = () => {
   playMenuMusic();
+  inGame = false;
   stopAmbience();
   stopVenues();
   openMainMenu({

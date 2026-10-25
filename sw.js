@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v52';
+const CACHE = 'vegas-mib-v53';
 const CORE = [
   './',
   './index.html',
@@ -47,6 +47,7 @@ const CORE = [
   './js/audio/music.js',
   './js/audio/ambience.js',
   './js/audio/venue.js',
+  './js/audio/voices.js',
   './js/three/scene.js',
   './js/three/meshkit.js',
   './js/three/meshes.js',

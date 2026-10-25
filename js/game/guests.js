@@ -257,11 +257,21 @@ function spend(guest) {
   state.cash += amount;
   state.stats.tipsEarned += amount;
   state.stats.guestsServed += 0.1;
+  if (isGambling(cell.item.id) && Math.random() < 0.3) {
+    Bus.emit('guest:voice', {
+      kind: Math.random() < 0.6 ? 'win' : 'lose',
+      position: guest.mesh.position.clone()
+    });
+  }
   if (guest.arch.noiseSensitive && Math.random() < 0.3) {
     Bus.emit(EV.FLOATING, { position: guest.mesh.position, text: `+$${amount}`, color: '#ffd166' });
   } else if (Math.random() < 0.06) {
     Bus.emit(EV.FLOATING, { position: guest.mesh.position, text: `+$${amount}`, color: '#06d6a0' });
   }
+}
+
+function isGambling(id) {
+  return /(casino|slots|roulette|poker|blackjack|vip_bj|sicbo|craps|baccarat|keno|videopoker|wheeloffortune|carjackpot|texasholdem|paigow|caribbeanstud|highlimit)/.test(id || '');
 }
 
 function securityStrength() {
