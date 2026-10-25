@@ -127,17 +127,17 @@ export function openInspector(world, key, layer = 0) {
     const slider = document.getElementById('insp-edge-slider');
     if (dec) dec.addEventListener('click', () => {
       cell.betIndex = Math.max(0, (cell.betIndex || 0) - 1);
-      if (cell.item.id === 'poker') state.stats.pokerAdjusted = 1;
+      if (isGambling(world, cell.item.id)) state.stats.pokerAdjusted = 1;
       markLotDirty(); playSound('rotate'); openInspector(world, key, layer); Bus.emit(EV.UI_REFRESH);
     });
     if (inc) inc.addEventListener('click', () => {
       cell.betIndex = Math.min(BET_STEPS.length - 1, (cell.betIndex || 0) + 1);
-      if (cell.item.id === 'poker') state.stats.pokerAdjusted = 1;
+      if (isGambling(world, cell.item.id)) state.stats.pokerAdjusted = 1;
       markLotDirty(); playSound('rotate'); openInspector(world, key, layer); Bus.emit(EV.UI_REFRESH);
     });
     if (slider) slider.addEventListener('input', (e) => {
       cell.edge = parseInt(e.target.value, 10);
-      if (cell.item.id === 'poker') state.stats.pokerAdjusted = 1;
+      if (isGambling(world, cell.item.id)) state.stats.pokerAdjusted = 1;
       const el = document.getElementById('insp-edge');
       if (el) el.textContent = `${cell.edge}% · ${edgeLabel(cell.edge)}`;
       markLotDirty();

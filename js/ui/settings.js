@@ -8,6 +8,7 @@ import { applyVolumes } from '../audio/engine.js';
 import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
 import { resetToNew, save, exportSave, importSave } from '../core/save.js';
+import { inCampaign } from '../game/campaign.js';
 import { LANGS, getLang, setLang, applyStaticI18n } from '../i18n/i18n.js';
 import { openStatsScreen } from './statsScreen.js';
 import { openPricingScreen } from './pricingScreen.js';
@@ -93,6 +94,12 @@ export function openSettingsScreen() {
   `;
 
   openModal({ title: '⚙️ Settings', bodyHTML: body, onOpen: (bodyEl) => {
+    if (inCampaign()) {
+      const achBtn = bodyEl.querySelector('[data-tool="ach"]');
+      const presBtn = bodyEl.querySelector('[data-tool="prestige"]');
+      if (achBtn) achBtn.style.display = 'none';
+      if (presBtn) presBtn.style.display = 'none';
+    }
     bodyEl.querySelectorAll('.toggle').forEach(tg => {
       tg.addEventListener('click', () => {
         const key = tg.dataset.key;

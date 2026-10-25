@@ -64,6 +64,7 @@ export function unlockedCount() {
 }
 
 export function checkProgress() {
+  if (inCampaign()) return;
   checkQuests();
   checkAchievements();
 }

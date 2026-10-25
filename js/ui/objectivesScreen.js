@@ -27,6 +27,8 @@ function buildRows() {
 }
 
 export function openObjectivesScreen() {
+  const inCamp = inCampaign();
+  const scTitle = inCamp && currentScenario() ? currentScenario().title : 'Objectives';
   const list = buildRows();
   const body = list.length
     ? `<table class="obj-table">
@@ -37,8 +39,8 @@ export function openObjectivesScreen() {
             return `<tr>
               <td>${o.name}</td>
               <td class="obj-prog-cell"><div class="obj-prog-bar"><i style="width:${pct}%"></i></div></td>
-              <td style="color:${o.done ? '#6fe3b0' : '#ffb4a2'};text-align:center">${o.done ? '✔' : '✘'}</td>
-              <td style="text-align:center"><button class="obj-info-btn" data-i="${i}">ℹ</button></td>
+              <td style="color:${o.done ? '#6fe3b0' : '#ffb4a2'};text-align:center">${o.done ? '&#10003;' : '&#10007;'}</td>
+              <td style="text-align:center"><button class="obj-info-btn" data-i="${i}">&#8505;</button></td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -46,13 +48,15 @@ export function openObjectivesScreen() {
     : '<div class="center muted">No objectives right now.</div>';
 
   openModal({
-    title: 'Objectives',
+    title: scTitle,
     className: 'green-modal objectives-window',
     bodyHTML: body,
-    actions: [
-      { label: 'Quests & Missions', cls: 'btn-ghost', onClick: () => { closeModal(); openQuestsScreen(); } },
-      { label: 'Close', cls: 'btn-ghost', onClick: closeModal }
-    ],
+    actions: inCamp
+      ? [{ label: 'Close', cls: 'btn-ghost', onClick: closeModal }]
+      : [
+          { label: 'Quests & Missions', cls: 'btn-ghost', onClick: () => { closeModal(); openQuestsScreen(); } },
+          { label: 'Close', cls: 'btn-ghost', onClick: closeModal }
+        ],
     onOpen: (bodyEl) => {
       bodyEl.querySelectorAll('[data-i]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -61,7 +65,7 @@ export function openObjectivesScreen() {
           openModal({
             title: 'Objective',
             className: 'green-modal',
-            bodyHTML: `<div class="modal-text"><b>${o.name}</b><br><br>Progress: ${Math.min(o.current, o.target)} / ${o.target}<br>Status: ${o.done ? 'Completed ✔' : 'In progress'}</div>`,
+            bodyHTML: `<div class="modal-text"><b>${o.name}</b><br><br>Progress: ${Math.min(o.current, o.target)} / ${o.target}<br>Status: ${o.done ? 'Completed' : 'In progress'}</div>`,
             actions: [{ label: 'Back', cls: 'btn-ghost', onClick: () => { closeModal(); openObjectivesScreen(); } }]
           });
         });

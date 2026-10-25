@@ -18,6 +18,7 @@ function text(body) {
 export function runCampaignIntro() {
   let pathHintArmed = false;
   let pathHintShown = false;
+  let casinoHintShown = false;
   openModal({
     title: 'Welcome to the Strip!',
     className: 'green-modal',
@@ -127,6 +128,7 @@ export function runCampaignIntro() {
       }]
     });
     armPathHint();
+    armCasinoHint();
   }
 
   function armPathHint() {
@@ -140,6 +142,43 @@ export function runCampaignIntro() {
       setTimeout(showPaths, 450);
     };
     Bus.on(EV.BUILDING_PLACED, onPlaced);
+  }
+
+  function armCasinoHint() {
+    const onPlaced = (data) => {
+      if (!data || !data.item || data.item.id !== 'casino' || data.world !== 'exterior') return;
+      if (casinoHintShown) return;
+      casinoHintShown = true;
+      Bus.off(EV.BUILDING_PLACED, onPlaced);
+      setTimeout(showEnterCasino, 450);
+    };
+    Bus.on(EV.BUILDING_PLACED, onPlaced);
+  }
+
+  function showEnterCasino() {
+    openModal({
+      title: 'Entering a Casino.',
+      className: 'green-modal',
+      closable: false,
+      bodyHTML: text(`
+        <p>Select the Casino you want to enter.</p>
+        <p>Click the <b>Casino / Strip</b> tab on the left to go inside, then add Slot Machines, tables and staff from the construction panel.</p>
+      `),
+      actions: [{
+        label: '\u2713',
+        cls: 'btn-green',
+        onClick: () => {
+          closeModal();
+          if (state.mode !== 'interior') {
+            const btn = document.getElementById('btn-switch-view');
+            if (btn) btn.click();
+          }
+          state.dockMajor.interior = 'gambling';
+          state.dockCategory.interior = 'slots';
+          Bus.emit(EV.UI_REFRESH);
+        }
+      }]
+    });
   }
 
   function showPaths() {

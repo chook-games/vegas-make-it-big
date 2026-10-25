@@ -2,6 +2,7 @@ import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { save } from '../core/save.js';
 import { playSound } from '../audio/audio.js';
+import { inCampaign } from './campaign.js';
 
 const POOL = [
   { type: 'earn', min: 5000, max: 30000, step: 1000, cash: 1500, label: (n) => `Earn $${n.toLocaleString()}` },
@@ -65,6 +66,7 @@ export function missionDone(m) {
 }
 
 export function checkDailies() {
+  if (inCampaign()) return;
   ensureDailies();
   let changed = false;
   for (let i = 0; i < state.dailies.length; i++) {
