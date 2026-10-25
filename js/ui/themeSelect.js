@@ -57,7 +57,7 @@ export function openThemeSelect({ defaultId, onPick }) {
       }));
     },
     actions: [
-      { label: '✓', cls: 'btn-green', onClick: () => { closeModal(); onPick && onPick(sel); } }
+      { label: '\u2713', cls: 'btn-green', onClick: () => { closeModal(); onPick && onPick(sel); } }
     ]
   });
 }

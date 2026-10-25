@@ -16,6 +16,8 @@ function text(body) {
 }
 
 export function runCampaignIntro() {
+  let pathHintArmed = false;
+  let pathHintShown = false;
   openModal({
     title: 'Welcome to the Strip!',
     className: 'green-modal',
@@ -26,7 +28,7 @@ export function runCampaignIntro() {
       <p>At any time you can view your objectives by clicking on the <b>Objectives</b> icon in the top left panel.</p>
       <p>The <b>i</b> icon will give you further details on individual tasks.</p>
     `),
-    actions: [{ label: '✓', cls: 'btn-green', onClick: () => { closeModal(); showObjectives(); } }]
+    actions: [{ label: '\u2713', cls: 'btn-green', onClick: () => { closeModal(); showObjectives(); } }]
   });
 
   function showObjectives() {
@@ -46,7 +48,7 @@ export function runCampaignIntro() {
       className: 'green-modal objectives-window',
       closable: false,
       bodyHTML: `<div class="center muted">All construction takes place on a piece of land called a Lot. It will be highlighted when the cursor is over it.</div><div class="spacer"></div>${body}`,
-      actions: [{ label: '✓', cls: 'btn-green', onClick: () => { closeModal(); showLotPurchase(); } }],
+      actions: [{ label: '\u2713', cls: 'btn-green', onClick: () => { closeModal(); showLotPurchase(); } }],
       onOpen: (bodyEl) => {
         const btn = bodyEl.querySelector('[data-info]');
         if (btn) btn.addEventListener('click', () => {
@@ -73,7 +75,7 @@ export function runCampaignIntro() {
         <p>To buy this Lot click the <b>Buy</b> 💵 icon in the panel below.</p>
         <p>You will be given a choice of themes for your Lot. Choose one of the available themes, then click on the <b>Accept</b> ✓ icon.</p>`),
       actions: [{
-        label: '✓',
+        label: '\u2713',
         cls: 'btn-green',
         onClick: () => {
           closeModal();
@@ -115,12 +117,51 @@ export function runCampaignIntro() {
         <p>Use the mouse to position the Hotel in the Lot and use the <b>Space</b> bar to rotate it.</p>
       `),
       actions: [{
-        label: '✓',
+        label: '\u2713',
         cls: 'btn-green',
         onClick: () => {
           closeModal();
           const hint = document.getElementById('ui-hint');
           if (hint) hint.innerHTML = '🏨 Build a <b>Small Hotel</b> from Infrastructure → Hotels below.';
+        }
+      }]
+    });
+    armPathHint();
+  }
+
+  function armPathHint() {
+    if (pathHintArmed) return;
+    pathHintArmed = true;
+    const onPlaced = (data) => {
+      if (!data || !data.item || data.item.id !== 'hotel' || data.world !== 'exterior') return;
+      if (pathHintShown) return;
+      pathHintShown = true;
+      Bus.off(EV.BUILDING_PLACED, onPlaced);
+      setTimeout(showPaths, 450);
+    };
+    Bus.on(EV.BUILDING_PLACED, onPlaced);
+  }
+
+  function showPaths() {
+    openModal({
+      title: 'Paths.',
+      className: 'green-modal',
+      closable: false,
+      bodyHTML: text(`
+        <p>Guests must be able to reach the Hotel from the street.</p>
+        <p>Open <b>Paths &amp; Scenery</b> - <b>Paths</b> and lay path tiles from the road up to the Hotel entrance.</p>
+        <p>Once connected, the Hotel starts earning money.</p>
+      `),
+      actions: [{
+        label: '\u2713',
+        cls: 'btn-green',
+        onClick: () => {
+          closeModal();
+          state.dockMajor.exterior = 'scenery';
+          state.dockCategory.exterior = 'paths';
+          Bus.emit(EV.UI_REFRESH);
+          const hint = document.getElementById('ui-hint');
+          if (hint) hint.innerHTML = 'Lay path tiles from the street to the Hotel entrance.';
         }
       }]
     });

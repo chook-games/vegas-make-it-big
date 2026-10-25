@@ -5,9 +5,9 @@ export const GOODS = [
     venues: ['restaurant', 'buffet', 'foodcourt'] },
   { id: 'rooms', name: 'Rooms', icon: '🛏️', cost: 50, min: 20, max: 90, step: 5, def: 45,
     venues: ['hotel', 'motel', 'mediumhotel', 'largehotel'] },
-  { id: 'shows', name: 'Shows', icon: '🎬', cost: 30, min: 10, max: 60, step: 5, def: 25,
+  { id: 'shows', name: 'Shows', icon: '🎬', cost: 30, min: 10, max: 60, step: 5, def: 35,
     venues: ['cinema', 'stadium', 'boxing', 'theatre', 'circus'] },
-  { id: 'shops', name: 'Souvenirs', icon: '🎁', cost: 15, min: 5, max: 30, step: 1, def: 12,
+  { id: 'shops', name: 'Souvenirs', icon: '🎁', cost: 15, min: 5, max: 30, step: 1, def: 18,
     venues: ['mall', 'giftshop', 'jewelrystore'] }
 ];
 

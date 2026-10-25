@@ -65,9 +65,9 @@ export function openCampaignScreen(opts) {
         <div class="scenario-list" id="scenario-list">${rows}</div>
         <div class="scenario-detail" id="scenario-detail">${detailHTML(selected)}</div>
         <div class="mm-actions">
-          <button class="mm-icon" data-act="cancel" title="Back">✕</button>
+          <button class="mm-icon" data-act="cancel" title="Back">&#10005;</button>
           <span class="sc-progress">${prog.stars}/${prog.maxStars} ★</span>
-          <button class="mm-icon" data-act="accept" title="Start scenario">✓</button>
+          <button class="mm-icon" data-act="accept" title="Start scenario">&#10003;</button>
         </div>
       </div>`;
     wire();
