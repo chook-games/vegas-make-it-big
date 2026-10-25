@@ -3,6 +3,7 @@ import { Bus, EV } from '../core/events.js';
 import { openModal, closeModal } from './modals.js';
 import { playSound } from '../audio/audio.js';
 import { refreshMusic } from '../audio/music.js';
+import { refreshAmbience } from '../audio/ambience.js';
 import { applyVolumes } from '../audio/engine.js';
 import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
@@ -98,6 +99,7 @@ export function openSettingsScreen() {
         state.settings[key] = !state.settings[key];
         tg.classList.toggle('on', state.settings[key]);
         if (key === 'music') refreshMusic();
+        if (key === 'sound') refreshAmbience();
         if (key === 'shadows') applySettings();
         if (key === 'bloom') setBloom(state.settings.bloom);
         playSound('preview');
@@ -106,7 +108,7 @@ export function openSettingsScreen() {
     });
     bodyEl.querySelectorAll('[data-vol]').forEach(inp => {
       const key = inp.dataset.vol;
-      const upd = () => { state.settings[key] = Number(inp.value) / 100; applyVolumes(); };
+      const upd = () => { state.settings[key] = Number(inp.value) / 100; applyVolumes(); if (key === 'ambVol') refreshAmbience(); };
       inp.addEventListener('input', upd);
       inp.addEventListener('change', () => { upd(); save(); });
     });
