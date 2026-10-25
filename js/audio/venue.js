@@ -52,9 +52,10 @@ function ensure(file) {
       const src = c.createMediaElementSource(el);
       const gain = c.createGain();
       gain.gain.value = 0;
-      src.connect(gain);
+      const panner = c.createStereoPanner ? c.createStereoPanner() : null;
+      if (panner) { src.connect(panner); panner.connect(gain); } else { src.connect(gain); }
       gain.connect(getBus('ambience'));
-      t = { file, el, gain };
+      t = { file, el, gain, panner };
       tracks.set(file, t);
     } catch (e) {
       return null;
@@ -105,15 +106,24 @@ function scan() {
     if (dist > radius) continue;
     const score = 1 - dist / radius;
     const prev = best.get(file);
-    if (!prev || score > prev) best.set(file, score);
+    if (!prev || score > prev.score) best.set(file, { score, x: cell.mesh.position.x, z: cell.mesh.position.z });
   }
 
-  const ranked = Array.from(best.entries()).sort((a, b) => b[1] - a[1]).slice(0, 2);
-  const wanted = new Map(ranked.map(([file, score]) => [file, score]));
+  const ranked = Array.from(best.entries()).sort((a, b) => b[1].score - a[1].score).slice(0, 2);
+  const wanted = new Map(ranked);
+  const ctx = initAudio();
 
-  for (const [file, score] of wanted) {
+  for (const [file, data] of wanted) {
     const t = ensure(file);
-    fade(t, 0.05 + score * 0.22, 1400);
+    fade(t, 0.05 + data.score * 0.22, 1400);
+    if (t && t.panner && ctx) {
+      const dx = data.x - cx;
+      const dz = data.z - cz;
+      const e = camera.matrixWorld.elements;
+      let pan = (dx * e[0] + dz * e[2]) / 12;
+      pan = Math.max(-0.7, Math.min(0.7, pan));
+      t.panner.pan.setTargetAtTime(pan, ctx.currentTime, 0.35);
+    }
   }
   for (const t of tracks.values()) {
     if (!wanted.has(t.file)) fade(t, 0, 1400);
