@@ -544,3 +544,10 @@
   .player-panel { top: calc(var(--safe-top) + 172px); left: 8px; right: 8px; min-width: 0; }
   .side-tabs { top: calc(var(--safe-top) + 232px); }
 }
+/* ===== Audio volume sliders ===== */
+.vol-slider {
+  width: 150px;
+  accent-color: #4be08a;
+  cursor: pointer;
+}
+@media (max-width: 640px) { .vol-slider { width: 110px; } }

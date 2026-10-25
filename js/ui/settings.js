@@ -2,6 +2,7 @@ import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { openModal, closeModal } from './modals.js';
 import { refreshMusic, playSound } from '../audio/audio.js';
+import { applyVolumes } from '../audio/engine.js';
 import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
 import { resetToNew, save, exportSave, importSave } from '../core/save.js';
@@ -23,6 +24,14 @@ function toggleRow(label, sub, key) {
   </div>`;
 }
 
+function volumeRow(label, key) {
+  const cur = typeof state.settings[key] === 'number' ? state.settings[key] : 0.7;
+  return `<div class="settings-row">
+    <div><div class="settings-label">${label}</div></div>
+    <input type="range" class="vol-slider" data-vol="${key}" min="0" max="100" value="${Math.round(cur * 100)}">
+  </div>`;
+}
+
 export function openSettingsScreen() {
   const body = `
     <div class="settings-row">
@@ -36,6 +45,9 @@ export function openSettingsScreen() {
     </div>
     ${toggleRow('🔊 Sound effects', 'Building & UI sounds', 'sound')}
     ${toggleRow('🎵 Music', 'Soft ambient loop', 'music')}
+    ${volumeRow('Music volume', 'musicVol')}
+    ${volumeRow('Sound effects volume', 'sfxVol')}
+    ${volumeRow('Ambience volume', 'ambVol')}
     ${toggleRow('📳 Vibration', 'Haptic feedback (mobile)', 'vibration')}
     ${toggleRow('🌑 Shadows', 'Prettier but heavier', 'shadows')}
     ${bloomAvailable() ? toggleRow('✨ Bloom (Neon Glow)', 'Glow on lights, heavier', 'bloom') : ''}
@@ -90,6 +102,12 @@ export function openSettingsScreen() {
         playSound('preview');
         save();
       });
+    });
+    bodyEl.querySelectorAll('[data-vol]').forEach(inp => {
+      const key = inp.dataset.vol;
+      const upd = () => { state.settings[key] = Number(inp.value) / 100; applyVolumes(); };
+      inp.addEventListener('input', upd);
+      inp.addEventListener('change', () => { upd(); save(); });
     });
     const langSel = bodyEl.querySelector('#set-lang');
     if (langSel) langSel.addEventListener('change', (e) => {

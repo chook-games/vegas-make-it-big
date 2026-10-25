@@ -47,7 +47,7 @@ import { doIncomeTick, calculateTotals } from './game/economy.js';
 import { updateGuests, animateGuests } from './game/guests.js';
 import { checkProgress } from './game/quests.js';
 import { canPrestige } from './game/prestige.js';
-import { playSound, vibrate, unlockAudio, startMusic, refreshMusic } from './audio/audio.js';
+import { playSound, vibrate, unlockAudio, startMusic, refreshMusic, suspendAudio, resumeAudio } from './audio/audio.js';
 
 const clock = new THREE.Clock();
 let booted = false;
@@ -124,7 +124,10 @@ function initUI() {
       if (state.pendingPlacement) { cancelPendingPlacement(); e.preventDefault(); }
     }
   });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { save(); suspendAudio(); }
+    else resumeAudio();
+  });
 
   unlockAudio();
   document.body.addEventListener('pointerdown', unlockAudio, { once: true });
