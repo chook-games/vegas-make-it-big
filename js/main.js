@@ -47,7 +47,8 @@ import { doIncomeTick, calculateTotals } from './game/economy.js';
 import { updateGuests, animateGuests } from './game/guests.js';
 import { checkProgress } from './game/quests.js';
 import { canPrestige } from './game/prestige.js';
-import { playSound, vibrate, unlockAudio, startMusic, refreshMusic, suspendAudio, resumeAudio } from './audio/audio.js';
+import { playSound, vibrate, unlockAudio, suspendAudio, resumeAudio } from './audio/audio.js';
+import { playMenuMusic, playGameMusic, playSting } from './audio/music.js';
 
 const clock = new THREE.Clock();
 let booted = false;
@@ -140,6 +141,7 @@ function initUI() {
   });
 
   Bus.on(EV.DAY_PASSED, onDayPassed);
+  Bus.on('campaign:complete', () => playSting('win'));
 }
 
 function toggleSound() {
@@ -406,8 +408,7 @@ async function boot() {
 
   const launch = () => {
     booted = true;
-    if (state.settings.music) startMusic();
-    refreshMusic();
+    playGameMusic(currentTheme());
     updateHUD();
     renderDock();
     refreshPrestigeAlert();
@@ -419,7 +420,9 @@ async function boot() {
   await nextFrame();
   document.getElementById('loading').classList.add('hide');
 
-  const menu = () => openMainMenu({
+  const menu = () => {
+  playMenuMusic();
+  openMainMenu({
     hasSave: hasSave(),
     onContinue: () => { const r = load() || raw || {}; startContinue(r); launch(); },
     onCampaign: () => openCampaignScreen({
@@ -475,6 +478,7 @@ async function boot() {
     }),
     onSettings: () => openSettingsScreen()
   });
+  };
 
   menu();
 }

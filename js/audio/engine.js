@@ -119,7 +119,12 @@ export function unlockAudio() {
   if (!unlocked) {
     unlocked = true;
     preloadCore();
+    try { window.dispatchEvent(new CustomEvent('audio:unlocked')); } catch (e) {}
   }
+}
+
+export function isUnlocked() {
+  return unlocked;
 }
 
 export function preloadCore() {

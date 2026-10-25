@@ -1,6 +1,6 @@
 import { state } from '../core/state.js';
 import {
-  initAudio, getBus, loadBuffer, playBuffer, applyVolumes,
+  initAudio, getBus, loadBuffer, playBuffer,
   unlockAudio as engineUnlock, suspendAudio, resumeAudio
 } from './engine.js';
 
@@ -67,60 +67,6 @@ export function playSound(type) {
         break;
     }
   } catch (e) {}
-}
-
-let musicNodes = null;
-
-export function startMusic() {
-  if (!state.settings.music || musicNodes) return;
-  const c = initAudio();
-  if (!c) return;
-  try {
-    const master = c.createGain();
-    master.gain.value = 0.05;
-    master.connect(getBus('music'));
-    const filter = c.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 900;
-    filter.connect(master);
-
-    const notes = [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 349.23];
-    let i = 0;
-    const osc = c.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = notes[0];
-    osc.connect(filter);
-    osc.start();
-
-    const scheduler = setInterval(() => {
-      i = (i + 1) % notes.length;
-      const t = c.currentTime;
-      osc.frequency.linearRampToValueAtTime(notes[i], t + 0.9);
-    }, 950);
-
-    musicNodes = { master, osc, scheduler };
-  } catch (e) {}
-}
-
-export function stopMusic() {
-  if (!musicNodes) return;
-  try {
-    clearInterval(musicNodes.scheduler);
-    const c = initAudio();
-    if (c) musicNodes.master.gain.linearRampToValueAtTime(0, c.currentTime + 0.4);
-    setTimeout(() => { try { musicNodes.osc.stop(); } catch (e) {} }, 500);
-  } catch (e) {}
-  musicNodes = null;
-}
-
-export function refreshMusic() {
-  applyVolumes();
-  if (state.settings.music) startMusic();
-  else stopMusic();
-}
-
-export function setVolumes() {
-  applyVolumes();
 }
 
 export function vibrate(pattern) {

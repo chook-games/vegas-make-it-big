@@ -1,7 +1,8 @@
 import { state } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { openModal, closeModal } from './modals.js';
-import { refreshMusic, playSound } from '../audio/audio.js';
+import { playSound } from '../audio/audio.js';
+import { refreshMusic } from '../audio/music.js';
 import { applyVolumes } from '../audio/engine.js';
 import { applySettings } from '../three/scene.js';
 import { setBloom, bloomAvailable } from '../three/postfx.js';
