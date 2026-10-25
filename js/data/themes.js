@@ -61,6 +61,8 @@ export const THEMES = [
   }
 ];
 
+for (const t of THEMES) t.thumb = 'assets/thumbs/theme_' + t.id + '.png';
+
 export function themeById(id) {
   return THEMES.find(t => t.id === id) || THEMES[0];
 }

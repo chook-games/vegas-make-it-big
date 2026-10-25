@@ -29,6 +29,7 @@ import { openLotPurchase } from './ui/lotPurchase.js';
 import { openThemeSelect } from './ui/themeSelect.js';
 import { openObjectivesScreen } from './ui/objectivesScreen.js';
 import { startFreePlayLot, startFreePlayWithTheme, checkCampaign, currentScenario } from './game/campaign.js';
+import { runCampaignIntro } from './game/campaignIntro.js';
 import { npcTick } from './game/npc.js';
 import { checkDailies, onDayPassed } from './game/missions.js';
 import { checkScenarioEvents } from './game/scenarioEvents.js';
@@ -421,6 +422,11 @@ async function boot() {
     onCampaign: () => openCampaignScreen({
       fromMenu: true,
       onStarted: () => {
+        if (state.campaignIndex === 0) {
+          launch();
+          runCampaignIntro();
+          return;
+        }
         openLotPurchase({
           onPick: ({ radius, cost }) => {
             openThemeSelect({

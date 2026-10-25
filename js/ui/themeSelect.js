@@ -46,7 +46,7 @@ export function openThemeSelect({ defaultId, onPick }) {
       <div class="center muted">Pick the theme for your lot. It changes the look of the casino and unlocks a themed landmark.</div>
       <div class="theme-grid thumbs">
         ${THEMES.map(t => `<button class="theme-card ${t.id === sel ? 'active' : ''}" data-theme="${t.id}">
-          <img class="tc-thumb" src="${themeThumb(t)}" alt="">
+          <img class="tc-thumb" src="${t.thumb || themeThumb(t)}" alt="">
           <span class="tc-name">${t.icon} ${t.name}</span>
         </button>`).join('')}
       </div>

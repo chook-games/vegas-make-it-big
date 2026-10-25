@@ -18,7 +18,7 @@ export function openModal({ title, bodyHTML, bodyEl, actions, closable = true, c
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close';
-  closeBtn.textContent = '✕';
+  closeBtn.textContent = '×';
   closeBtn.addEventListener('click', closeModal);
   if (closable) card.appendChild(closeBtn);
 

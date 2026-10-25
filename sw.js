@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v47';
+const CACHE = 'vegas-mib-v48';
 const CORE = [
   './',
   './index.html',
@@ -8,6 +8,16 @@ const CORE = [
   './css/hud.css',
   './css/panels.css',
   './css/screens.css',
+  './assets/thumbs/theme_american.png',
+  './assets/thumbs/theme_ocean.png',
+  './assets/thumbs/theme_space.png',
+  './assets/thumbs/theme_prehistoric.png',
+  './assets/thumbs/theme_oriental.png',
+  './assets/thumbs/theme_egyptian.png',
+  './assets/thumbs/theme_western.png',
+  './assets/thumbs/theme_tropical.png',
+  './assets/thumbs/theme_medieval.png',
+  './assets/thumbs/theme_futuristic.png',
   './js/main.js',
   './js/core/constants.js',
   './js/core/events.js',
