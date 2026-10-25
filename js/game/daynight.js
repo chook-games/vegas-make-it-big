@@ -86,5 +86,5 @@ export function formatClock() {
   const hh = String(h).padStart(2, '0');
   const mm = String(m).padStart(2, '0');
   const icon = isNight() ? '🌙' : '☀️';
-  return `${icon} Day ${state.clock.day} • ${hh}:${mm}`;
+  return `${hh}:${mm}  Day ${state.clock.day}`;
 }

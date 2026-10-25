@@ -2,7 +2,7 @@ export const CATALOG = {
   exterior: [
     { id: 'casino', name: 'Casino', icon: '🎰', cost: 1200, income: 160, power: -3, guests: 25, tier: 1,
       desc: 'The heart of the resort. Bright entrance with a red carpet out front.' },
-    { id: 'hotel', name: 'Hotel', icon: '🏨', cost: 900, income: 110, power: -2, guests: 40, tier: 1, isHotel: true,
+    { id: 'hotel', name: 'Small Hotel', icon: '🏨', cost: 900, income: 110, power: -2, guests: 40, tier: 1, isHotel: true,
       desc: 'Luxury tower with a pool. Increases guest capacity.' },
     { id: 'chapel', name: 'Wedding Chapel', icon: '💒', cost: 650, income: 95, power: -1, guests: 15, tier: 1,
       desc: 'Little wedding chapel with a bell tower on the front.' },
@@ -194,6 +194,47 @@ export const CATALOG = {
       desc: 'Stage shows and performances.' }
   ]
 };
+
+// Values from the original GAMEDATA SourceTemplate files (build cost, capacity,
+// running cost per game day). Only entries with real original data are overridden.
+const ORIGINAL_BALANCE = {
+  casino: { cost: 3200, guests: 85, running: 100 },
+  hotel: { cost: 3000, guests: 20, running: 450 },
+  chapel: { cost: 8000, guests: 4, running: 240 },
+  fountain: { cost: 1250, guests: 0, running: 0 },
+  generator: { cost: 2000, running: 500 },
+  parking: { cost: 2000, guests: 0, running: 500 },
+  headoffice: { cost: 1000, running: 150 },
+  mechhut: { cost: 350, running: 40 },
+  elechut: { cost: 300, running: 20 },
+  restaurant: { cost: 1500, guests: 12, running: 245 },
+  pool: { cost: 8000, guests: 20, running: 100 },
+  cinema: { cost: 5000, guests: 22, running: 140 },
+  aquarium: { cost: 4000, guests: 12, running: 100 },
+  rollercoaster: { cost: 20000, guests: 25, running: 350 },
+  convention: { cost: 7000, running: 450 },
+  stadium: { cost: 15000, guests: 100, running: 500 },
+  circus: { cost: 4500, guests: 25, running: 390 },
+  wavepool: { cost: 10000, guests: 15, running: 135 },
+  mediumhotel: { cost: 10000, guests: 50, running: 1500 },
+  largehotel: { cost: 20000, guests: 100, running: 3500 },
+  mediumcasino: { cost: 10000, guests: 280, running: 400 },
+  largecasino: { cost: 16000, guests: 500, running: 900 },
+  arcade: { cost: 800, guests: 12, running: 90 },
+  waterplant: { cost: 2000, running: 500 },
+  bar: { cost: 1200, guests: 12, running: 200 },
+  nightclub: { cost: 4000, guests: 24, running: 180 },
+  spa: { cost: 2700, guests: 6, running: 125 },
+  jewelrystore: { cost: 12000, guests: 3, running: 5500 },
+  theatre: { cost: 8500, guests: 18, running: 400 }
+};
+
+for (const world of ['exterior', 'interior']) {
+  for (const item of CATALOG[world]) {
+    const b = ORIGINAL_BALANCE[item.id];
+    if (b) Object.assign(item, b);
+  }
+}
 
 export function findItem(world, id) {
   const list = CATALOG[world];

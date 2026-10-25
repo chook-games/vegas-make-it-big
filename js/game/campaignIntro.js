@@ -1,4 +1,4 @@
-import { activeLot } from '../core/state.js';
+import { state, activeLot } from '../core/state.js';
 import { Bus, EV } from '../core/events.js';
 import { openModal, closeModal } from '../ui/modals.js';
 import { openThemeSelect } from '../ui/themeSelect.js';
@@ -101,6 +101,9 @@ export function runCampaignIntro() {
   }
 
   function showBuilding() {
+    state.dockMajor.exterior = 'facilities';
+    state.dockCategory.exterior = 'hotel';
+    Bus.emit(EV.UI_REFRESH);
     openModal({
       title: 'Building.',
       className: 'green-modal',
@@ -117,7 +120,7 @@ export function runCampaignIntro() {
         onClick: () => {
           closeModal();
           const hint = document.getElementById('ui-hint');
-          if (hint) hint.innerHTML = '🏨 Build a <b>Hotel</b> from the Construction panel below.';
+          if (hint) hint.innerHTML = '🏨 Build a <b>Small Hotel</b> from Infrastructure → Hotels below.';
         }
       }]
     });

@@ -14,7 +14,7 @@ import { playerValue } from '../game/npc.js';
 export function updateHUD() {
   const totals = calculateTotals();
 
-  document.getElementById('ui-cash').textContent = `$${Math.floor(state.cash).toLocaleString()}`;
+  document.getElementById('ui-cash').textContent = `$${Math.floor(state.cash)}`;
   document.getElementById('ui-clock').textContent = formatClock();
 
   const s = seasonInfo();

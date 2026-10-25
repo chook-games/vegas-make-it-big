@@ -112,7 +112,7 @@ export function categoriesFor(world) {
 }
 
 export const EXT_MAJOR = [
-  { id: 'facilities', name: 'Hotels & Facilities', icon: '🏨', subgroups: ['hotel', 'utility'] },
+  { id: 'facilities', name: 'Infrastructure', icon: '🏨', subgroups: ['hotel', 'utility'] },
   { id: 'entertainment', name: 'Casinos & Entertainment', icon: '🎰', subgroups: ['casino', 'attraction'] },
   { id: 'services', name: 'Shops & Services', icon: '🛍️', subgroups: ['food', 'transport'] },
   { id: 'scenery', name: 'Paths & Scenery', icon: '🌳', subgroups: ['paths', 'decor'] }

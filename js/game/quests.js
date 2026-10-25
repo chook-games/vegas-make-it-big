@@ -6,9 +6,10 @@ import { playSound } from '../audio/audio.js';
 import { save } from '../core/save.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
+import { inCampaign } from './campaign.js';
 
 function grantReward(reward, xpAmount) {
-  if (reward) {
+  if (reward && !inCampaign()) {
     if (reward.cash) state.cash += reward.cash;
     if (reward.rep) state.reputation = Math.min(100, state.reputation + reward.rep);
   }

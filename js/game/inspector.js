@@ -62,6 +62,7 @@ export function openInspector(world, key, layer = 0) {
   let content = '';
   if (inspTab === 'finance') {
     content += `<div class="fin-line"><span>Income / cycle</span><b style="color:#06d6a0">$${stats.income.toLocaleString()}</b></div>`;
+    if (cell.item.running) content += `<div class="fin-line"><span>Running cost / day</span><b style="color:#ff9a8b">$${cell.item.running.toLocaleString()}</b></div>`;
     content += `<div class="fin-line"><span>Power demand</span><b style="color:#9fd6ff">${u.p || 0} kW</b></div>`;
     content += `<div class="fin-line"><span>Water demand</span><b style="color:#9fd6ff">${u.w || 0}</b></div>`;
     if (utilParts.length) content += `<div class="fin-line"><span>Supply</span><b style="color:#ffd166">${utilParts.join(' · ')}</b></div>`;

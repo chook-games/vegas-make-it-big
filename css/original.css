@@ -295,3 +295,10 @@
   box-shadow: inset 0 0 0 1px #d86060;
 }
 #paused-banner.show { display: block; }
+/* Remove non-original HUD additions */
+#player-panel { display: none !important; }
+.status-sub { display: none !important; }
+/* Original 2-line clock panel */
+.status-main { flex-direction: column; align-items: flex-end; gap: 0; }
+.status-panel { min-width: 150px; padding: 4px 8px; }
+.status-cash { color: #ffffff; }

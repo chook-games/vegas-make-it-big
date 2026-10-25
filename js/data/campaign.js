@@ -4,7 +4,7 @@ export const SCENARIOS = [
     desc: 'The tutorial scenario: buy your first Lot, choose a theme, then build a Hotel and open your first games.',
     targetDays: 2, reward: { cash: 3000 },
     goals: [
-      { type: 'build', target: 'hotel', label: 'Build a Hotel' },
+      { type: 'build', target: 'hotel', label: 'Build a Small Hotel' },
       { type: 'paths', target: 5, label: 'Lay 5 path tiles' },
       { type: 'build', target: 'headoffice', label: 'Build the Head Office' },
       { type: 'upgradeBuilding', target: 'headoffice', label: 'Upgrade the Head Office' },
@@ -22,7 +22,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's2', title: 'King of the Hill', theme: 'egyptian', startCash: 6000,
+    id: 's2', title: 'King of the Hill', theme: 'egyptian', startCash: 60000, startHour: 9,
     desc: 'Open a small casino, advertise it and pull in the gamblers.',
     targetDays: 4, reward: { cash: 6000 },
     goals: [
@@ -33,7 +33,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's3', title: 'Top of the Heap', theme: 'prehistoric', startCash: 8000,
+    id: 's3', title: 'Top of the Heap', theme: 'prehistoric', startCash: 50000, startHour: 10,
     desc: 'Rise above the rest: profit, entertainment and grand fountains.',
     targetDays: 5, reward: { cash: 12000, gold: 1 },
     goals: [
@@ -44,18 +44,18 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's4', title: 'Big Spenders', theme: 'american', startCash: 10000,
+    id: 's4', title: 'Big Spenders', theme: 'american', startCash: 90000, startHour: 6,
     desc: 'A large hotel, a second lot and the biggest crowd on the Strip.',
     targetDays: 5, reward: { cash: 20000 },
     goals: [
-      { type: 'build', target: 'hotel', label: 'Build a Hotel' },
+      { type: 'build', target: 'largehotel', label: 'Build a Large Hotel' },
       { type: 'lots', target: 2, label: 'Own 2 lots' },
       { type: 'guests', target: 200, label: '200 guests' },
       { type: 'rep', target: 40, label: 'Reputation 40' }
     ]
   },
   {
-    id: 's5', title: 'Convention Season', theme: 'oriental', startCash: 15000,
+    id: 's5', title: 'Convention Season', theme: 'oriental', startCash: 80000, startHour: 12,
     desc: 'Conventions fill the town. Add craps and restaurants to feed the crowd.',
     targetDays: 6, reward: { cash: 35000, gold: 2 },
     goals: [
@@ -66,7 +66,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's6', title: 'High Hopes', theme: 'ocean', startCash: 20000,
+    id: 's6', title: 'High Hopes', theme: 'ocean', startCash: 80000, startHour: 20,
     desc: 'High rollers and whales. Build the VIP tables and a second lot.',
     targetDays: 6, reward: { cash: 60000 },
     goals: [
@@ -77,7 +77,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's7', title: 'All Shook Up', theme: 'space', startCash: 25000,
+    id: 's7', title: 'All Shook Up', theme: 'space', startCash: 60000, startHour: 9,
     desc: 'Family fun: rollercoaster, pool and a space-age resort.',
     targetDays: 7, reward: { cash: 90000, gold: 2 },
     goals: [
@@ -88,7 +88,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's8', title: 'Shop til you Drop', theme: 'medieval', startCash: 30000,
+    id: 's8', title: 'Shop til you Drop', theme: 'medieval', startCash: 24000, startHour: 9,
     desc: 'Retail therapy: mall, gift shops and wedding chapels.',
     targetDays: 7, reward: { cash: 130000 },
     goals: [
@@ -99,7 +99,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's9', title: 'The Ace of Clubs', theme: 'tropical', startCash: 40000,
+    id: 's9', title: 'The Ace of Clubs', theme: 'tropical', startCash: 70000, startHour: 15,
     desc: 'Best nightlife on the Strip: clubs, fights and big money.',
     targetDays: 8, reward: { cash: 220000, gold: 3 },
     goals: [
@@ -110,7 +110,7 @@ export const SCENARIOS = [
     ]
   },
   {
-    id: 's10', title: 'Viva Las Vegas', theme: 'futuristic', startCash: 60000,
+    id: 's10', title: 'Viva Las Vegas', theme: 'futuristic', startCash: 100000, startHour: 19,
     desc: 'The final show. Arena, chapel, crowds and the Emperor title.',
     targetDays: 9, reward: { cash: 600000, gold: 5 },
     goals: [

@@ -1,5 +1,5 @@
 import { state } from '../core/state.js';
-import { BASE_GUESTS, BASE_POWER, BASE_WATER } from '../core/constants.js';
+import { BASE_GUESTS, BASE_POWER, BASE_WATER, TICK_MS, DAY_LENGTH_MS } from '../core/constants.js';
 import { getTimeFactors, seasonInfo } from './daynight.js';
 import { addXP } from './leveling.js';
 import { XP } from '../data/levels.js';
@@ -92,6 +92,7 @@ function lotTotals(lot, staffing) {
   let waterDemand = 0;
   let waterGen = BASE_WATER;
   let capacity = 0;
+  let running = 0;
   let rawExt = 0;
   let rawInt = 0;
   let noise = 0;
@@ -107,6 +108,7 @@ function lotTotals(lot, staffing) {
     waterGen += (u.gw || 0) * cell.level;
     waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
+    running += (item.running || 0) * cell.level;
     rawExt += evaluateTileStats('exterior', cell, lot.exteriorGrid, heat.exterior, openExt, staffing).income;
   }
   for (const k in lot.interiorGrid) {
@@ -118,6 +120,7 @@ function lotTotals(lot, staffing) {
     waterGen += (u.gw || 0) * cell.level;
     waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
+    running += (item.running || 0) * cell.level;
     rawInt += evaluateTileStats('interior', cell, lot.interiorGrid, heat.interior, openInt, staffing).income;
     noise += heat.interior.noise[k] || 0;
     smell += heat.interior.smell[k] || 0;
@@ -133,11 +136,12 @@ function lotTotals(lot, staffing) {
     waterGen += (u.gw || 0) * cell.level;
     waterDemand += (u.w || 0) * cell.level;
     capacity += (item.guests || 0) * cell.level;
+    running += (item.running || 0) * cell.level;
     rawInt += evaluateTileStats('interior', cell, upper, null, null, staffing).income;
     cells++;
   }
 
-  return { powerDemand, powerGen, waterDemand, waterGen, capacity: Math.max(0, capacity), rawExt, rawInt,
+  return { powerDemand, powerGen, waterDemand, waterGen, capacity: Math.max(0, capacity), running, rawExt, rawInt,
     avgNoise: cells ? noise / cells : 0, avgSmell: cells ? smell / cells : 0 };
 }
 
@@ -147,6 +151,7 @@ export function calculateTotals() {
   let waterDemand = 0;
   let waterGen = 0;
   let capacity = BASE_GUESTS;
+  let runningPerDay = 0;
   let rawExt = 0;
   let rawInt = 0;
   let noiseSum = 0;
@@ -169,6 +174,7 @@ export function calculateTotals() {
     waterDemand += lt.waterDemand;
     waterGen += lt.waterGen;
     capacity += lt.capacity;
+    runningPerDay += lt.running;
     rawExt += lt.rawExt;
     rawInt += lt.rawInt;
     noiseSum += lt.avgNoise;
@@ -211,7 +217,9 @@ export function calculateTotals() {
   );
 
   const wages = totalWages();
-  const totalIncome = grossIncome - wages;
+  const running = Math.round(runningPerDay * (TICK_MS / DAY_LENGTH_MS));
+  const costs = wages + running;
+  const totalIncome = grossIncome - costs;
 
   let priceSum = 0;
   for (const g of GOODS) {
@@ -233,7 +241,7 @@ export function calculateTotals() {
     waterUsed: waterDemand, waterCap: waterGen,
     powerShort, waterShort,
     capacity, guests, fill,
-    rawExt, rawInt, totalIncome, grossIncome, wages, hasBlackout,
+    rawExt, rawInt, totalIncome, grossIncome, wages, running, costs, hasBlackout,
     edgeGuestFactor, repFactor, happyFactor,
     prestigeMul, eventIncome, eventGuest, staffEff: eff,
     avgNoise, avgSmell, nuisancePenalty, condFactor,

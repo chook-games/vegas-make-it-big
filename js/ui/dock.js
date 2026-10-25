@@ -67,7 +67,7 @@ export function renderDock() {
     return;
   }
 
-  const PANEL_TITLES = { world: 'World Info', people: 'People', finance: 'Finance', staff: 'Staff' };
+  const PANEL_TITLES = { world: 'i World Info', people: 'i People', finance: 'i Finance', staff: 'i Staff' };
 
   if (panels[mode]) {
     tabs.innerHTML = '';
