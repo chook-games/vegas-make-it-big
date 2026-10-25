@@ -174,6 +174,34 @@ export function createWorlds() {
   }
   exteriorGroup.add(skyline);
 
+
+  for (let x = -112; x <= 112; x += 16) {
+    for (const sz of [-4.8, 4.8]) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 2.4, 6), new THREE.MeshStandardMaterial({ color: 0x556070 }));
+      post.position.set(x, 1.2, sz);
+      stripGroup.add(post);
+      const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfff1a8 }));
+      lamp.position.set(x, 2.45, sz);
+      stripGroup.add(lamp);
+    }
+  }
+
+  for (let x = -100; x <= 100; x += 34) {
+    const palm = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.14, 2.0, 6), new THREE.MeshStandardMaterial({ color: 0x8d6e4a }));
+    trunk.position.y = 1.0;
+    palm.add(trunk);
+    for (let f = 0; f < 6; f++) {
+      const a = (f / 6) * Math.PI * 2;
+      const frond = new THREE.Mesh(new THREE.ConeGeometry(0.2, 1.3, 5), new THREE.MeshStandardMaterial({ color: 0x2f9e44 }));
+      frond.position.set(Math.cos(a) * 0.45, 2.1, Math.sin(a) * 0.45);
+      frond.rotation.z = Math.cos(a) * 1.05;
+      frond.rotation.x = Math.sin(a) * 1.05;
+      palm.add(frond);
+    }
+    palm.position.set(x, 0.05, 5.9);
+    stripGroup.add(palm);
+  }
   exteriorGroup.add(stripGroup);
 
   floorMesh = new THREE.Mesh(
@@ -193,12 +221,12 @@ export function createWorlds() {
   interiorWalls.left.position.y = 1.25;
   interiorGroup.add(interiorWalls.back, interiorWalls.left);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     const isLimo = i % 2 === 0;
     const car = new THREE.Group();
     const body = new THREE.Mesh(
       new THREE.BoxGeometry(isLimo ? 2.1 : 1.2, 0.45, 0.7),
-      new THREE.MeshStandardMaterial({ color: isLimo ? 0xffffff : 0x00f5d4, roughness: 0.3 })
+      new THREE.MeshStandardMaterial({ color: isLimo ? 0xffffff : [0x00f5d4, 0xff2a85, 0xffd166, 0x9b5de5][i % 4], roughness: 0.3 })
     );
     body.position.y = 0.3;
     const cabin = new THREE.Mesh(new THREE.BoxGeometry(isLimo ? 1.3 : 0.65, 0.35, 0.6), new THREE.MeshStandardMaterial({ color: 0x111122 }));

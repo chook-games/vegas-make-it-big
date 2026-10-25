@@ -1,6 +1,7 @@
 import { state } from '../core/state.js';
 import { exteriorGroup } from './scene.js';
 import { themeById } from '../data/themes.js';
+import { textSprite } from './icons.js';
 
 const SPACING = 30;
 const cityGroup = new THREE.Group();
@@ -88,13 +89,16 @@ function addRivalLot(group, npc, r, slot, size) {
     const gx = ((i % 3) - 1) * (size / 4);
     const gz = ((Math.floor(i / 3) % 3) - 1) * (size / 4);
     const h = 1.2 + (i % 4) * 0.9;
-    const b = box(2.0, h, 1.8, color);
+    const b = box(2.0, h, 1.8, i % 3 === 0 ? color : 0x3a4658);
     b.position.set(gx, h / 2, gz);
     g.add(b);
     const roof = box(2.15, 0.14, 1.95, 0xffd166);
     roof.position.set(gx, h + 0.05, gz);
     g.add(roof);
   }
+  const label = textSprite(npc.name, npc.color || '#9fb3d9', 10);
+  label.position.set(0, 6.2, size / 2 + 1.6);
+  g.add(label);
   cityGroup.add(g);
 }
 
@@ -123,6 +127,9 @@ export function rebuildCity() {
     const g = lotSlab(size, th);
     g.position.x = (i - active) * SPACING;
     addLotBuildings(g, lot, ts);
+    const label = textSprite(lot.name, '#ffd166', 10);
+    label.position.set(0, 6.2, size / 2 + 1.6);
+    g.add(label);
     cityGroup.add(g);
 
     const hit = box(size, 1.4, size, th.accent, { transparent: true, opacity: 0.001 });
@@ -150,6 +157,9 @@ export function rebuildCity() {
     const panel = box(1.6, 0.5, 0.1, 0xffd166);
     panel.position.set(x, 2.4, size / 2 + 1.2);
     cityGroup.add(panel);
+    const lbl = textSprite('FOR SALE', '#22c55e', 8);
+    lbl.position.set(x, 4.6, size / 2 + 2.0);
+    cityGroup.add(lbl);
     const hit = box(size, 1.4, size, 0x22c55e, { transparent: true, opacity: 0.001 });
     hit.position.set(x, 0.7, 0);
     hit.userData = { kind: 'buyPlot' };
