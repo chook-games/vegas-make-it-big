@@ -132,8 +132,8 @@ export function rebuildCity() {
     g.add(label);
     cityGroup.add(g);
 
-    const hit = box(size, 1.4, size, th.accent, { transparent: true, opacity: 0.001 });
-    hit.position.set((i - active) * SPACING, 0.7, 0);
+    const hit = box(size, 8, size, th.accent, { transparent: true, opacity: 0.001 });
+    hit.position.set((i - active) * SPACING, 4, 0);
     hit.userData = { kind: 'lot', index: i };
     cityGroup.add(hit);
     cityInteractives.push(hit);
@@ -160,8 +160,8 @@ export function rebuildCity() {
     const lbl = textSprite('FOR SALE', '#22c55e', 8);
     lbl.position.set(x, 4.6, size / 2 + 2.0);
     cityGroup.add(lbl);
-    const hit = box(size, 1.4, size, 0x22c55e, { transparent: true, opacity: 0.001 });
-    hit.position.set(x, 0.7, 0);
+    const hit = box(size, 8, size, 0x22c55e, { transparent: true, opacity: 0.001 });
+    hit.position.set(x, 4, 0);
     hit.userData = { kind: 'buyPlot' };
     cityGroup.add(hit);
     cityInteractives.push(hit);

@@ -526,3 +526,21 @@
   font-size: 10px; cursor: pointer; flex: 0 0 auto;
 }
 .dock-arrow:active { transform: scale(0.94); }
+/* ===== Player info panel (top-right, original-style) ===== */
+.player-panel {
+  position: fixed; top: calc(var(--safe-top) + 72px); right: 8px; z-index: 29;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(10, 14, 26, 0.94);
+  border: 1px solid rgba(140, 170, 220, 0.4);
+  border-radius: 8px; padding: 6px 10px; min-width: 224px;
+}
+.pp-portrait { font-size: 22px; }
+.pp-info { flex: 1; text-align: left; }
+.pp-name { font-size: 12px; font-weight: 800; color: #dfe3ff; }
+.pp-rank { font-size: 10px; color: #9fb3d9; }
+.pp-stats { display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; color: var(--gold); font-weight: 700; }
+
+@media (max-width: 700px) {
+  .player-panel { top: calc(var(--safe-top) + 172px); left: 8px; right: 8px; min-width: 0; }
+  .side-tabs { top: calc(var(--safe-top) + 232px); }
+}

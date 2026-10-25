@@ -255,7 +255,11 @@ export function worldRadius() {
 
 export function animateCityPeds(dtMs) {
   const dt = dtMs / 1000;
-  for (const p of cityPeds) {
+  const rep = state.reputation || 0;
+  const desired = Math.round(6 + (rep / 100) * 20);
+  for (let i = 0; i < cityPeds.length; i++) {
+    const p = cityPeds[i];
+    p.mesh.visible = i < desired;
     p.mesh.position.x += p.speed * dt * 60;
     if (p.mesh.position.x > 112) p.mesh.position.x = -112;
     if (p.mesh.position.x < -112) p.mesh.position.x = 112;

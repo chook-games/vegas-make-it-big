@@ -9,6 +9,7 @@ import { themeById } from '../data/themes.js';
 import { inCampaign, currentScenario, goalStatus } from '../game/campaign.js';
 import { currentWeather } from '../game/weather.js';
 import { activeQuest, questProgress } from '../game/quests.js';
+import { playerValue } from '../game/npc.js';
 
 export function updateHUD() {
   const totals = calculateTotals();
@@ -28,6 +29,14 @@ export function updateHUD() {
   document.getElementById('ui-gold').textContent = `💎 ${state.gold}`;
   document.getElementById('ui-staff').textContent = `👔 ${totalStaff()}`;
   document.getElementById('ui-level').textContent = `Lv.${levelProgress().level}`;
+
+  const lp = levelProgress();
+  const ppRank = document.getElementById('pp-rank');
+  if (ppRank) {
+    ppRank.textContent = `${lp.rank} · Lv.${lp.level}`;
+    document.getElementById('pp-rep').textContent = `⭐${Math.round(state.reputation)}`;
+    document.getElementById('pp-value').textContent = `$${playerValue().toLocaleString()}`;
+  }
 
   updateFinance(totals);
   updateObjectives();
