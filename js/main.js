@@ -48,6 +48,8 @@ import { updateGuests, animateGuests } from './game/guests.js';
 import { checkProgress } from './game/quests.js';
 import { canPrestige } from './game/prestige.js';
 import { playSound, vibrate, unlockAudio, suspendAudio, resumeAudio } from './audio/audio.js';
+import { modalOpen } from './ui/modals.js';
+import { pendingLotPrice } from './game/lotTutorial.js';
 import { playMenuMusic, playGameMusic, playSting } from './audio/music.js';
 import { startAmbience, stopAmbience } from './audio/ambience.js';
 import { startVenues, stopVenues } from './audio/venue.js';
@@ -222,8 +224,11 @@ function loop() {
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta() * 1000, 100);
   const t = clock.getElapsedTime();
-  const scale = state.timeScale == null ? 1 : state.timeScale;
+  const paused = booted && (modalOpen() || pendingLotPrice() > 0 || !!document.querySelector('.main-menu'));
+  const scale = paused ? 0 : (state.timeScale == null ? 1 : state.timeScale);
   const simDt = dt * scale;
+  const pb = document.getElementById('paused-banner');
+  if (pb) pb.classList.toggle('show', paused);
 
   fpsAcc += dt;
   fpsFrames++;

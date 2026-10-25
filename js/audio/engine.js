@@ -116,11 +116,9 @@ export function unlockAudio() {
   const c = initAudio();
   if (!c) return;
   if (c.state === 'suspended') c.resume();
-  if (!unlocked) {
-    unlocked = true;
-    preloadCore();
-    try { window.dispatchEvent(new CustomEvent('audio:unlocked')); } catch (e) {}
-  }
+  unlocked = true;
+  preloadCore();
+  try { window.dispatchEvent(new CustomEvent('audio:unlocked')); } catch (e) {}
 }
 
 export function isUnlocked() {

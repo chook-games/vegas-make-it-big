@@ -41,9 +41,8 @@ export function openThemeSelect({ defaultId, onPick }) {
   openModal({
     title: 'Select a Theme',
     closable: false,
-    className: 'green-modal',
+    className: 'theme-picker',
     bodyHTML: `
-      <div class="center muted">Pick the theme for your lot. It changes the look of the casino and unlocks a themed landmark.</div>
       <div class="theme-grid thumbs">
         ${THEMES.map(t => `<button class="theme-card ${t.id === sel ? 'active' : ''}" data-theme="${t.id}">
           <img class="tc-thumb" src="${t.thumb || themeThumb(t)}" alt="">
@@ -58,7 +57,7 @@ export function openThemeSelect({ defaultId, onPick }) {
       }));
     },
     actions: [
-      { label: 'Accept', cls: 'btn-green', onClick: () => { closeModal(); onPick && onPick(sel); } }
+      { label: '✓', cls: 'btn-green', onClick: () => { closeModal(); onPick && onPick(sel); } }
     ]
   });
 }

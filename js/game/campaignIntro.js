@@ -1,18 +1,21 @@
-import { state, activeLot, syncActiveGrids } from '../core/state.js';
+import { activeLot } from '../core/state.js';
+import { Bus, EV } from '../core/events.js';
 import { openModal, closeModal } from '../ui/modals.js';
-import { openLotPurchase } from '../ui/lotPurchase.js';
 import { openThemeSelect } from '../ui/themeSelect.js';
 import { switchLot } from './lots.js';
 import { currentScenario } from './campaign.js';
-import { applyRadius, applyThemeToTiles } from '../three/worlds.js';
+import { applyThemeToTiles } from '../three/worlds.js';
 import { currentTheme } from './lots.js';
 import { save } from '../core/save.js';
+import { startLotTutorial } from './lotTutorial.js';
+
+const LOT_PRICE = 16000;
 
 function text(body) {
   return `<div class="modal-text">${body}</div>`;
 }
 
-export function runCampaignIntro(onDone) {
+export function runCampaignIntro() {
   openModal({
     title: 'Welcome to the Strip!',
     className: 'green-modal',
@@ -23,7 +26,7 @@ export function runCampaignIntro(onDone) {
       <p>At any time you can view your objectives by clicking on the <b>Objectives</b> icon in the top left panel.</p>
       <p>The <b>i</b> icon will give you further details on individual tasks.</p>
     `),
-    actions: [{ label: 'OK', cls: 'btn-green', onClick: () => { closeModal(); showObjectives(); } }]
+    actions: [{ label: '✓', cls: 'btn-green', onClick: () => { closeModal(); showObjectives(); } }]
   });
 
   function showObjectives() {
@@ -43,14 +46,17 @@ export function runCampaignIntro(onDone) {
       className: 'green-modal objectives-window',
       closable: false,
       bodyHTML: `<div class="center muted">All construction takes place on a piece of land called a Lot. It will be highlighted when the cursor is over it.</div><div class="spacer"></div>${body}`,
-      actions: [{ label: 'Continue', cls: 'btn-green', onClick: () => { closeModal(); showLotPurchase(); } }],
+      actions: [{ label: '✓', cls: 'btn-green', onClick: () => { closeModal(); showLotPurchase(); } }],
       onOpen: (bodyEl) => {
         const btn = bodyEl.querySelector('[data-info]');
         if (btn) btn.addEventListener('click', () => {
           openModal({
             title: 'Objectives',
             className: 'green-modal',
-            bodyHTML: text('<p>In Vegas: Make It Big! all construction takes place on an area of land referred to as a Lot.</p><p>There is only one available Lot at this time and it will become highlighted when the cursor is over it.</p><p>Left click to select the Lot.</p>'),
+            bodyHTML: text(`
+              <p>In Vegas: Make It Big! all construction takes place on an area of land referred to as a Lot.</p>
+              <p>There is only one available Lot at this time and it will become highlighted when the cursor is over it.</p>
+              <p>Left click to select the Lot.</p>`),
             actions: [{ label: 'Back', cls: 'btn-ghost', onClick: showObjectives }]
           });
         });
@@ -59,17 +65,24 @@ export function runCampaignIntro(onDone) {
   }
 
   function showLotPurchase() {
-    openLotPurchase({
-      onPick: ({ radius, cost }) => {
-        const lot = activeLot();
-        lot.radius = radius;
-        state.cash = Math.max(0, state.cash - cost);
-        syncActiveGrids();
-        applyRadius(radius);
-        switchLot(0, true);
-        save();
-        showTheme();
-      }
+    openModal({
+      title: 'Lot Purchase.',
+      className: 'green-modal',
+      closable: false,
+      bodyHTML: text(`
+        <p>To buy this Lot click the <b>Buy</b> 💵 icon in the panel below.</p>
+        <p>You will be given a choice of themes for your Lot. Choose one of the available themes, then click on the <b>Accept</b> ✓ icon.</p>`),
+      actions: [{
+        label: '✓',
+        cls: 'btn-green',
+        onClick: () => {
+          closeModal();
+          startLotTutorial(LOT_PRICE, showTheme);
+          Bus.emit(EV.UI_REFRESH);
+          const hint = document.getElementById('ui-hint');
+          if (hint) hint.innerHTML = `🏷️ Select the highlighted Lot, then press <b>Buy</b> in the bottom-left panel.`;
+        }
+      }]
     });
   }
 
@@ -89,7 +102,7 @@ export function runCampaignIntro(onDone) {
 
   function showBuilding() {
     openModal({
-      title: 'Building',
+      title: 'Building.',
       className: 'green-modal',
       closable: false,
       bodyHTML: text(`
@@ -98,7 +111,15 @@ export function runCampaignIntro(onDone) {
         <p>Select the <b>Infrastructure → Hotels</b> tab and select a <b>Small Hotel</b>.</p>
         <p>Use the mouse to position the Hotel in the Lot and use the <b>Space</b> bar to rotate it.</p>
       `),
-      actions: [{ label: 'OK', cls: 'btn-green', onClick: () => { closeModal(); if (onDone) onDone(); } }]
+      actions: [{
+        label: '✓',
+        cls: 'btn-green',
+        onClick: () => {
+          closeModal();
+          const hint = document.getElementById('ui-hint');
+          if (hint) hint.innerHTML = '🏨 Build a <b>Hotel</b> from the Construction panel below.';
+        }
+      }]
     });
   }
 }

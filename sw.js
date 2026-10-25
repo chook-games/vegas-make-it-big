@@ -1,4 +1,4 @@
-const CACHE = 'vegas-mib-v53';
+const CACHE = 'vegas-mib-v55';
 const CORE = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const CORE = [
   './css/hud.css',
   './css/panels.css',
   './css/screens.css',
+  './css/original.css',
   './assets/thumbs/theme_american.png',
   './assets/thumbs/theme_ocean.png',
   './assets/thumbs/theme_space.png',
@@ -78,6 +79,7 @@ const CORE = [
   './js/game/paths.js',
   './js/game/campaign.js',
   './js/game/campaignIntro.js',
+  './js/game/lotTutorial.js',
   './js/game/npc.js',
   './js/game/weather.js',
   './js/game/missions.js',

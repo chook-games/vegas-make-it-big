@@ -105,6 +105,8 @@ function applyIntent() {
     if (overlay) fade(overlay, 0, 1200);
     overlay = ovName ? startTrack(ovName, 0.2, 1200) : null;
   }
+  if (base && base.el.paused) base.el.play().catch(() => {});
+  if (overlay && overlay.el.paused) overlay.el.play().catch(() => {});
 }
 
 function stopAll(ms) {

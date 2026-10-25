@@ -1,10 +1,10 @@
 export const SCENARIOS = [
   {
-    id: 's1', title: 'Welcome to The Strip', theme: 'american', startCash: 12000,
-    desc: 'The tutorial scenario: build a motel, lay paths, set up maintenance, then open the casino and its first games.',
+    id: 's1', title: 'Welcome to The Strip', theme: 'american', startCash: 250000, startHour: 9,
+    desc: 'The tutorial scenario: buy your first Lot, choose a theme, then build a Hotel and open your first games.',
     targetDays: 2, reward: { cash: 3000 },
     goals: [
-      { type: 'build', target: 'motel', label: 'Build a Motel' },
+      { type: 'build', target: 'hotel', label: 'Build a Hotel' },
       { type: 'paths', target: 5, label: 'Lay 5 path tiles' },
       { type: 'build', target: 'headoffice', label: 'Build the Head Office' },
       { type: 'upgradeBuilding', target: 'headoffice', label: 'Upgrade the Head Office' },

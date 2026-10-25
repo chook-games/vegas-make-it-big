@@ -173,6 +173,7 @@ export function startScenario(i) {
   state.campaignIndex = i;
   const lot = state.lots[0];
   lot.theme = sc.theme;
+  if (sc.startHour != null) state.clock.hour = sc.startHour;
   if (state.cash < sc.startCash) state.cash = sc.startCash;
   switchLot(0, true);
   state.scenarioStartDay = state.clock.day;
