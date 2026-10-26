@@ -6,7 +6,7 @@ function lim() {
 }
 
 export const camTarget = new THREE.Vector3(0, 0, 1.5);
-let camRadius = 58;
+let camRadius = 95;
 let camElevation = 0.92;
 let camAngle = Math.PI / 4;
 let camTargetAngle = Math.PI / 4;
@@ -60,6 +60,15 @@ export function updateCamera(dtMs) {
       updateCameraPosition();
     }
   }
+}
+
+export function resetCamera() {
+  camRadius = 95;
+  camElevation = 0.92;
+  camAngle = Math.PI / 4;
+  camTargetAngle = Math.PI / 4;
+  camTarget.set(0, 0, 1.5);
+  updateCameraPosition();
 }
 
 export function focusOn(worldX, worldZ) {

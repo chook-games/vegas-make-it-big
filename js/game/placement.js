@@ -13,6 +13,7 @@ import { XP, xpForCost } from '../data/levels.js';
 import { markLotDirty, currentTheme, buyLot, canBuyLot, switchLot } from './lots.js';
 import { getOccupancy, getUpperOccupancy, upperSupport } from './paths.js';
 import { isGambling, defaultBetIndex } from '../data/betting.js';
+import { isLotLocked } from './lotTutorial.js';
 import { randomTheme } from '../data/themes.js';
 import { cityInteractives } from '../three/city.js';
 import { t } from '../i18n/i18n.js';
@@ -346,6 +347,7 @@ function resolveCell(world, layer, tileKey) {
 }
 
 function handleCityTap(ray) {
+  if (isLotLocked()) return false;
   if (!cityInteractives.length) return false;
   const hits = ray.intersectObjects(cityInteractives, false);
   if (!hits.length) return false;

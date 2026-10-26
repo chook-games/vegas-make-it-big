@@ -7,7 +7,8 @@ import { cancelPendingPlacement } from '../game/placement.js';
 import { activeLot, switchLot } from '../game/lots.js';
 import { t } from '../i18n/i18n.js';
 import { renderPeoplePanel, renderFinancePanel, renderStaffPanel, renderWorldPanel } from './peoplePanel.js';
-import { pendingLotPrice, buyPendingLot } from '../game/lotTutorial.js';
+import { pendingLotPrice, pendingLotSelected, buyPendingLot } from '../game/lotTutorial.js';
+import { setBuyHighlight } from '../three/city.js';
 
 export function renderDock() {
   const grid = document.getElementById('build-grid');
@@ -24,6 +25,7 @@ export function renderDock() {
   const wi = document.getElementById('world-info');
   const fs = document.getElementById('finance-strip');
   const modesEl = document.querySelector('.dock-modes');
+  setBuyHighlight(!!buyPrice);
   if (buyPrice) {
     if (wi) wi.style.display = 'none';
     if (fs) fs.style.display = 'none';
@@ -55,11 +57,17 @@ export function renderDock() {
     grid.style.display = 'block';
     grid.style.maxHeight = 'none';
     grid.style.overflow = 'visible';
-    grid.innerHTML = `<div class="lot-buy">
-      <div class="lot-buy-title">${activeLot() ? activeLot().name : 'Lot'}</div>
-      <div class="lot-buy-price">This lot is available to buy for $${buyPrice}</div>
-      <button class="lot-buy-btn" id="lot-buy-btn" title="Buy this Lot">💵</button>
-    </div>`;
+    const picked = pendingLotSelected();
+    grid.innerHTML = picked
+      ? `<div class="lot-buy">
+          <div class="lot-buy-title">${activeLot() ? activeLot().name : 'Lot'}</div>
+          <div class="lot-buy-price">This lot is available to buy for $${buyPrice}</div>
+          <button class="lot-buy-btn" id="lot-buy-btn" title="Buy this Lot">💵</button>
+        </div>`
+      : `<div class="lot-buy">
+          <div class="lot-buy-title">${activeLot() ? activeLot().name : 'Lot'}</div>
+          <div class="lot-buy-price">Select this Lot on the map to buy it.</div>
+        </div>`;
     const buyBtn = grid.querySelector('#lot-buy-btn');
     if (buyBtn) buyBtn.addEventListener('click', () => buyPendingLot());
     document.getElementById('dock-title').textContent = `i ${activeLot() ? activeLot().name : 'Lot'}`;

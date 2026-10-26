@@ -4,7 +4,7 @@ export const container = document.getElementById('canvas-container');
 
 export const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x6f8fc4);
-scene.fog = new THREE.FogExp2(0x6f8fc4, 0.010);
+scene.fog = new THREE.FogExp2(0x6f8fc4, 0.0026);
 
 export const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 900);
 

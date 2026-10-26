@@ -65,10 +65,10 @@ export function applyRadius(radius) {
 }
 
 export function applyThemeToTiles(theme) {
-  extMatA.color.setHex(theme.groundA);
+  extMatA.color.setHex(theme.groundB);
   extMatB.color.setHex(theme.groundB);
-  intMatA.color.setHex(theme.groundA).offsetHSL(0, 0, 0.05);
-  intMatB.color.setHex(theme.groundB).offsetHSL(0, 0, 0.05);
+  intMatA.color.setHex(theme.groundB).offsetHSL(0, 0, 0.03);
+  intMatB.color.setHex(theme.groundB).offsetHSL(0, 0, 0.01);
   if (groundMesh) groundMesh.material.color.setHex(theme.groundB).offsetHSL(0, 0, -0.03);
   if (floorMesh) floorMesh.material.color.setHex(theme.groundA).offsetHSL(0, 0, 0.02);
 }

@@ -10,6 +10,7 @@ import { save } from '../core/save.js';
 import { invalidateHeat, computeLotHeatmap } from './noise.js';
 import { invalidatePaths } from './paths.js';
 import { playSound, vibrate } from '../audio/audio.js';
+import { isLotLocked } from './lotTutorial.js';
 import { focusOn } from '../three/controls.js';
 
 export function activeLot() {
@@ -84,6 +85,7 @@ function buildMeshes(lot) {
 }
 
 export function switchLot(index, force = false) {
+  if (isLotLocked() && index !== state.activeLot) return false;
   if (index < 0 || index >= state.lots.length) return;
   if (index === state.activeLot && !force) return;
   const cur = state.lots[state.activeLot];
@@ -110,6 +112,7 @@ export function switchLot(index, force = false) {
 }
 
 export function buyLot(themeId) {
+  if (isLotLocked()) return false;
   if (!canBuyLot()) {
     Bus.emit(EV.TOAST, { text: 'You reached the maximum number of lots.', kind: 'info' });
     playSound('error');

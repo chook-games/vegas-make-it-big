@@ -9,6 +9,29 @@ exteriorGroup.add(cityGroup);
 
 export const cityInteractives = [];
 
+const buyRing = new THREE.Group();
+{
+  const gold = new THREE.MeshBasicMaterial({ color: 0xffd166, transparent: true, opacity: 0.95, depthWrite: false });
+  const sides = [];
+  for (let s = 0; s < 4; s++) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 0.18, 0.035), gold);
+    const a = s * Math.PI / 2;
+    m.position.set(Math.sin(a) * 0.5, 0, Math.cos(a) * 0.5);
+    m.rotation.y = a;
+    sides.push(m);
+  }
+  buyRing.add(...sides);
+  buyRing.position.y = 0.16;
+  buyRing.visible = false;
+  exteriorGroup.add(buyRing);
+}
+
+export function setBuyHighlight(on) {
+  const size = state.gridSize * state.tileSize * 0.95;
+  buyRing.scale.set(size, 1, size);
+  buyRing.visible = !!on;
+}
+
 const hoverRing = new THREE.Mesh(
   new THREE.RingGeometry(0.92, 1.0, 40),
   new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide, transparent: true, opacity: 0.9, depthWrite: false })
@@ -92,7 +115,11 @@ function addLotBuildings(group, lot, ts) {
 function addRivalLot(npc, slot, size) {
   const color = parseColor(npc.color, 0x99aabb);
   const g = new THREE.Group();
-  g.position.set(slot[0] * SPACING, 0, slot[1] * SPACING);
+  const jx = jitter(slot[0] * 7 + slot[1] * 13, 1) * 5;
+  const jz = jitter(slot[0] * 7 + slot[1] * 13, 2) * 5;
+  const jr = jitter(slot[0] * 7 + slot[1] * 13, 3) * 0.14;
+  g.position.set(slot[0] * SPACING + jx, 0, slot[1] * SPACING + jz);
+  g.rotation.y = jr;
   const slab = box(size, 0.12, size, 0x263238);
   slab.position.y = -0.02;
   g.add(slab);
@@ -112,6 +139,11 @@ function addRivalLot(npc, slot, size) {
   label.position.set(0, 6.2, size / 2 + 1.6);
   g.add(label);
   cityGroup.add(g);
+}
+
+function jitter(i, salt) {
+  const v = Math.sin((i + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+  return (v - Math.floor(v)) - 0.5;
 }
 
 function parseColor(hex, fallback) {
@@ -151,11 +183,13 @@ export function rebuildCity() {
     if (i === active) return;
     const cell = OWNED_CELLS[ownedIdx % OWNED_CELLS.length];
     ownedIdx++;
-    const x = cell[0] * SPACING;
-    const z = cell[1] * SPACING;
+    const x = cell[0] * SPACING + jitter(i + 11, 1) * 5;
+    const z = cell[1] * SPACING + jitter(i + 11, 2) * 5;
+    const rot = jitter(i + 11, 3) * 0.14;
     const th = themeColors(themeById(lot.theme));
     const g = lotSlab(size, th);
     g.position.set(x, 0, z);
+    g.rotation.y = rot;
     addLotBuildings(g, lot, ts);
     const label = textSprite(lot.name, '#ffd166', 10);
     label.position.set(0, 6.2, size / 2 + 1.6);
@@ -164,6 +198,7 @@ export function rebuildCity() {
 
     const hit = box(size, 8, size, th.accent, { transparent: true, opacity: 0.001 });
     hit.position.set(x, 4, z);
+    hit.rotation.y = rot;
     hit.userData = { kind: 'lot', index: i, x, z, size };
     cityGroup.add(hit);
     cityInteractives.push(hit);
@@ -175,10 +210,12 @@ export function rebuildCity() {
 
   for (let k = 0; k < 2; k++) {
     const cell = SALE_CELLS[k % SALE_CELLS.length];
-    const x = cell[0] * SPACING;
-    const z = cell[1] * SPACING;
+    const x = cell[0] * SPACING + jitter(k + 41, 1) * 5;
+    const z = cell[1] * SPACING + jitter(k + 41, 2) * 5;
+    const rot = jitter(k + 41, 3) * 0.14;
     const g = lotSlab(size, null);
     g.position.set(x, 0, z);
+    g.rotation.y = rot;
     const sign = box(6, 2.2, 0.35, 0x22c55e);
     sign.position.set(0, 1.2, size / 2 + 1.2);
     g.add(sign);
@@ -192,6 +229,7 @@ export function rebuildCity() {
 
     const hit = box(size, 8, size, 0x22c55e, { transparent: true, opacity: 0.001 });
     hit.position.set(x, 4, z);
+    hit.rotation.y = rot;
     hit.userData = { kind: 'buyPlot', x, z, size };
     cityGroup.add(hit);
     cityInteractives.push(hit);

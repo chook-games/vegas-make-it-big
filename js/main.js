@@ -8,7 +8,7 @@ import { rebuildCity, updateCityHover } from './three/city.js';
 import { animatedObjects, vehicles, exteriorGroup, interiorGroup, applySettings, onResize } from './three/scene.js';
 import { renderFrame, initPostFX, resizePostFX, setBloom } from './three/postfx.js';
 import { updateParticles, spawnConfetti, spawnMoneyBurst, setWeatherParticles, updateWeatherParticles, triggerLightning, tickLightning } from './three/particles.js';
-import { initControls, updateCamera, rotateCameraStep, wanderStep, screenRay } from './three/controls.js';
+import { initControls, updateCamera, rotateCameraStep, wanderStep, screenRay, resetCamera } from './three/controls.js';
 import { initToast, spawnFloatingText } from './ui/toast.js';
 import { initHUD, updateHUD } from './ui/hud.js';
 import { initDock, renderDock } from './ui/dock.js';
@@ -430,6 +430,7 @@ async function boot() {
 
   const launch = () => {
     booted = true;
+    resetCamera();
     playGameMusic(currentTheme());
     inGame = true;
     musicTheme = currentTheme();

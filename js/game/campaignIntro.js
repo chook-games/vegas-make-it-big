@@ -7,7 +7,7 @@ import { currentScenario } from './campaign.js';
 import { applyThemeToTiles } from '../three/worlds.js';
 import { currentTheme } from './lots.js';
 import { save } from '../core/save.js';
-import { startLotTutorial } from './lotTutorial.js';
+import { startLotTutorial, selectPendingLot, unlockLots } from './lotTutorial.js';
 
 const LOT_PRICE = 16000;
 
@@ -81,9 +81,19 @@ export function runCampaignIntro() {
         onClick: () => {
           closeModal();
           startLotTutorial(LOT_PRICE, showTheme);
+          const canvas = document.getElementById('canvas-container');
+          if (canvas) {
+            const pick = () => {
+              if (!selectPendingLot()) return;
+              canvas.removeEventListener('pointerdown', pick);
+              const h = document.getElementById('ui-hint');
+              if (h) h.innerHTML = 'Now press <b>Buy</b> in the bottom-left panel to purchase the Lot.';
+            };
+            canvas.addEventListener('pointerdown', pick);
+          }
           Bus.emit(EV.UI_REFRESH);
           const hint = document.getElementById('ui-hint');
-          if (hint) hint.innerHTML = `🏷️ Select the highlighted Lot, then press <b>Buy</b> in the bottom-left panel.`;
+          if (hint) hint.innerHTML = 'Click the highlighted <b>Lot</b> on the map to select it.';
         }
       }]
     });
@@ -138,6 +148,7 @@ export function runCampaignIntro() {
       if (!data || !data.item || data.item.id !== 'hotel' || data.world !== 'exterior') return;
       if (pathHintShown) return;
       pathHintShown = true;
+      unlockLots();
       Bus.off(EV.BUILDING_PLACED, onPlaced);
       setTimeout(showPaths, 450);
     };
